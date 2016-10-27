@@ -1,6 +1,8 @@
 package me.contrapost.jee_quiz.ejb;
 
 import me.contrapost.jee_quiz.entity.RootCategory;
+import me.contrapost.jee_quiz.entity.SpecifyingCategory;
+import me.contrapost.jee_quiz.entity.SubCategory;
 import me.contrapost.jee_quiz.util.DeleterEJB;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -42,9 +44,10 @@ public abstract class EjbTestBase {
     public void emptyDatabase(){
 //        quizEJB.getAllQuizes().forEach(q ->
 //                deleterEJB.deleteEntityById(Quiz.class, q.getId()));
-//        deleterEJB.deleteEntities(SpecifyingCategory.class);
-//
-//        deleterEJB.deleteEntities(SubCategory.class);
+        deleterEJB.deleteQuizes();
+        deleterEJB.deleteEntities(SpecifyingCategory.class);
+
+        deleterEJB.deleteEntities(SubCategory.class);
         deleterEJB.deleteEntities(RootCategory.class);
     }
 

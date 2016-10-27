@@ -1,11 +1,15 @@
 package me.contrapost.jee_quiz.util;
 
 
+import me.contrapost.jee_quiz.entity.Quiz;
+import me.contrapost.jee_quiz.entity.SpecifyingCategory;
+
 import javax.ejb.Stateless;
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import java.util.List;
 
 /*
     Utility EJB to use ONLY in an Arquillian deployment to clean up the database.
@@ -44,4 +48,13 @@ public class DeleterEJB {
         query.executeUpdate();
     }
 
+    public void deleteQuizes() {
+        List<Quiz> quizes = em.createNamedQuery(Quiz.GET_ALL_QUIZES).getResultList();
+        for(Quiz quiz : quizes) {
+            SpecifyingCategory specifyingCategory = em.find(SpecifyingCategory.class,
+                    quiz.getSpecifyingCategory().getId());
+            specifyingCategory.getQuizes().remove(quiz);
+//            em.persist(specifyingCategory);
+        }
+    }
 }
