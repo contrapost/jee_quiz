@@ -9,9 +9,13 @@ import java.util.Map;
  * Created by Alexander Shipunov on 24.10.16.
  * Quiz entity
  */
+@NamedQueries(
+        @NamedQuery(name = Quiz.GET_ALL_QUIZES, query = "select q from Quiz q")
+)
 @Entity
 public class Quiz {
 
+    public static final String GET_ALL_QUIZES = "GET_ALL_QUIZES";
     @Id
     @GeneratedValue
     private Long id;
@@ -19,6 +23,9 @@ public class Quiz {
     @NotNull
     @Size(max = 100)
     private String question;
+
+    @ManyToOne
+    private SpecifyingCategory specifyingCategory;
 
     @ElementCollection(fetch = FetchType.EAGER)
     private Map<String, Boolean> answerMap;
@@ -48,5 +55,13 @@ public class Quiz {
 
     public void setAnswerMap(Map<String, Boolean> answerMap) {
         this.answerMap = answerMap;
+    }
+
+    public SpecifyingCategory getSpecifyingCategory() {
+        return specifyingCategory;
+    }
+
+    public void setSpecifyingCategory(SpecifyingCategory specifyingCategory) {
+        this.specifyingCategory = specifyingCategory;
     }
 }
