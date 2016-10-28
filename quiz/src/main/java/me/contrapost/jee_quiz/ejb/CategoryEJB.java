@@ -35,9 +35,10 @@ public class CategoryEJB {
         SubCategory subCategory = new SubCategory();
         subCategory.setTitle(title);
         subCategory.setRootCategory(rootCategory);
-        rootCategory.getSubCategories().add(subCategory);
 
         em.persist(subCategory);
+
+        rootCategory.getSubCategories().put(subCategory.getId(), subCategory);
 
         return subCategory.getId();
     }
@@ -49,9 +50,10 @@ public class CategoryEJB {
         SpecifyingCategory specCategory = new SpecifyingCategory();
         specCategory.setTitle(title);
         specCategory.setSubCategory(subCategory);
-        subCategory.getSpecifyingCategories().add(specCategory);
 
         em.persist(specCategory);
+
+        subCategory.getSpecifyingCategories().put(specCategory.getId(), specCategory);
 
         return specCategory.getId();
     }
@@ -109,7 +111,7 @@ public class CategoryEJB {
         SubCategory subCategory = em.find(SubCategory.class, id);
         if (subCategory == null) return false; // Or cast exception
         RootCategory rootCategory = em.find(RootCategory.class, subCategory.getRootCategory().getId());
-        rootCategory.getSubCategories().remove(subCategory);
+        rootCategory.getSubCategories().remove(id);
         return true;
     }
 
@@ -117,7 +119,8 @@ public class CategoryEJB {
         SpecifyingCategory specifyingCategory = em.find(SpecifyingCategory.class, id);
         if (specifyingCategory == null) return false; // Or cast exception
         SubCategory subCategory = em.find(SubCategory.class, specifyingCategory.getSubCategory().getId());
-        subCategory.getSpecifyingCategories().remove(specifyingCategory);
+        subCategory.getSpecifyingCategories().remove(id);
+//        em.remove(specifyingCategory);
         return true;
     }
 }

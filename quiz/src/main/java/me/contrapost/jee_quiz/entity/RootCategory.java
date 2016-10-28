@@ -4,7 +4,9 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Alexander Shipunov on 24.10.16.
@@ -23,7 +25,7 @@ public class RootCategory {
     private String title;
 
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "rootCategory")
-    private List<SubCategory> subCategories;
+    private Map<Long, SubCategory> subCategories;
 
     public RootCategory() {
     }
@@ -44,12 +46,12 @@ public class RootCategory {
         this.title = title;
     }
 
-    public List<SubCategory> getSubCategories() {
-        if(subCategories == null) subCategories = new ArrayList<>();
+    public Map<Long, SubCategory> getSubCategories() {
+        if(subCategories == null) subCategories = new HashMap<>();
         return subCategories;
     }
 
-    public void setSubCategories(List<SubCategory> subCategories) {
+    public void setSubCategories(Map<Long, SubCategory> subCategories) {
         this.subCategories = subCategories;
     }
 }

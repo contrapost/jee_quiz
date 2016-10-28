@@ -25,6 +25,7 @@ public abstract class EjbTestBase {
         return ShrinkWrap.create(JavaArchive.class)
                 .addPackages(true, "me.contrapost.jee_quiz")
                 .addClass(DeleterEJB.class)
+                .addPackages(true, "com.google.guava")
                 .addPackages(true, "org.apache.commons.codec")
                 .addAsResource("META-INF/persistence.xml");
     }
@@ -87,7 +88,7 @@ public abstract class EjbTestBase {
         Map<String, Boolean> answers = new HashMap<>();
         answers.put("Right", true);
         for (int i = 0; i < 3; i++) {
-            answers.put("Wrong", false);
+            answers.put("Wrong #" + i, false);
         }
 
         return answers;

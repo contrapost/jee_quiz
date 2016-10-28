@@ -36,7 +36,7 @@ public class QuizEJB {
         return quiz.getId();
     }
 
-    public boolean deleteQuiz(long id) {
+    public boolean deleteQuiz(@NotNull long id) {
         Quiz quiz = em.find(Quiz.class, id);
         if (quiz == null) return false;
         SpecifyingCategory specifyingCategory = em.find(SpecifyingCategory.class,
@@ -45,14 +45,22 @@ public class QuizEJB {
         return true;
     }
 
-    public boolean updateQuizQuestion(long quizId, String newQuestionText) {
+    public boolean updateQuizQuestion(@NotNull long quizId, @NotNull String newQuestionText) {
         Quiz quiz = em.find(Quiz.class, quizId);
         if (quiz == null) return false;
         quiz.setQuestion(newQuestionText);
         return true;
     }
 
-//    public boolean updateAnswersMap()
+    public boolean updateAnswersMap(@NotNull long quizId, @NotNull String previousAnswer, @NotNull String newAnswer) {
+        Quiz quiz = em.find(Quiz.class, quizId);
+        if (quiz == null || quiz.getAnswerMap().get(previousAnswer) == null) 
+            throw new IllegalArgumentException("Quiz doesn't exist or the previous answer doesn't match one in the map");
+        boolean isCorrect = quiz.getAnswerMap().get(previousAnswer);
+        quiz.getAnswerMap().remove(previousAnswer);
+        quiz.getAnswerMap().put(newAnswer, isCorrect);
+        return true;
+    }
 
     public Quiz getQuiz(long id) {
         return em.find(Quiz.class, id);

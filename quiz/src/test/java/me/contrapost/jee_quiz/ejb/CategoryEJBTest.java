@@ -49,9 +49,13 @@ public class CategoryEJBTest extends EjbTestBase {
     public void testDeleteSubCategory() {
         long rootCatId = createRootCategory("Root");
         long subCatId = createSubCategory("Sub", rootCatId);
+        long specCatId = createSpecifyingCategory("Spec", subCatId);
+        long quizId = createQuiz("Quiz", specCatId);
 
         assertTrue(categoryEJB.deleteSubCategory(subCatId));
         assertNull(categoryEJB.getSubCategory(subCatId));
+        assertNull(categoryEJB.getSpecifyingCategory(specCatId));
+        assertNull(quizEJB.getQuiz(quizId));
     }
 
     @Test
