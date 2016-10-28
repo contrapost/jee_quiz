@@ -33,4 +33,14 @@ public class QuizEJBTest extends EjbTestBase {
         assertNull(quizEJB.getQuiz(quizId));
         assertTrue(quizEJB.getAllQuizes().size() == 0);
     }
+
+    @Test
+    public void testUpdateQuizQuestion() {
+        long quizId = createQuiz("Original question");
+
+        String updatedQuestion = "Updated question text";
+
+        assertTrue(quizEJB.updateQuizQuestion(quizId, updatedQuestion));
+        assertEquals(quizEJB.getQuiz(quizId).getQuestion(), updatedQuestion);
+    }
 }

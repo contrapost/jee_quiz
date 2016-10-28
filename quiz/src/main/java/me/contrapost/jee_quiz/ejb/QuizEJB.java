@@ -33,14 +33,7 @@ public class QuizEJB {
 
         category.getQuizes().put(quiz.getId(), quiz);
 
-        em.persist(category);
-
         return quiz.getId();
-    }
-
-
-    public List<Quiz> getAllQuizes() {
-        return em.createNamedQuery(Quiz.GET_ALL_QUIZES).getResultList();
     }
 
     public boolean deleteQuiz(long id) {
@@ -49,11 +42,23 @@ public class QuizEJB {
         SpecifyingCategory specifyingCategory = em.find(SpecifyingCategory.class,
                 quiz.getSpecifyingCategory().getId());
         specifyingCategory.getQuizes().remove(id);
-        em.persist(specifyingCategory);
         return true;
     }
 
+    public boolean updateQuizQuestion(long quizId, String newQuestionText) {
+        Quiz quiz = em.find(Quiz.class, quizId);
+        if (quiz == null) return false;
+        quiz.setQuestion(newQuestionText);
+        return true;
+    }
+
+//    public boolean updateAnswersMap()
+
     public Quiz getQuiz(long id) {
         return em.find(Quiz.class, id);
+    }
+
+    public List<Quiz> getAllQuizes() {
+        return em.createNamedQuery(Quiz.GET_ALL_QUIZES).getResultList();
     }
 }

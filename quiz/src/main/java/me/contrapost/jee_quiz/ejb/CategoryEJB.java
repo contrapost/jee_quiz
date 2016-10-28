@@ -37,7 +37,7 @@ public class CategoryEJB {
         subCategory.setRootCategory(rootCategory);
         rootCategory.getSubCategories().add(subCategory);
 
-        em.persist(rootCategory);
+        em.persist(subCategory);
 
         return subCategory.getId();
     }
@@ -51,7 +51,7 @@ public class CategoryEJB {
         specCategory.setSubCategory(subCategory);
         subCategory.getSpecifyingCategories().add(specCategory);
 
-        em.persist(subCategory);
+        em.persist(specCategory);
 
         return specCategory.getId();
     }
@@ -110,7 +110,6 @@ public class CategoryEJB {
         if (subCategory == null) return false; // Or cast exception
         RootCategory rootCategory = em.find(RootCategory.class, subCategory.getRootCategory().getId());
         rootCategory.getSubCategories().remove(subCategory);
-//        em.persist(rootCategory);
         return true;
     }
 
@@ -119,7 +118,6 @@ public class CategoryEJB {
         if (specifyingCategory == null) return false; // Or cast exception
         SubCategory subCategory = em.find(SubCategory.class, specifyingCategory.getSubCategory().getId());
         subCategory.getSpecifyingCategories().remove(specifyingCategory);
-//        em.persist(rootCategory);
         return true;
     }
 }
