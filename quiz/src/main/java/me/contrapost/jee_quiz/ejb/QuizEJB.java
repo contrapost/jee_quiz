@@ -20,16 +20,18 @@ public class QuizEJB {
     @PersistenceContext
     protected EntityManager em;
 
-    public long createQuiz(@NotNull String question, @NotNull Map<String, Boolean> answers, @NotNull long categoryId) {
-        SpecifyingCategory category = em.find(SpecifyingCategory.class, categoryId);
-        if (category == null) throw new IllegalArgumentException("No such specifying category: " + categoryId);
+    public long createQuiz(@NotNull String question, @NotNull Map<String, Boolean> answers, @NotNull long specifyingCategoryId) {
+        SpecifyingCategory category = em.find(SpecifyingCategory.class, specifyingCategoryId);
+        if (category == null) throw new IllegalArgumentException("No such specifying category: " + specifyingCategoryId);
 
         Quiz quiz = new Quiz();
         quiz.setQuestion(question);
         quiz.setAnswerMap(answers);
         quiz.setSpecifyingCategory(category);
 
-        category.getQuizes().add(quiz);
+        em.persist(quiz);
+
+        category.getQuizes().put(quiz.getId(), quiz);
 
         em.persist(category);
 
@@ -46,7 +48,7 @@ public class QuizEJB {
         if (quiz == null) return false;
         SpecifyingCategory specifyingCategory = em.find(SpecifyingCategory.class,
                 quiz.getSpecifyingCategory().getId());
-        specifyingCategory.getQuizes().remove(quiz);
+        specifyingCategory.getQuizes().remove(id);
         em.persist(specifyingCategory);
         return true;
     }

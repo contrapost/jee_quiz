@@ -53,8 +53,7 @@ public class DeleterEJB {
         for(Quiz quiz : quizes) {
             SpecifyingCategory specifyingCategory = em.find(SpecifyingCategory.class,
                     quiz.getSpecifyingCategory().getId());
-            specifyingCategory.getQuizes().remove(quiz);
-//            em.persist(specifyingCategory);
+            specifyingCategory.getQuizes().remove(quiz.getId());
         }
     }
 }

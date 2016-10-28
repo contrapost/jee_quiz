@@ -22,7 +22,7 @@ public class RootCategory {
     @Size(max = 100)
     private String title;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "rootCategory")
     private List<SubCategory> subCategories;
 
     public RootCategory() {

@@ -42,8 +42,6 @@ public abstract class EjbTestBase {
     @Before
     @After
     public void emptyDatabase(){
-//        quizEJB.getAllQuizes().forEach(q ->
-//                deleterEJB.deleteEntityById(Quiz.class, q.getId()));
         deleterEJB.deleteQuizes();
         deleterEJB.deleteEntities(SpecifyingCategory.class);
 
