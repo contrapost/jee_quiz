@@ -20,38 +20,53 @@ public class QuizEJB {
     @PersistenceContext
     protected EntityManager em;
 
-    public long createQuiz(@NotNull String question, @NotNull Map<String, Boolean> answers, @NotNull long categoryId) {
-        SpecifyingCategory category = em.find(SpecifyingCategory.class, categoryId);
-        if (category == null) throw new IllegalArgumentException("No such specifying category: " + categoryId);
+    public long createQuiz(@NotNull String question, @NotNull Map<String, Boolean> answers, @NotNull long specifyingCategoryId) {
+        SpecifyingCategory category = em.find(SpecifyingCategory.class, specifyingCategoryId);
+        if (category == null) throw new IllegalArgumentException("No such specifying category: " + specifyingCategoryId);
 
         Quiz quiz = new Quiz();
         quiz.setQuestion(question);
         quiz.setAnswerMap(answers);
         quiz.setSpecifyingCategory(category);
 
-        category.getQuizes().add(quiz);
+        em.persist(quiz);
 
-        em.persist(category);
+        category.getQuizes().put(quiz.getId(), quiz);
 
         return quiz.getId();
     }
 
-
-    public List<Quiz> getAllQuizes() {
-        return em.createNamedQuery(Quiz.GET_ALL_QUIZES).getResultList();
-    }
-
-    public boolean deleteQuiz(long id) {
+    public boolean deleteQuiz(@NotNull long id) {
         Quiz quiz = em.find(Quiz.class, id);
         if (quiz == null) return false;
         SpecifyingCategory specifyingCategory = em.find(SpecifyingCategory.class,
                 quiz.getSpecifyingCategory().getId());
-        specifyingCategory.getQuizes().remove(quiz);
-        em.persist(specifyingCategory);
+        specifyingCategory.getQuizes().remove(id);
+        return true;
+    }
+
+    public boolean updateQuizQuestion(@NotNull long quizId, @NotNull String newQuestionText) {
+        Quiz quiz = em.find(Quiz.class, quizId);
+        if (quiz == null) return false;
+        quiz.setQuestion(newQuestionText);
+        return true;
+    }
+
+    public boolean updateAnswersMap(@NotNull long quizId, @NotNull String previousAnswer, @NotNull String newAnswer) {
+        Quiz quiz = em.find(Quiz.class, quizId);
+        if (quiz == null || quiz.getAnswerMap().get(previousAnswer) == null) 
+            throw new IllegalArgumentException("Quiz doesn't exist or the previous answer doesn't match one in the map");
+        boolean isCorrect = quiz.getAnswerMap().get(previousAnswer);
+        quiz.getAnswerMap().remove(previousAnswer);
+        quiz.getAnswerMap().put(newAnswer, isCorrect);
         return true;
     }
 
     public Quiz getQuiz(long id) {
         return em.find(Quiz.class, id);
+    }
+
+    public List<Quiz> getAllQuizes() {
+        return em.createNamedQuery(Quiz.GET_ALL_QUIZES).getResultList();
     }
 }

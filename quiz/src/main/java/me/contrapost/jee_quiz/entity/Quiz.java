@@ -1,5 +1,8 @@
 package me.contrapost.jee_quiz.entity;
 
+import me.contrapost.jee_quiz.validation.AnswerMap;
+import org.hibernate.validator.constraints.NotBlank;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -20,13 +23,15 @@ public class Quiz {
     @GeneratedValue
     private Long id;
 
-    @NotNull
+    @NotBlank
+    @Column(unique = true)
     @Size(max = 100)
     private String question;
 
     @ManyToOne
     private SpecifyingCategory specifyingCategory;
 
+    @AnswerMap
     @ElementCollection(fetch = FetchType.EAGER)
     private Map<String, Boolean> answerMap;
 

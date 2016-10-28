@@ -1,46 +1,50 @@
 package me.contrapost.jee_quiz.entity;
 
-import javax.mail.MethodNotSupportedException;
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by Alexander Shipunov on 24.10.16.
  * This entity specifies a sub category.
  */
 @Entity
-public class SpecifyingCategory extends SubCategory {
+public class SpecifyingCategory extends Category {
 
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Quiz> quizes;
+    private Map<Long, Quiz> quizes;
+
+    @ManyToOne
+    private SubCategory subCategory;
 
     public SpecifyingCategory() {
     }
 
-    public List<Quiz> getQuizes() {
-        if(quizes == null) quizes = new ArrayList<>();
+    public Map<Long, Quiz> getQuizes() {
+        if(quizes == null) quizes = new HashMap<>();
         return quizes;
     }
 
-    public void setQuizes(List<Quiz> quizes) {
+    public void setQuizes(Map<Long, Quiz> quizes) {
         this.quizes = quizes;
     }
 
-    @Override
-    public List<SubCategory> getSubCategories() {
-        return null;
+    public SubCategory getSubCategory() {
+        return subCategory;
+    }
+
+    public void setSubCategory(SubCategory subCategory) {
+        this.subCategory = subCategory;
     }
 
     @Override
-    public void setSubCategories(List<SubCategory> subCategories) {
-        try {
-            throw new MethodNotSupportedException("It's not possible to add subcaregory to the Specifying category");
-        } catch (MethodNotSupportedException e) {
-            e.printStackTrace();
-        }
+    public List<Quiz> getListOfAllQuizes() {
+        return new ArrayList<>(getQuizes().values());
     }
 }
