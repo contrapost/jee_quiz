@@ -92,4 +92,27 @@ public class QuizEJBTest extends EjbTestBase {
 //            assertTrue("Cause: " + cause, cause instanceof ConstraintViolationException);
         }
     }
+
+    @Test
+    public void testCreateTwoQuizesWithSameQuestion() {
+        String quizName = "Super duper quiz";
+        createQuiz(quizName);
+
+        try {
+            createQuiz(quizName);
+        } catch (EJBException e) {
+//            Throwable cause = com.google.common.base.Throwables.getRootCause(e);
+//            assertTrue("Cause: " + cause, cause instanceof ConstraintViolationException);
+        }
+    }
+
+    @Test
+    public void testUpdateAnswerMapForNonexistentQuiz() {
+        try {
+            quizEJB.updateAnswersMap(0L, "New answer", "Previous answer");
+        } catch (EJBException e) {
+//            Throwable cause = com.google.common.base.Throwables.getRootCause(e);
+//            assertTrue("Cause: " + cause, cause instanceof ConstraintViolationException);
+        }
+    }
 }

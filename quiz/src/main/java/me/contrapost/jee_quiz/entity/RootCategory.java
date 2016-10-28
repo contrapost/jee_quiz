@@ -7,43 +7,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by Alexander Shipunov on 24.10.16.
  * Root category of the quiz
  */
 @Entity
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-public class RootCategory {
-
-    @Id
-    @GeneratedValue
-    private Long id;
-
-    @NotNull
-    @Size(max = 100)
-    private String title;
+public class RootCategory extends Category{
 
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "rootCategory")
     private Map<Long, SubCategory> subCategories;
 
     public RootCategory() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
     }
 
     public Map<Long, SubCategory> getSubCategories() {
@@ -53,5 +30,19 @@ public class RootCategory {
 
     public void setSubCategories(Map<Long, SubCategory> subCategories) {
         this.subCategories = subCategories;
+    }
+
+    @Override
+    public List<Quiz> getListOfAllQuizes() {
+        List<SpecifyingCategory> specifyingCategories = new ArrayList<>();
+        for(SubCategory sc : getSubCategories().values()) {
+            specifyingCategories = Stream.concat(sc.getSpecifyingCategories().values().stream(),
+                    specifyingCategories.stream()).collect(Collectors.toList());
+        }
+        List<Quiz> quizes = new ArrayList<>();
+        for (SpecifyingCategory sc : specifyingCategories) {
+            quizes = Stream.concat(quizes.stream(), sc.getQuizes().values().stream()).collect(Collectors.toList());
+        }
+        return quizes;
     }
 }
