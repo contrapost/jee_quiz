@@ -17,8 +17,6 @@ import java.util.Map;
 
 public abstract class EjbTestBase {
 
-    private Map<String, Boolean> answers;
-
     @Deployment
     public static JavaArchive createDeployment() {
 
