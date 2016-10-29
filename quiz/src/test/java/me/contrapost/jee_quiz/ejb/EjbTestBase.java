@@ -23,7 +23,7 @@ public abstract class EjbTestBase {
         return ShrinkWrap.create(JavaArchive.class)
                 .addPackages(true, "me.contrapost.jee_quiz")
                 .addClass(DeleterEJB.class)
-                .addPackages(true, "com.google.guava")
+                .addPackages(true, "com.google")
                 .addPackages(true, "org.apache.commons.codec")
                 .addAsResource("META-INF/persistence.xml");
     }
