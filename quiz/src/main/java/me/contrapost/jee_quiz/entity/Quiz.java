@@ -18,6 +18,7 @@ import java.util.Map;
 public class Quiz {
 
     public static final String GET_ALL_QUIZES = "GET_ALL_QUIZES";
+
     @Id
     @GeneratedValue
     private Long id;

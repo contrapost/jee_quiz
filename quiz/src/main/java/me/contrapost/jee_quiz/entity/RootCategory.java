@@ -1,5 +1,8 @@
 package me.contrapost.jee_quiz.entity;
 
+import org.hibernate.annotations.NamedQueries;
+import org.hibernate.annotations.NamedQuery;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -15,8 +18,13 @@ import java.util.stream.Stream;
  * Created by Alexander Shipunov on 24.10.16.
  * Root category of the quiz
  */
+@NamedQueries(
+        @NamedQuery(name = RootCategory.GET_ALL, query = "select r from RootCategory r")
+)
 @Entity
 public class RootCategory extends Category{
+
+    public static final String GET_ALL = "GET_ALL";
 
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "rootCategory")
     private Map<Long, SubCategory> subCategories;

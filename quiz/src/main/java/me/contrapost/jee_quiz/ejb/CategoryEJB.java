@@ -104,4 +104,8 @@ public class CategoryEJB {
 
         return category.getListOfAllQuizes();
     }
+
+    public List<RootCategory> getAllRootCategories() {
+        return em.createNamedQuery(RootCategory.GET_ALL).getResultList();
+    }
 }
