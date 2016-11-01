@@ -10,7 +10,8 @@ import java.util.Map;
  * Created by alexandershipunov on 30/10/2016.
  * Specifying category DTO
  */
-public class SpecifyingCategoryDTO {
+public class
+SpecifyingCategoryDTO {
 
     @ApiModelProperty("The id of the subcategory")
     public String id;

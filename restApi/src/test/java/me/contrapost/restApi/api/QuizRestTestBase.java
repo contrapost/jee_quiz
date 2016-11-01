@@ -17,6 +17,7 @@ import static org.hamcrest.core.Is.is;
 
 /**
  * Created by alexandershipunov on 30/10/2016.
+ * Base for integration tests
  */
 public class QuizRestTestBase {
     @BeforeClass
@@ -26,7 +27,7 @@ public class QuizRestTestBase {
         // RestAssured configs shared by all the tests
         RestAssured.baseURI = "http://localhost";
         RestAssured.port = 8080;
-        RestAssured.basePath = "/quiz/api/root";
+        RestAssured.basePath = "/quiz/api/quiz";
         RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
     }
 
@@ -41,7 +42,7 @@ public class QuizRestTestBase {
            Here, we read each resource (GET), and then delete them
            one by one (DELETE)
          */
-        List<RootCategoryDTO> list = Arrays.asList(given().accept(ContentType.JSON).get()
+        List<RootCategoryDTO> list = Arrays.asList(given().accept(ContentType.JSON).get("/categories")
                 .then()
                 .statusCode(200)
                 .extract().as(RootCategoryDTO[].class));
@@ -52,8 +53,8 @@ public class QuizRestTestBase {
             but the return HTTP response will have no body.
          */
         list.forEach(dto ->
-                given().pathParam("id", dto.id).delete("/root/{id}").then().statusCode(204));
+                given().pathParam("id", dto.id).delete("categories/id/{id}").then().statusCode(204));
 
-        get().then().statusCode(200).body("size()", is(0));
+        get("/categories").then().statusCode(200).body("size()", is(0));
     }
 }

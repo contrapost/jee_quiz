@@ -25,7 +25,8 @@ public class RootCategoryDTO {
     public RootCategoryDTO() {
     }
 
-    public RootCategoryDTO(String id, String title, Map<Long, SubCategory> subCategories) {
+    public
+    RootCategoryDTO(String id, String title, Map<Long, SubCategory> subCategories) {
         this.id = id;
         this.title = title;
         this.subCategories = subCategories;

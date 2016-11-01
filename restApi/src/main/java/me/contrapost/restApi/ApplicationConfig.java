@@ -2,7 +2,7 @@ package me.contrapost.restApi;
 
 
 import io.swagger.jaxrs.config.BeanConfig;
-import me.contrapost.restApi.api.QuizRestImplementation;
+import me.contrapost.restApi.api.QuizRestImpl;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
@@ -32,7 +32,7 @@ public class ApplicationConfig extends Application {
     beanConfig.setScan(true);
 
     HashSet<Class<?>> c = new HashSet<>();
-    c.add(QuizRestImplementation.class);
+    c.add(QuizRestImpl.class);
 
     c.add(io.swagger.jaxrs.listing.ApiListingResource.class);
     c.add(io.swagger.jaxrs.listing.SwaggerSerializers.class);

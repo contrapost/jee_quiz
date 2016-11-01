@@ -1,6 +1,5 @@
 package me.contrapost.restApi.dto;
 
-import me.contrapost.jee_quiz.entity.Quiz;
 import me.contrapost.jee_quiz.entity.RootCategory;
 
 import java.util.List;
@@ -9,6 +8,7 @@ import java.util.stream.Collectors;
 
 /**
  * Created by alexandershipunov on 30/10/2016.
+ * RootCategoryConverter
  */
 public class RootCategoryConverter {
     private RootCategoryConverter() {}
