@@ -19,12 +19,12 @@ import java.util.stream.Stream;
  * Root category of the quiz
  */
 @NamedQueries(
-        @NamedQuery(name = RootCategory.GET_ALL, query = "select r from RootCategory r")
+        @NamedQuery(name = RootCategory.GET_ALL_ROOT_CATEGORIES, query = "select r from RootCategory r")
 )
 @Entity
 public class RootCategory extends Category{
 
-    public static final String GET_ALL = "GET_ALL";
+    public static final String GET_ALL_ROOT_CATEGORIES = "GET_ALL_ROOT_CATEGORIES";
 
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "rootCategory")
     private Map<Long, SubCategory> subCategories;

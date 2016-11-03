@@ -21,6 +21,7 @@ public class SpecifyingCategoryConverter {
         dto.id = String.valueOf(specifyingCategory.getId());
         dto.title = specifyingCategory.getTitle();
         dto.quizes = specifyingCategory.getQuizes();
+        dto.subCategoryId = String.valueOf(specifyingCategory.getSubCategory().getId());
 
         return dto;
     }

@@ -20,7 +20,7 @@ public class SubCategoryConverter {
         SubCategoryDTO dto = new SubCategoryDTO();
         dto.id = String.valueOf(subCategory.getId());
         dto.title = subCategory.getTitle();
-        dto.specifyingCategories = subCategory.getSpecifyingCategories();
+        dto.rootCategoryId = String.valueOf(subCategory.getRootCategory().getId());
 
         return dto;
     }

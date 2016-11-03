@@ -19,7 +19,6 @@ public class RootCategoryConverter {
         RootCategoryDTO dto = new RootCategoryDTO();
         dto.id = String.valueOf(rootCategory.getId());
         dto.title = rootCategory.getTitle();
-        dto.subCategories = rootCategory.getSubCategories();
 
         return dto;
     }
