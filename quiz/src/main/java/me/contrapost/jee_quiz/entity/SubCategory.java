@@ -1,6 +1,12 @@
 package me.contrapost.jee_quiz.entity;
 
+import org.hibernate.annotations.*;
+import org.hibernate.annotations.NamedQueries;
+import org.hibernate.annotations.NamedQuery;
+
 import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,9 +18,13 @@ import java.util.stream.Stream;
  * Created by Alexander Shipunov on 24.10.16.
  * Subcategory of a root category
  */
+@NamedQueries(
+    @NamedQuery(name = SubCategory.GET_ALL_SUBCATEGORIES, query = "select s from SubCategory s")
+)
 @Entity
 public class SubCategory extends Category{
 
+    public static final String GET_ALL_SUBCATEGORIES = "GET_ALL_SUBCATEGORIES";
     @ManyToOne
     private RootCategory rootCategory;
 
