@@ -23,14 +23,14 @@ SpecifyingCategoryDTO {
     public Map<Long, Quiz> quizes;
 
     @ApiModelProperty("The subcategory the specifying categories belongs to")
-    public SubCategory subCategory;
+    public String subCategoryId;
 
     public SpecifyingCategoryDTO(){}
 
-    public SpecifyingCategoryDTO(String id, String title, Map<Long, Quiz> quizes, SubCategory subCategory) {
+    public SpecifyingCategoryDTO(String id, String title, Map<Long, Quiz> quizes, String subCategoryId) {
         this.id = id;
         this.title = title;
         this.quizes = quizes;
-        this.subCategory = subCategory;
+        this.subCategoryId = subCategoryId;
     }
 }

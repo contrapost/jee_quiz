@@ -19,16 +19,12 @@ public class RootCategoryDTO {
     @ApiModelProperty("The title of the root category")
     public String title;
 
-    @ApiModelProperty("The set of subcategories belonging to the root category")
-    public Map<Long, SubCategory> subCategories;
-
     public RootCategoryDTO() {
     }
 
     public
-    RootCategoryDTO(String id, String title, Map<Long, SubCategory> subCategories) {
+    RootCategoryDTO(String id, String title) {
         this.id = id;
         this.title = title;
-        this.subCategories = subCategories;
     }
 }

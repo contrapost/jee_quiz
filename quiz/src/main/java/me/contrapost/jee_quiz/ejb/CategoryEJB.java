@@ -106,6 +106,10 @@ public class CategoryEJB {
     }
 
     public List<RootCategory> getAllRootCategories() {
-        return em.createNamedQuery(RootCategory.GET_ALL).getResultList();
+        return em.createNamedQuery(RootCategory.GET_ALL_ROOT_CATEGORIES).getResultList();
+    }
+
+    public List<SubCategory> getAllSubCategories() {
+        return em.createNamedQuery(SubCategory.GET_ALL_SUBCATEGORIES).getResultList();
     }
 }
