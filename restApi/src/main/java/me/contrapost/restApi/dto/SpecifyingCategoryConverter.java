@@ -20,7 +20,6 @@ public class SpecifyingCategoryConverter {
         SpecifyingCategoryDTO dto = new SpecifyingCategoryDTO();
         dto.id = String.valueOf(specifyingCategory.getId());
         dto.title = specifyingCategory.getTitle();
-        dto.quizes = specifyingCategory.getQuizes();
         dto.subCategoryId = String.valueOf(specifyingCategory.getSubCategory().getId());
 
         return dto;

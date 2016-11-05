@@ -2,7 +2,9 @@ package me.contrapost.restApi.api;
 
 import io.restassured.http.ContentType;
 import me.contrapost.restApi.dto.RootCategoryDTO;
+import me.contrapost.restApi.dto.SpecifyingCategoryDTO;
 import me.contrapost.restApi.dto.SubCategoryDTO;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static io.restassured.RestAssured.*;
@@ -26,8 +28,7 @@ public class QuizRestIT extends QuizRestTestBase {
                 .body("size()", is(0));
     }
 
-    // ================= Testing root category ===========================
-
+    //region Testing root category
 
     @Test
     public void testCreateAndGetRoot() {
@@ -117,17 +118,23 @@ public class QuizRestIT extends QuizRestTestBase {
         get("/categories/id/" + id).then().body("title", is(anotherTitle));
     }
 
+    @Ignore
     @Test
-    public void testPatchMergeRootCategory(){
+    public void testPatchMergeRootCategory() {
 
         String title = "RootCategory";
 
         String id = createRootCategory(title);
 
-        String newTitle = "RootCategory v.2";
+        String newTitle = "TEST";
 
-        //just change the value
-        patchWithMergeJSon(id, "{\"title\": \"" +  newTitle +"\"}", 204);
+        given().port(8080)
+                .baseUri("http://localhost")
+                .contentType("application/merge-patch+json")
+                .body("{\"title\": \"" + newTitle + "\"}")
+                .patch("/categories/id/" + id)
+                .then()
+                .statusCode(204);
 
         RootCategoryDTO readBack = given().port(8080)
                 .baseUri("http://localhost")
@@ -142,21 +149,11 @@ public class QuizRestIT extends QuizRestTestBase {
         assertEquals(id, readBack.id); // should had stayed the same
     }
 
-    private void patchWithMergeJSon(String id, String jsonBody, int statusCode) {
-        given().port(8080)
-                .baseUri("http://localhost")
-                .contentType("application/merge-patch+json")
-                .body(jsonBody)
-                .patch("/categories/id/" + id)
-                .then()
-                .statusCode(statusCode);
-    }
-
     @Test
     public void testRootCreateWithSameTitle() {
         String title = "Title";
 
-      given().contentType(ContentType.JSON)
+        given().contentType(ContentType.JSON)
                 .body(new RootCategoryDTO(null, title))
                 .post("/categories")
                 .then()
@@ -173,8 +170,9 @@ public class QuizRestIT extends QuizRestTestBase {
         get("/categories").then().statusCode(200).body("size()", is(1));
     }
 
-    // ==================== Testing subcategory =========================
+    //endregion
 
+    //region Testing subcategory
     @Test
     public void testCreateAndGetSubCategory() {
         String rootCategoryId = createRootCategory();
@@ -287,8 +285,143 @@ public class QuizRestIT extends QuizRestTestBase {
         get("/subcategories").then().statusCode(200).body("size()", is(1));
     }
 
-    // ===================== Util methods ============================
+    //endregion
 
+    //region Testing specifying categories
+    @Test
+    public void testCreateAndGetSpecifyingCategory() {
+        String rootCategoryId = createRootCategory("Root Category");
+        String subCategoryId = createSubCategory(rootCategoryId, "Subcategory");
+
+        String title = "Specifying category";
+
+        SpecifyingCategoryDTO dto = new SpecifyingCategoryDTO(null, title, subCategoryId);
+
+        get("/specifying-categories").then().statusCode(200).body("size()", is(0));
+
+        String id = given().contentType(ContentType.JSON)
+                .body(dto)
+                .post("/specifying-categories")
+                .then()
+                .statusCode(200)
+                .extract().asString();
+
+        get("/specifying-categories").then().statusCode(200).body("size()", is(1));
+
+        given().pathParam("id", id)
+                .get("specifying-categories/id/{id}")
+                .then()
+                .statusCode(200)
+                .body("id", is(id))
+                .body("title", is(title));
+    }
+
+    @Test
+    public void testGetAllSpecifyingCategories() {
+        String rootId = createRootCategory("Root #1");
+
+        String subCategoryId1 = createSubCategory(rootId, "SubCategory #1");
+        String subCategoryId2 = createSubCategory(rootId, "SubCategory #2");
+        String subCategoryId3 = createSubCategory(rootId, "SubCategory #3");
+
+        String specCatId1 = createSpecifyingCategory(subCategoryId1, "Specifying category #1 for Subcategory #1");
+        String specCatId2 = createSpecifyingCategory(subCategoryId1, "Specifying category #2 for Subcategory #1");
+        String specCatId3 = createSpecifyingCategory(subCategoryId1, "Specifying category #3 for Subcategory #1");
+        String specCatId4 = createSpecifyingCategory(subCategoryId2, "Specifying category #1 for Subcategory #2");
+        String specCatId5 = createSpecifyingCategory(subCategoryId2, "Specifying category #2 for Subcategory #2");
+        String specCatId6 = createSpecifyingCategory(subCategoryId2, "Specifying category #3 for Subcategory #2");
+        String specCatId7 = createSpecifyingCategory(subCategoryId3, "Specifying category #1 for Subcategory #3");
+        String specCatId8 = createSpecifyingCategory(subCategoryId3, "Specifying category #2 for Subcategory #3");
+        String specCatId9 = createSpecifyingCategory(subCategoryId3, "Specifying category #3 for Subcategory #3");
+
+        get("/specifying-categories").then().statusCode(200).body("size()", is(9));
+
+        given().get("/specifying-categories")
+                .then()
+                .statusCode(200)
+                .body("id", hasItems(specCatId1, specCatId2, specCatId3, specCatId4, specCatId5,
+                        specCatId6, specCatId7, specCatId8, specCatId9))
+                .body("title", hasItems("Specifying category #1 for Subcategory #1",
+                        "Specifying category #2 for Subcategory #1",
+                        "Specifying category #3 for Subcategory #1",
+                        "Specifying category #1 for Subcategory #2",
+                        "Specifying category #2 for Subcategory #2",
+                        "Specifying category #3 for Subcategory #2",
+                        "Specifying category #1 for Subcategory #3",
+                        "Specifying category #2 for Subcategory #3",
+                        "Specifying category #3 for Subcategory #3"));
+    }
+
+    @Test
+    public void testDeleteSpecifyingCategory() {
+
+        String id = given().contentType(ContentType.JSON)
+                .body(new SpecifyingCategoryDTO(null, "Specifying category",
+                        createSubCategory(createRootCategory(), "Subcategory")))
+                .post("/specifying-categories")
+                .then()
+                .statusCode(200)
+                .extract().asString();
+
+        get("/specifying-categories").then().body("id", contains(id));
+
+        delete("/specifying-categories/id/" + id);
+
+        get("/specifying-categories").then().body("id", not(contains(id)));
+    }
+
+    @Test
+    public void testUpdateSpecifyingCategory() throws Exception {
+
+        String title = "Specifying category title";
+
+        //first create with a POST
+        String id = given().contentType(ContentType.JSON)
+                .body(new SpecifyingCategoryDTO(null, title, createSubCategory(createRootCategory("Root category"), "Subcategory")))
+                .post("/specifying-categories")
+                .then()
+                .statusCode(200)
+                .extract().asString();
+
+        //check if POST was fine
+        get("/specifying-categories/id/" + id).then().body("title", is(title));
+
+
+        //now change just the title
+        String anotherTitle = "another title";
+
+        given().contentType(ContentType.TEXT)
+                .body(anotherTitle)
+                .pathParam("id", id)
+                .put("/specifying-categories/id/{id}/title")
+                .then()
+                .statusCode(204);
+
+        get("/specifying-categories/id/" + id).then().body("title", is(anotherTitle));
+    }
+
+    @Test
+    public void testCreateSpecifyingCategoryWithSameTitle() {
+        String title = "Unique title";
+        String rootId = createRootCategory("Root");
+        String subId = createSubCategory(rootId, "Subcategory");
+        createSpecifyingCategory(subId, title);
+
+        get("/specifying-categories").then().statusCode(200).body("size()", is(1));
+
+        given().contentType(ContentType.JSON)
+                .body(new SpecifyingCategoryDTO(null, title,
+                        subId))
+                .post("/specifying-categories")
+                .then()
+                .statusCode(400);
+
+        get("/specifying-categories").then().statusCode(200).body("size()", is(1));
+    }
+
+    //endregion
+
+    //region Util methods
     private String createRootCategory(String title) {
         return given().contentType(ContentType.JSON)
                 .body(new RootCategoryDTO(null, title))
@@ -310,4 +443,15 @@ public class QuizRestIT extends QuizRestTestBase {
                 .statusCode(200)
                 .extract().asString();
     }
+
+    private String createSpecifyingCategory(String subCategoryId, String title) {
+        return given().contentType(ContentType.JSON)
+                .body(new SpecifyingCategoryDTO(null, title, subCategoryId))
+                .post("/specifying-categories")
+                .then()
+                .statusCode(200)
+                .extract().asString();
+    }
+
+    //endregion
 }

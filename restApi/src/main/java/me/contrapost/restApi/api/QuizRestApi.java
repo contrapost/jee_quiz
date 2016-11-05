@@ -6,8 +6,11 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.jaxrs.PATCH;
 import me.contrapost.restApi.dto.RootCategoryDTO;
+import me.contrapost.restApi.dto.SpecifyingCategoryDTO;
 import me.contrapost.restApi.dto.SubCategoryDTO;
 
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
@@ -20,10 +23,14 @@ import java.util.List;
         "categories and quizes")
 @Path("/quiz")
 @Produces(MediaType.APPLICATION_JSON)
+@TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
 public interface QuizRestApi {
 
+    String ROOT_ID_PARAM = "The numeric id of the root category";
+    String SUB_ID_PARAM = "The numeric id of the subcategory";
+    String SPEC_ID_PARAM = "The numeric id of the specifying category";
 
-    // ================== Dealing with subcategory =======================
+    //region Dealing with root category
 
     @ApiOperation("Get all root categories")
     @GET
@@ -34,7 +41,7 @@ public interface QuizRestApi {
     @GET
     @Path("categories/id/{id}")
     RootCategoryDTO getRootCategoryById(
-            @ApiParam("The numeric id of the subcategory")
+            @ApiParam(ROOT_ID_PARAM)
             @PathParam("id")
                     Long id);
 
@@ -52,7 +59,7 @@ public interface QuizRestApi {
     @Path("/categories/id/{id}/title")
     @Consumes(MediaType.TEXT_PLAIN)
     void updateRootCategoryTitle(
-            @ApiParam("The numeric id of the root category")
+            @ApiParam(ROOT_ID_PARAM)
             @PathParam("id")
                     Long id,
             //
@@ -74,11 +81,13 @@ public interface QuizRestApi {
     @DELETE
     @Path("/categories/id/{id}")
     void deleteRootCategory(
-            @ApiParam("The numeric id of the root category")
+            @ApiParam(ROOT_ID_PARAM)
             @PathParam("id")
                     Long id);
 
-    // ================== Dealing with subcategory =======================
+    // endregion
+
+    //region Dealing with subcategory
 
     @ApiOperation("Get all subcategories")
     @GET
@@ -89,7 +98,7 @@ public interface QuizRestApi {
     @GET
     @Path("/subcategories/id/{id}")
     SubCategoryDTO getSubCategoryById(
-            @ApiParam("The numeric id of the root category")
+            @ApiParam(SUB_ID_PARAM)
             @PathParam("id")
                     Long id);
 
@@ -107,7 +116,7 @@ public interface QuizRestApi {
     @Path("/subcategories/id/{id}/title")
     @Consumes(MediaType.TEXT_PLAIN)
     void updateSubCategoryTitle(
-            @ApiParam("The numeric id of the subcategory")
+            @ApiParam(SUB_ID_PARAM)
             @PathParam("id")
                     Long id,
             //
@@ -129,7 +138,68 @@ public interface QuizRestApi {
     @DELETE
     @Path("/subcategories/id/{id}")
     void deleteSubCategory(
-            @ApiParam("The numeric id of the subcategory")
+            @ApiParam(SUB_ID_PARAM)
             @PathParam("id")
                     Long id);
+
+    //endregion
+
+    //region Dealing with specifying categories
+
+    @ApiOperation("Get all specifying categories")
+    @GET
+    @Path("/specifying-categories")
+    List<SpecifyingCategoryDTO> getAllSpecifyingCategories();
+
+    @ApiOperation("Get a single specifying category specified by id")
+    @GET
+    @Path("/specifying-categories/id/{id}")
+    SpecifyingCategoryDTO getSpecifyingCategoryById(
+            @ApiParam(SPEC_ID_PARAM)
+            @PathParam("id")
+                    Long id);
+
+    @ApiOperation("Create a new specifying category")
+    @POST
+    @Path("/specifying-categories")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @ApiResponse(code = 200, message = "The id of newly created specifying category")
+    Long createSpecifyingCategory(
+            @ApiParam("Title of a new subcategory. Should not specify id.")
+                    SpecifyingCategoryDTO dto);
+
+    @ApiOperation("Update a title of a specifying category")
+    @PUT
+    @Path("/specifying-categories/id/{id}/title")
+    @Consumes(MediaType.TEXT_PLAIN)
+    void updateSpecifyingCategoryTitle(
+            @ApiParam(SPEC_ID_PARAM)
+            @PathParam("id")
+                    Long id,
+            //
+            @ApiParam("The new title which will replace the old one")
+                    String title
+    );
+
+    @ApiOperation("Modify the specifying category using JSON Merge Patch")
+    @Path("/specifying-categories/id/{id}")
+    @PATCH
+    @Consumes("application/merge-patch+json")
+    void mergePatchSpecifyingCategory(@ApiParam("The unique id of the specifying category")
+                               @PathParam("id")
+                                       Long id,
+                               @ApiParam("The partial patch")
+                                       String jsonPatch);
+
+    @ApiOperation("Delete a specifying category with the given id")
+    @DELETE
+    @Path("/specifying-categories/id/{id}")
+    void deleteSpecifyingCategory(
+            @ApiParam(SPEC_ID_PARAM)
+            @PathParam("id")
+                    Long id);
+
+    //endregion
+
+
 }
