@@ -28,6 +28,7 @@ import java.util.Set;
 @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
 public interface QuizRestApi {
 
+    String GENERAL_ID_PARAM = "The numeric id of a parent category (root/sub/specifying)";
     String ROOT_ID_PARAM = "The numeric id of the root category";
     String SUB_ID_PARAM = "The numeric id of the subcategory";
     String SPEC_ID_PARAM = "The numeric id of the specifying category";
@@ -75,10 +76,10 @@ public interface QuizRestApi {
     @PATCH
     @Consumes("application/merge-patch+json")
     void mergePatchRootCategory(@ApiParam("The unique id of the root category")
-                    @PathParam("id")
-                            Long id,
+                                @PathParam("id")
+                                        Long id,
                                 @ApiParam("The partial patch")
-                            String jsonPatch);
+                                        String jsonPatch);
 
     @ApiOperation("Delete a root category with the given id")
     @DELETE
@@ -245,7 +246,7 @@ public interface QuizRestApi {
     @Path("/quizes/id/{id}")
     @PATCH
     @Consumes("application/merge-patch+json")
-    void mergePatchQuiz(@ApiParam("The unique id of the quiz")
+    void mergePatchQuiz(@ApiParam(QUIZ_ID_PARAM)
                                       @PathParam("id")
                                               Long id,
                                       @ApiParam("The partial patch")
@@ -298,5 +299,12 @@ public interface QuizRestApi {
     List<SpecifyingCategoryDTO> getAllSpecifyingCategoriesForParent(@ApiParam(SUB_ID_PARAM)
                                                       @PathParam("id")
                                                               Long id);
+
+    @ApiOperation("Get all quizes for parent (root/sub/specifying) category specified by id")
+    @GET
+    @Path("/quizes/parent/{id}")
+    List<QuizDTO> getAllQuizesForParent(@ApiParam(GENERAL_ID_PARAM)
+                                                                    @PathParam("id")
+                                                                            Long id);
     //endregion
 }

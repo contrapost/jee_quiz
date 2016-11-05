@@ -116,7 +116,8 @@ public class QuizRestImpl implements QuizRestApi {
             }
         }
 
-        dto.title = newTitle;
+        categoryEJB.updateCategoryTitle(id, newTitle);
+       // dto.title = newTitle;
     }
 
     @Override
@@ -148,7 +149,7 @@ public class QuizRestImpl implements QuizRestApi {
             throw new WebApplicationException("Cannot specify id for a newly generated subcategory", 400);
         }
 
-        Long rootCategoryId = null;
+        Long rootCategoryId;
         try {
             rootCategoryId = Long.parseLong(dto.rootCategoryId);
         } catch (NumberFormatException e) {
@@ -205,33 +206,27 @@ public class QuizRestImpl implements QuizRestApi {
                     "Cannot modify the subcategory id from " + id + " to " + jsonNode.get("id"), 409);
         }
 
-        String newTitle = dto.title;
-        String newRootCategoryId = dto.rootCategoryId;
+        if (jsonNode.has("rootCategoryId")) {
+            throw new WebApplicationException(
+                    "Cannot modify the subcategory's root category id", 409);
+        }
 
+        String newTitle = dto.title;
+
+        //noinspection Duplicates
         if (jsonNode.has("title")) {
             JsonNode nameNode = jsonNode.get("title");
             if (nameNode.isNull()) {
                 newTitle = dto.title;
-            } else if (nameNode.isTextual()) {
+            } else
+                if (nameNode.isTextual()) {
                 newTitle = nameNode.asText();
             } else {
                 throw new WebApplicationException("Invalid JSON. Non-string title", 400);
             }
         }
 
-        if (jsonNode.has("rootCategoryId")) {
-            JsonNode nameNode = jsonNode.get("rootCategoryId");
-            if (nameNode.isNull()) {
-                newRootCategoryId = dto.rootCategoryId;
-            } else if (nameNode.isTextual()) {
-                newRootCategoryId = nameNode.asText();
-            } else {
-                throw new WebApplicationException("Invalid JSON. Non-string root category id", 400);
-            }
-        }
-
-        dto.title = newTitle;
-        dto.rootCategoryId = newRootCategoryId;
+        updateTitle(id, newTitle);
     }
 
     @Override
@@ -318,8 +313,12 @@ public class QuizRestImpl implements QuizRestApi {
                     "Cannot modify the subcategory id from " + id + " to " + jsonNode.get("id"), 409);
         }
 
+        if (jsonNode.has("subCategoryId")) {
+            throw new WebApplicationException(
+                    "Cannot modify the id of subcategory's root category", 400);
+        }
+
         String newTitle = dto.title;
-        String newSubCategoryId = dto.subCategoryId;
 
         //noinspection Duplicates
         if (jsonNode.has("title")) {
@@ -333,19 +332,10 @@ public class QuizRestImpl implements QuizRestApi {
             }
         }
 
-        if (jsonNode.has("subCategoryId")) {
-            JsonNode nameNode = jsonNode.get("subCategoryId");
-            if (nameNode.isNull()) {
-                newSubCategoryId = dto.subCategoryId;
-            } else if (nameNode.isTextual()) {
-                newSubCategoryId = nameNode.asText();
-            } else {
-                throw new WebApplicationException("Invalid JSON. Non-string root category id", 400);
-            }
-        }
+        updateTitle(id, newTitle);
 
-        dto.title = newTitle;
-        dto.subCategoryId = newSubCategoryId;
+//        dto.title = newTitle;
+//        dto.subCategoryId = newSubCategoryId;
     }
 
     @Override
@@ -436,9 +426,13 @@ public class QuizRestImpl implements QuizRestApi {
                     "Cannot modify the quiz id from " + id + " to " + jsonNode.get("id"), 409);
         }
 
+        if (jsonNode.has("specifyingCategoryId")) {
+            throw new WebApplicationException(
+                    "Cannot modify the id of quiz's specifying category", 400);
+        }
+
         String newQuestion = dto.question;
         Map<String, Boolean> newAnswerMap = dto.answerMap;
-        String newSpecCategoryId = dto.specifyingCategoryId;
 
         if (jsonNode.has("question")) {
             JsonNode questionNode = jsonNode.get("question");
@@ -448,17 +442,6 @@ public class QuizRestImpl implements QuizRestApi {
                 newQuestion = questionNode.asText();
             } else {
                 throw new WebApplicationException("Invalid JSON. Non-string title", 400);
-            }
-        }
-
-        if (jsonNode.has("specifyingCategoryId")) {
-            JsonNode specifyingCategoryIdNode = jsonNode.get("specifyingCategoryId");
-            if (specifyingCategoryIdNode.isNull()) {
-                newSpecCategoryId = dto.specifyingCategoryId;
-            } else if (specifyingCategoryIdNode.isTextual()) {
-                newSpecCategoryId = specifyingCategoryIdNode.asText();
-            } else {
-                throw new WebApplicationException("Invalid JSON. Non-string root category id", 400);
             }
         }
 
@@ -473,15 +456,15 @@ public class QuizRestImpl implements QuizRestApi {
             }
         }
 
-        dto.question = newQuestion;
-        dto.specifyingCategoryId = newSpecCategoryId;
-        dto.answerMap = newAnswerMap;
+        quizEJB.updateQuiz(id, newQuestion, newAnswerMap);
     }
 
     @Override
     public void deleteQuiz(@ApiParam(QUIZ_ID_PARAM) Long id) {
         quizEJB.deleteQuiz(id);
     }
+
+
 
     //endregion
 
@@ -519,6 +502,11 @@ public class QuizRestImpl implements QuizRestApi {
     public List<SpecifyingCategoryDTO> getAllSpecifyingCategoriesForParent(@ApiParam(ROOT_ID_PARAM) Long id) {
         return SpecifyingCategoryConverter
                 .transform(categoryEJB.getAllSpecifyingCategoriesForSubCategory(id));
+    }
+
+    @Override
+    public List<QuizDTO> getAllQuizesForParent(@ApiParam(GENERAL_ID_PARAM) Long id) {
+        return QuizConverter.transform(categoryEJB.getAllQuizesForCategory(id));
     }
 
     //endregion

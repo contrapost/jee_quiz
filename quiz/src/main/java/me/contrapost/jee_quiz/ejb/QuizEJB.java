@@ -69,4 +69,12 @@ public class QuizEJB {
     public List<Quiz> getAllQuizes() {
         return em.createNamedQuery(Quiz.GET_ALL_QUIZES).getResultList();
     }
+
+    public boolean updateQuiz(Long id, String newQuestion, Map<String, Boolean> newAnswerMap) {
+        Quiz quiz = em.find(Quiz.class, id);
+        if (quiz == null) return false;
+        quiz.setQuestion(newQuestion);
+        quiz.setAnswerMap(newAnswerMap);
+        return true;
+    }
 }
