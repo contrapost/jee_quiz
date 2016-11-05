@@ -19,8 +19,8 @@ public class QuizDTO {
     @ApiModelProperty("The quiz question")
     public String question;
 
-    @ApiModelProperty("The specifying category the quiz belongs to")
-    public SpecifyingCategory specifyingCategory;
+    @ApiModelProperty("Id of the specifying category the quiz belongs to")
+    public String specifyingCategoryId;
 
     @ApiModelProperty("The set of answers marked with false and true")
     public Map<String, Boolean> answerMap;
@@ -28,10 +28,10 @@ public class QuizDTO {
     public QuizDTO() {
     }
 
-    public QuizDTO(String id, String question, SpecifyingCategory category, Map<String, Boolean> answers) {
+    public QuizDTO(String id, String question, String categoryId, Map<String, Boolean> answers) {
         this.id = id;
         this.question = question;
-        specifyingCategory = category;
+        specifyingCategoryId = categoryId;
         answerMap = answers;
     }
 }

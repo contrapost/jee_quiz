@@ -23,6 +23,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by alexandershipunov on 30/10/2016.
@@ -267,11 +268,11 @@ public class QuizRestImpl implements QuizRestApi {
             throw new WebApplicationException("Cannot specify id for a newly generated specifying category", 400);
         }
 
-        Long subCategoryId = null;
+        Long subCategoryId;
         try {
             subCategoryId = Long.parseLong(dto.subCategoryId);
         } catch (NumberFormatException e) {
-            throw new WebApplicationException("Id of the root category is not numeric", 400);
+            throw new WebApplicationException("Id of the subcategory is not numeric", 400);
         }
 
         Long id;
@@ -356,7 +357,136 @@ public class QuizRestImpl implements QuizRestApi {
     public void deleteSpecifyingCategory(@ApiParam("The numeric id of the specifying category") Long id) {
         categoryEJB.deleteSpecifyingCategory(id);
     }
+    //endregion
 
+    //region implementation of REST API for quizes
+    @Override
+    public List<QuizDTO> getAllQuizes() {
+        return QuizConverter.transform(quizEJB.getAllQuizes());
+    }
+
+    @Override
+    public QuizDTO getQuizById(@ApiParam(QUIZ_ID_PARAM) Long id) {
+        return QuizConverter.transform(quizEJB.getQuiz(id));
+    }
+
+    @Override
+    public Long createQuiz(@ApiParam("Question, set of answers as a Map<String, boolean> and " +
+            "id of specifying category the quiz belongs to. Should not specify id.") QuizDTO dto) {
+        /*
+            Error code 400:
+            the user had done something wrong, eg sent invalid input configurations
+         */
+
+        if (dto.id != null) {
+            throw new WebApplicationException("Cannot specify id for a newly generated quiz", 400);
+        }
+
+        Long specifyingCategoryId = null;
+        try {
+            specifyingCategoryId = Long.parseLong(dto.specifyingCategoryId);
+        } catch (NumberFormatException e) {
+            throw new WebApplicationException("Id of the specifying category is not numeric", 400);
+        }
+
+        Long id;
+
+        try {
+            id = quizEJB.createQuiz(dto.question, dto.answerMap, specifyingCategoryId);
+        } catch (Exception e) {
+            /*
+                note: this work just because NOT_SUPPORTED,
+                otherwise a rolledback transaction would propagate to the
+                caller of this method
+             */
+            throw wrapException(e);
+        }
+
+        return id;
+    }
+
+    @Override
+    public void updateQuestionQuiz(@ApiParam(QUIZ_ID_PARAM) Long id,
+                                   @ApiParam("The new question which will replace the old one") String question) {
+        if(quizEJB.getQuiz(id) == null){
+            throw new WebApplicationException("Cannot find quiz with id: " + id, 404);
+        }
+
+        try {
+            quizEJB.updateQuizQuestion(id, question);
+        } catch (Exception e){
+            throw wrapException(e);
+        }
+    }
+
+    @Override
+    public void mergePatchQuiz(@ApiParam("The unique id of the quiz") Long id,
+                               @ApiParam("The partial patch") String jsonPatch) {
+        QuizDTO dto = QuizConverter.transform(quizEJB.getQuiz(id));
+        if (dto == null) {
+            throw new WebApplicationException("Cannot find quiz with id " + id, 404);
+        }
+
+        ObjectMapper jackson = new ObjectMapper();
+
+        JsonNode jsonNode;
+        try {
+            jsonNode = jackson.readValue(jsonPatch, JsonNode.class);
+        } catch (Exception e) {
+            throw new WebApplicationException("Invalid JSON data as input: " + e.getMessage(), 400);
+        }
+
+        if (jsonNode.has("id")) {
+            throw new WebApplicationException(
+                    "Cannot modify the quiz id from " + id + " to " + jsonNode.get("id"), 409);
+        }
+
+        String newQuestion = dto.question;
+        Map<String, Boolean> newAnswerMap = dto.answerMap;
+        String newSpecCategoryId = dto.specifyingCategoryId;
+
+        if (jsonNode.has("question")) {
+            JsonNode questionNode = jsonNode.get("question");
+            if (questionNode.isNull()) {
+                newQuestion = dto.question;
+            } else if (questionNode.isTextual()) {
+                newQuestion = questionNode.asText();
+            } else {
+                throw new WebApplicationException("Invalid JSON. Non-string title", 400);
+            }
+        }
+
+        if (jsonNode.has("specifyingCategoryId")) {
+            JsonNode specifyingCategoryIdNode = jsonNode.get("specifyingCategoryId");
+            if (specifyingCategoryIdNode.isNull()) {
+                newSpecCategoryId = dto.specifyingCategoryId;
+            } else if (specifyingCategoryIdNode.isTextual()) {
+                newSpecCategoryId = specifyingCategoryIdNode.asText();
+            } else {
+                throw new WebApplicationException("Invalid JSON. Non-string root category id", 400);
+            }
+        }
+
+        if (jsonNode.has("answerMap")) {
+            JsonNode answerMapNode = jsonNode.get("answerMap");
+            if (answerMapNode.isNull()) {
+                newAnswerMap = dto.answerMap;
+            } else if (answerMapNode.isObject()) {
+                newAnswerMap = jackson.convertValue(answerMapNode, Map.class);
+            } else {
+                throw new WebApplicationException("Invalid JSON. Non-string root category id", 400);
+            }
+        }
+
+        dto.question = newQuestion;
+        dto.specifyingCategoryId = newSpecCategoryId;
+        dto.answerMap = newAnswerMap;
+    }
+
+    @Override
+    public void deleteQuiz(@ApiParam(QUIZ_ID_PARAM) Long id) {
+        quizEJB.deleteQuiz(id);
+    }
     //endregion
 
     //region Util methods

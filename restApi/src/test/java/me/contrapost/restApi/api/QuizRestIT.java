@@ -1,11 +1,15 @@
 package me.contrapost.restApi.api;
 
 import io.restassured.http.ContentType;
+import me.contrapost.restApi.dto.QuizDTO;
 import me.contrapost.restApi.dto.RootCategoryDTO;
 import me.contrapost.restApi.dto.SpecifyingCategoryDTO;
 import me.contrapost.restApi.dto.SubCategoryDTO;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.CoreMatchers.hasItems;
@@ -287,7 +291,7 @@ public class QuizRestIT extends QuizRestTestBase {
 
     //endregion
 
-    //region Testing specifying categories
+    //region Testing specifying category
     @Test
     public void testCreateAndGetSpecifyingCategory() {
         String rootCategoryId = createRootCategory("Root Category");
@@ -421,6 +425,171 @@ public class QuizRestIT extends QuizRestTestBase {
 
     //endregion
 
+    //region Testing quiz
+    @Test
+    public void testCreateAndGetQuiz() {
+        String rootCategoryId = createRootCategory("Root Category");
+        String subCategoryId = createSubCategory(rootCategoryId, "Subcategory");
+        String specifyingCategoryId = createSpecifyingCategory(subCategoryId, "SpecifyingCategory");
+
+        String quizQuestion = "Quiz question";
+
+        Map<String, Boolean> answerMap = getAnswerMap();
+
+        QuizDTO dto = new QuizDTO(null, quizQuestion, specifyingCategoryId, answerMap);
+
+        get("/quizes").then().statusCode(200).body("size()", is(0));
+
+        String id = given().contentType(ContentType.JSON)
+                .body(dto)
+                .post("/quizes")
+                .then()
+                .statusCode(200)
+                .extract().asString();
+
+        get("/quizes").then().statusCode(200).body("size()", is(1));
+
+        given().pathParam("id", id)
+                .get("quizes/id/{id}")
+                .then()
+                .statusCode(200)
+                .body("id", is(id))
+                .body("specifyingCategoryId", is(specifyingCategoryId))
+                .body("answerMap", is(answerMap))
+                .body("question", is(quizQuestion));
+    }
+
+    @Test
+    public void testGetAllQuizes() {
+        String rootId = createRootCategory("Root #1");
+
+        String subCategoryId1 = createSubCategory(rootId, "SubCategory #1");
+        String subCategoryId2 = createSubCategory(rootId, "SubCategory #2");
+        String subCategoryId3 = createSubCategory(rootId, "SubCategory #3");
+
+        String specCatId1 = createSpecifyingCategory(subCategoryId1, "Specifying category #1 for Subcategory #1");
+        String specCatId2 = createSpecifyingCategory(subCategoryId1, "Specifying category #2 for Subcategory #1");
+        String specCatId3 = createSpecifyingCategory(subCategoryId1, "Specifying category #3 for Subcategory #1");
+        String specCatId4 = createSpecifyingCategory(subCategoryId2, "Specifying category #1 for Subcategory #2");
+        String specCatId5 = createSpecifyingCategory(subCategoryId2, "Specifying category #2 for Subcategory #2");
+        String specCatId6 = createSpecifyingCategory(subCategoryId2, "Specifying category #3 for Subcategory #2");
+        String specCatId7 = createSpecifyingCategory(subCategoryId3, "Specifying category #1 for Subcategory #3");
+        String specCatId8 = createSpecifyingCategory(subCategoryId3, "Specifying category #2 for Subcategory #3");
+        String specCatId9 = createSpecifyingCategory(subCategoryId3, "Specifying category #3 for Subcategory #3");
+
+
+        String quizId1 = createQuiz(specCatId1, "Question #1 from specifying category #1");
+        String quizId2 = createQuiz(specCatId2, "Question #1 from specifying category #2");
+        String quizId3 = createQuiz(specCatId3, "Question #1 from specifying category #3");
+        String quizId4 = createQuiz(specCatId4, "Question #1 from specifying category #4");
+        String quizId5 = createQuiz(specCatId5, "Question #1 from specifying category #5");
+        String quizId6 = createQuiz(specCatId6, "Question #1 from specifying category #6");
+        String quizId7 = createQuiz(specCatId7, "Question #1 from specifying category #7");
+        String quizId8 = createQuiz(specCatId8, "Question #1 from specifying category #8");
+        String quizId9 = createQuiz(specCatId9, "Question #1 from specifying category #9");
+
+        get("/quizes").then().statusCode(200).body("size()", is(9));
+
+        given().get("/quizes")
+                .then()
+                .statusCode(200)
+                .body("id", hasItems(quizId1,
+                        quizId2,
+                        quizId3,
+                        quizId4,
+                        quizId5,
+                        quizId6,
+                        quizId7,
+                        quizId8,
+                        quizId9))
+                .body("question", hasItems("Question #1 from specifying category #1",
+                        "Question #1 from specifying category #2",
+                        "Question #1 from specifying category #3",
+                        "Question #1 from specifying category #4",
+                        "Question #1 from specifying category #5",
+                        "Question #1 from specifying category #6",
+                        "Question #1 from specifying category #7",
+                        "Question #1 from specifying category #8",
+                        "Question #1 from specifying category #9"));
+    }
+
+    @Test
+    public void testDeleteQuiz() {
+
+        String id = given().contentType(ContentType.JSON)
+                .body(new QuizDTO(null,
+                        "question",
+                        createSpecifyingCategory(createSubCategory(createRootCategory("Root"), "Sub"), "Spec"),
+                        getAnswerMap()))
+                .post("/quizes")
+                .then()
+                .statusCode(200)
+                .extract().asString();
+
+        get("/quizes").then().body("id", contains(id));
+
+        delete("/quizes/id/" + id);
+
+        get("/quizes").then().body("id", not(contains(id)));
+    }
+
+    @Test
+    public void testUpdateQuizQuestion() throws Exception {
+
+        String question = "Original question";
+
+        //first create with a POST
+        String id = given().contentType(ContentType.JSON)
+                .body(new QuizDTO(null,
+                        question,
+                        createSpecifyingCategory(createSubCategory(createRootCategory("Root"), "Sub"), "Spec"),
+                        getAnswerMap()))
+                .post("/quizes")
+                .then()
+                .statusCode(200)
+                .extract().asString();
+
+        //check if POST was fine
+        get("/quizes/id/" + id).then().body("question", is(question));
+
+
+        //now change just the title
+        String updatedQuestion = "Updated question";
+
+        given().contentType(ContentType.TEXT)
+                .body(updatedQuestion)
+                .pathParam("id", id)
+                .put("/quizes/id/{id}/question")
+                .then()
+                .statusCode(204);
+
+        get("/quizes/id/" + id).then().body("question", is(updatedQuestion));
+    }
+
+    @Test
+    public void testCreateQuizesWithSameTitle() {
+        String uniqueQuestion = "Unique question";
+        String rootId = createRootCategory("Root");
+        String subId = createSubCategory(rootId, "Subcategory");
+        String specId = createSpecifyingCategory(subId, "Spec");
+        createQuiz(specId, uniqueQuestion);
+
+        get("/quizes").then().statusCode(200).body("size()", is(1));
+
+        given().contentType(ContentType.JSON)
+                .body(new QuizDTO(null,
+                        uniqueQuestion,
+                        specId,
+                        getAnswerMap()))
+                .post("/quizes")
+                .then()
+                .statusCode(400);
+
+        get("/quizes").then().statusCode(200).body("size()", is(1));
+    }
+
+    //endregion
+
     //region Util methods
     private String createRootCategory(String title) {
         return given().contentType(ContentType.JSON)
@@ -451,6 +620,24 @@ public class QuizRestIT extends QuizRestTestBase {
                 .then()
                 .statusCode(200)
                 .extract().asString();
+    }
+
+    private String createQuiz(String specCatId, String question) {
+        return given().contentType(ContentType.JSON)
+                .body(new QuizDTO(null, question, specCatId, getAnswerMap()))
+                .post("/quizes")
+                .then()
+                .statusCode(200)
+                .extract().asString();
+    }
+
+    private Map<String,Boolean> getAnswerMap() {
+        Map<String, Boolean> answerMap = new HashMap<>();
+        for(int i = 0; i < 3; i++) {
+            answerMap.put("Wrong answer #" + i + 1, false);
+        }
+        answerMap.put("Correct answer", true);
+        return answerMap;
     }
 
     //endregion

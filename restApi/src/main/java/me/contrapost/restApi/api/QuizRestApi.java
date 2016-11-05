@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.jaxrs.PATCH;
+import me.contrapost.restApi.dto.QuizDTO;
 import me.contrapost.restApi.dto.RootCategoryDTO;
 import me.contrapost.restApi.dto.SpecifyingCategoryDTO;
 import me.contrapost.restApi.dto.SubCategoryDTO;
@@ -29,6 +30,7 @@ public interface QuizRestApi {
     String ROOT_ID_PARAM = "The numeric id of the root category";
     String SUB_ID_PARAM = "The numeric id of the subcategory";
     String SPEC_ID_PARAM = "The numeric id of the specifying category";
+    String QUIZ_ID_PARAM = "The numeric id of the quiz";
 
     //region Dealing with root category
 
@@ -201,5 +203,59 @@ public interface QuizRestApi {
 
     //endregion
 
+    //region Dealing with quizes
+    @ApiOperation("Get all quizes")
+    @GET
+    @Path("/quizes")
+    List<QuizDTO> getAllQuizes();
 
+    @ApiOperation("Get a single quiz specified by id")
+    @GET
+    @Path("/quizes/id/{id}")
+    QuizDTO getQuizById(
+            @ApiParam(QUIZ_ID_PARAM)
+            @PathParam("id")
+                    Long id);
+
+    @ApiOperation("Create a new quiz")
+    @POST
+    @Path("/quizes")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @ApiResponse(code = 200, message = "The id of newly created specifying category")
+    Long createQuiz(
+            @ApiParam("Question, set of answers as a Map<String, boolean> and " +
+                    "id of specifying category the quiz belongs to. Should not specify id.")
+                    QuizDTO dto);
+
+    @ApiOperation("Update the quiz question")
+    @PUT
+    @Path("/quizes/id/{id}/question")
+    @Consumes(MediaType.TEXT_PLAIN)
+    void updateQuestionQuiz(
+            @ApiParam(QUIZ_ID_PARAM)
+            @PathParam("id")
+                    Long id,
+            //
+            @ApiParam("The new question which will replace the old one")
+                    String question
+    );
+
+    @ApiOperation("Modify the quiz using JSON Merge Patch")
+    @Path("/quizes/id/{id}")
+    @PATCH
+    @Consumes("application/merge-patch+json")
+    void mergePatchQuiz(@ApiParam("The unique id of the quiz")
+                                      @PathParam("id")
+                                              Long id,
+                                      @ApiParam("The partial patch")
+                                              String jsonPatch);
+
+    @ApiOperation("Delete a quiz with the given id")
+    @DELETE
+    @Path("/quizes/id/{id}")
+    void deleteQuiz(
+            @ApiParam(QUIZ_ID_PARAM)
+            @PathParam("id")
+                    Long id);
+    //endregion
 }
