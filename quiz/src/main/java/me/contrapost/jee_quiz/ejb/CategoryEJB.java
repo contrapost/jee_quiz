@@ -6,7 +6,10 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Created by Alexander Shipunov on 24.10.16.
@@ -115,5 +118,25 @@ public class CategoryEJB {
 
     public List<SpecifyingCategory> getAllSpecifyingCategories() {
         return em.createNamedQuery(SpecifyingCategory.GET_ALL_SPECIFYING_CATEGORIES).getResultList();
+    }
+
+    public Set<RootCategory> getAllRootCategoriesWithAtLeastOneQuiz() {
+        List<Quiz> quizes = em.createNamedQuery(Quiz.GET_ALL_QUIZES).getResultList();
+        return quizes.stream().map(Quiz::getSpecifyingCategory).collect(Collectors.toSet())
+                .stream().map(SpecifyingCategory::getSubCategory).collect(Collectors.toSet())
+                .stream().map(SubCategory::getRootCategory).collect(Collectors.toSet());
+    }
+
+    public Set<SpecifyingCategory> getAllSpecifyingCategoriesWithAtLeastOneQuiz() {
+        List<Quiz> quizes = em.createNamedQuery(Quiz.GET_ALL_QUIZES).getResultList();
+        return quizes.stream().map(Quiz::getSpecifyingCategory).collect(Collectors.toSet());
+    }
+
+    public List<SubCategory> getAllSubCategoriesForRootCategory(long categoryId) {
+        return new ArrayList<>(getRootCategory(categoryId).getSubCategories().values());
+    }
+
+    public List<SpecifyingCategory> getAllSpecifyingCategoriesForSubCategory(Long id) {
+        return new ArrayList<>(getSubCategory(id).getSpecifyingCategories().values());
     }
 }

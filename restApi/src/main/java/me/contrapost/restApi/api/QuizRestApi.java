@@ -15,6 +15,7 @@ import javax.ejb.TransactionAttributeType;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by alexandershipunov on 30/10/2016.
@@ -257,5 +258,45 @@ public interface QuizRestApi {
             @ApiParam(QUIZ_ID_PARAM)
             @PathParam("id")
                     Long id);
+    //endregion
+
+    //region Custom requests
+    @ApiOperation("Get all root categories with at least one quiz")
+    @GET
+    @Path("/categories/withQuizzes")
+    List<RootCategoryDTO> getAllRootCategoriesWithAtLeastOneQuiz();
+
+    @ApiOperation("Get all specifying categories with at least one quiz")
+    @GET
+    @Path("/categories/withQuizzes/specifying-categories")
+    List<SpecifyingCategoryDTO> getAllSpecifyingCategoriesWithAtLeastOneQuiz();
+
+    @ApiOperation("Get all subcategories of the category specified by id")
+    @GET
+    @Path("/categories/id/{id}/subcategories")
+    List<SubCategoryDTO> getAllSubCategoriesForRootCategory(@ApiParam(ROOT_ID_PARAM)
+                                                            @PathParam("id")
+                                                                    Long id);
+
+    @ApiOperation("Get all subcategories with the given parent specified by id")
+    @GET
+    @Path("/subcategories/parent/{id}")
+    List<SubCategoryDTO> getAllSubCategoriesForParent(@ApiParam(ROOT_ID_PARAM)
+                                                            @PathParam("id")
+                                                                    Long id);
+
+    @ApiOperation("Get all specifying categories of the subcategory specified by id")
+    @GET
+    @Path("/subcategories/id/{id}/specifying-categories")
+    List<SpecifyingCategoryDTO> getAllSpecifyingCategoriesForSubCategory(@ApiParam(SUB_ID_PARAM)
+                                                            @PathParam("id")
+                                                                    Long id);
+
+    @ApiOperation("Get all specifying categories with the given subcategory parent specified by id")
+    @GET
+    @Path("/specifying-categories/parent/{id}")
+    List<SpecifyingCategoryDTO> getAllSpecifyingCategoriesForParent(@ApiParam(SUB_ID_PARAM)
+                                                      @PathParam("id")
+                                                              Long id);
     //endregion
 }

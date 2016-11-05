@@ -590,6 +590,124 @@ public class QuizRestIT extends QuizRestTestBase {
 
     //endregion
 
+    //region Testing custom requests
+    @Test
+    public void getAllRootCategoriesWithAtLeastOneQuiz() {
+        String rootId1 = createRootCategory("Root #1");
+        String rootId2 = createRootCategory("Root #2");
+        String rootId3 = createRootCategory("Root #3");
+
+        // Each root category has one subcategory
+        String subCategoryId1 = createSubCategory(rootId1, "SubCategory #1");
+        String subCategoryId2 = createSubCategory(rootId2, "SubCategory #2");
+        String subCategoryId3 = createSubCategory(rootId3, "SubCategory #3");
+
+        // Sub #1 (root #1) has spec 1-3, sub #2 (root #2) has spec 4-6 and sub #3 (root #3) has spec 7-9
+        String specCatId1 = createSpecifyingCategory(subCategoryId1, "Specifying category #1 for Subcategory #1");
+        String specCatId2 = createSpecifyingCategory(subCategoryId1, "Specifying category #2 for Subcategory #1");
+        String specCatId3 = createSpecifyingCategory(subCategoryId1, "Specifying category #3 for Subcategory #1");
+        String specCatId4 = createSpecifyingCategory(subCategoryId2, "Specifying category #1 for Subcategory #2");
+        String specCatId5 = createSpecifyingCategory(subCategoryId2, "Specifying category #2 for Subcategory #2");
+        String specCatId6 = createSpecifyingCategory(subCategoryId2, "Specifying category #3 for Subcategory #2");
+        String specCatId7 = createSpecifyingCategory(subCategoryId3, "Specifying category #1 for Subcategory #3");
+        String specCatId8 = createSpecifyingCategory(subCategoryId3, "Specifying category #2 for Subcategory #3");
+        String specCatId9 = createSpecifyingCategory(subCategoryId3, "Specifying category #3 for Subcategory #3");
+
+        // Spec #4 has 3 quizes, spec #1 and #6 has 2 quizes, spec #3 and #5 has 1 quiz, spec #2, 7, 8 and 9 has no quizes
+        createQuiz(specCatId1, "Question #1 from specifying category #1");
+        createQuiz(specCatId1, "Question #2 from specifying category #1");
+        createQuiz(specCatId3, "Question #1 from specifying category #3");
+        createQuiz(specCatId4, "Question #1 from specifying category #4");
+        createQuiz(specCatId4, "Question #2 from specifying category #4");
+        createQuiz(specCatId4, "Question #3 from specifying category #4");
+        createQuiz(specCatId5, "Question #1 from specifying category #5");
+        createQuiz(specCatId6, "Question #1 from specifying category #6");
+        createQuiz(specCatId6, "Question #2 from specifying category #6");
+
+        // Thus, root #1 has 3 quizes, root #2 has 6 quizes, root #3 has no quizes
+        get("/categories/withQuizzes").then().statusCode(200).body("size()", is(2));
+
+        given().get("/categories/withQuizzes")
+                .then()
+                .statusCode(200)
+                .body("id", hasItems(rootId1, rootId2))
+                .body("title", hasItems("Root #1", "Root #2"))
+                .body("title", not("Root #3"));
+    }
+
+    @Test
+    public void getAllSpecifyingCategoriesWithAtLeastOneQuiz() {
+        // Each root category has one subcategory
+        String subCategoryId1 = createSubCategory(createRootCategory("Root #1"), "SubCategory #1");
+        String subCategoryId2 = createSubCategory(createRootCategory("Root #2"), "SubCategory #2");
+        String subCategoryId3 = createSubCategory(createRootCategory("Root #3"), "SubCategory #3");
+
+        // Sub #1 (root #1) has spec 1-3, sub #2 (root #2) has spec 4-6 and sub #3 (root #3) has spec 7-9
+        String specCatId1 = createSpecifyingCategory(subCategoryId1, "Specifying category #1 for Subcategory #1");
+        String specCatId2 = createSpecifyingCategory(subCategoryId1, "Specifying category #2 for Subcategory #1");
+        String specCatId3 = createSpecifyingCategory(subCategoryId1, "Specifying category #3 for Subcategory #1");
+        String specCatId4 = createSpecifyingCategory(subCategoryId2, "Specifying category #1 for Subcategory #2");
+        String specCatId5 = createSpecifyingCategory(subCategoryId2, "Specifying category #2 for Subcategory #2");
+        String specCatId6 = createSpecifyingCategory(subCategoryId2, "Specifying category #3 for Subcategory #2");
+        String specCatId7 = createSpecifyingCategory(subCategoryId3, "Specifying category #1 for Subcategory #3");
+        String specCatId8 = createSpecifyingCategory(subCategoryId3, "Specifying category #2 for Subcategory #3");
+        String specCatId9 = createSpecifyingCategory(subCategoryId3, "Specifying category #3 for Subcategory #3");
+
+        // Spec #4 has 3 quizes, spec #1 and #6 has 2 quizes, spec #3 and #5 has 1 quiz, spec #2, 7, 8 and 9 has no quizes
+        createQuiz(specCatId1, "Question #1 from specifying category #1");
+        createQuiz(specCatId1, "Question #2 from specifying category #1");
+        createQuiz(specCatId3, "Question #1 from specifying category #3");
+        createQuiz(specCatId4, "Question #1 from specifying category #4");
+        createQuiz(specCatId4, "Question #2 from specifying category #4");
+        createQuiz(specCatId4, "Question #3 from specifying category #4");
+        createQuiz(specCatId5, "Question #1 from specifying category #5");
+        createQuiz(specCatId6, "Question #1 from specifying category #6");
+        createQuiz(specCatId6, "Question #2 from specifying category #6");
+
+        // Thus, there are 5 specifying categories with at least one quiz
+        get("/categories/withQuizzes/specifying-categories").then().statusCode(200).body("size()", is(5));
+
+        given().get("/categories/withQuizzes/specifying-categories")
+                .then()
+                .statusCode(200)
+                .body("id", hasItems(specCatId1,
+                        specCatId3,
+                        specCatId4,
+                        specCatId5,
+                        specCatId6))
+                .body("title", hasItems("Specifying category #1 for Subcategory #1",
+                        "Specifying category #3 for Subcategory #1",
+                        "Specifying category #1 for Subcategory #2",
+                        "Specifying category #2 for Subcategory #2",
+                        "Specifying category #3 for Subcategory #2"))
+                .body("title", not("Specifying category #2 for Subcategory #1"))
+                .body("title", not("Specifying category #1 for Subcategory #3"))
+                .body("title", not("Specifying category #2 for Subcategory #3"))
+                .body("title", not("Specifying category #3 for Subcategory #3"));
+    }
+
+    @Test
+    public void testGetSubCategoriesForRootCategory() {
+        testGetSubCategoriesForRootWithSpecifiedPath("/categories/id/{id}/subcategories");
+    }
+
+    @Test
+    public void testGetAllSubCategoriesForParent() {
+        testGetSubCategoriesForRootWithSpecifiedPath("/subcategories/parent/{id}");
+    }
+
+    @Test
+    public void testGetAllSpecifyingCategoriesForSubCategory() {
+        testGetSpecifyingCategoriesForSubWithSpecifiedPath("/subcategories/id/{id}/specifying-categories");
+    }
+
+    @Test
+    public void testGetAllSpecifyingCategoriesForParent() {
+        testGetSpecifyingCategoriesForSubWithSpecifiedPath("/specifying-categories/parent/{id}");
+    }
+
+    //endregion
+
     //region Util methods
     private String createRootCategory(String title) {
         return given().contentType(ContentType.JSON)
@@ -631,13 +749,105 @@ public class QuizRestIT extends QuizRestTestBase {
                 .extract().asString();
     }
 
-    private Map<String,Boolean> getAnswerMap() {
+    private Map<String, Boolean> getAnswerMap() {
         Map<String, Boolean> answerMap = new HashMap<>();
-        for(int i = 0; i < 3; i++) {
+        for (int i = 0; i < 3; i++) {
             answerMap.put("Wrong answer #" + i + 1, false);
         }
         answerMap.put("Correct answer", true);
         return answerMap;
+    }
+
+    private void testGetSubCategoriesForRootWithSpecifiedPath(String path) {
+        String rootId1 = createRootCategory("Root #1");
+        String rootId2 = createRootCategory("Root #2");
+        String rootId3 = createRootCategory("Root #3");
+
+        // Root #1 has sub #1-4, root #2 has sub #5-6, root #3 has sub #7
+        String subCategoryId1 = createSubCategory(rootId1, "SubCategory #1.1");
+        String subCategoryId2 = createSubCategory(rootId1, "SubCategory #1.2");
+        String subCategoryId3 = createSubCategory(rootId1, "SubCategory #1.3");
+        String subCategoryId4 = createSubCategory(rootId1, "SubCategory #1.4");
+        String subCategoryId5 = createSubCategory(rootId2, "SubCategory #2.1");
+        String subCategoryId6 = createSubCategory(rootId2, "SubCategory #2.2");
+        String subCategoryId7 = createSubCategory(rootId3, "SubCategory #3.1");
+
+        given().pathParam("id", rootId1)
+                .get(path)
+                .then()
+                .statusCode(200)
+                .body("id", hasItems(subCategoryId1,
+                        subCategoryId2,
+                        subCategoryId3,
+                        subCategoryId4))
+                .body("title", hasItems("SubCategory #1.1",
+                        "SubCategory #1.2",
+                        "SubCategory #1.3",
+                        "SubCategory #1.4"));
+
+        given().pathParam("id", rootId2)
+                .get(path)
+                .then()
+                .statusCode(200)
+                .body("id", hasItems(subCategoryId5, subCategoryId6))
+                .body("title", hasItems("SubCategory #2.1", "SubCategory #2.2"));
+
+        given().pathParam("id", rootId3)
+                .get(path)
+                .then()
+                .statusCode(200)
+                .body("id", hasItems(subCategoryId7))
+                .body("title", hasItems("SubCategory #3.1"));
+    }
+
+    private void testGetSpecifyingCategoriesForSubWithSpecifiedPath(String path) {
+        // Each root category has one subcategory
+        String subCategoryId1 = createSubCategory(createRootCategory("Root #1"), "SubCategory #1");
+        String subCategoryId2 = createSubCategory(createRootCategory("Root #2"), "SubCategory #2");
+        String subCategoryId3 = createSubCategory(createRootCategory("Root #3"), "SubCategory #3");
+
+        // Sub #1 (root #1) has spec 1-4, sub #2 (root #2) has spec 5-6 and sub #3 (root #3) has spec 7-9
+        String specCatId1 = createSpecifyingCategory(subCategoryId1, "Specifying category #1 for Subcategory #1");
+        String specCatId2 = createSpecifyingCategory(subCategoryId1, "Specifying category #2 for Subcategory #1");
+        String specCatId3 = createSpecifyingCategory(subCategoryId1, "Specifying category #3 for Subcategory #1");
+        String specCatId4 = createSpecifyingCategory(subCategoryId1, "Specifying category #4 for Subcategory #1");
+        String specCatId5 = createSpecifyingCategory(subCategoryId2, "Specifying category #1 for Subcategory #2");
+        String specCatId6 = createSpecifyingCategory(subCategoryId2, "Specifying category #2 for Subcategory #2");
+        String specCatId7 = createSpecifyingCategory(subCategoryId3, "Specifying category #1 for Subcategory #3");
+        String specCatId8 = createSpecifyingCategory(subCategoryId3, "Specifying category #2 for Subcategory #3");
+        String specCatId9 = createSpecifyingCategory(subCategoryId3, "Specifying category #3 for Subcategory #3");
+
+        given().pathParam("id", subCategoryId1)
+                .get(path)
+                .then()
+                .statusCode(200)
+                .body("id", hasItems(specCatId1,
+                        specCatId2,
+                        specCatId3,
+                        specCatId4))
+                .body("title", hasItems("Specifying category #1 for Subcategory #1",
+                        "Specifying category #2 for Subcategory #1",
+                        "Specifying category #3 for Subcategory #1",
+                        "Specifying category #4 for Subcategory #1"));
+
+        given().pathParam("id", subCategoryId2)
+                .get(path)
+                .then()
+                .statusCode(200)
+                .body("id", hasItems(specCatId5, specCatId6))
+                .body("title", hasItems("Specifying category #1 for Subcategory #2",
+                        "Specifying category #2 for Subcategory #2"));
+
+        given().pathParam("id", subCategoryId3)
+                .get(path)
+                .then()
+                .statusCode(200)
+                .body("id", hasItems(specCatId7,
+                        specCatId8,
+                        specCatId9))
+                .body("title", hasItems("Specifying category #1 for Subcategory #3",
+                        "Specifying category #2 for Subcategory #3",
+                        "Specifying category #3 for Subcategory #3"));
     }
 
     //endregion

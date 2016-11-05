@@ -3,13 +3,9 @@ package me.contrapost.restApi.api;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Throwables;
-import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import io.swagger.jaxrs.PATCH;
 import me.contrapost.jee_quiz.ejb.CategoryEJB;
 import me.contrapost.jee_quiz.ejb.QuizEJB;
-import me.contrapost.jee_quiz.entity.SpecifyingCategory;
-import me.contrapost.jee_quiz.entity.SubCategory;
 import me.contrapost.restApi.dto.*;
 
 import javax.ejb.EJB;
@@ -17,11 +13,10 @@ import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.validation.ConstraintViolationException;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -487,6 +482,45 @@ public class QuizRestImpl implements QuizRestApi {
     public void deleteQuiz(@ApiParam(QUIZ_ID_PARAM) Long id) {
         quizEJB.deleteQuiz(id);
     }
+
+    //endregion
+
+    //region implementation of REST API for custom requests
+    @Override
+    public List<RootCategoryDTO> getAllRootCategoriesWithAtLeastOneQuiz() {
+        return RootCategoryConverter.transform(new ArrayList<>(categoryEJB.getAllRootCategoriesWithAtLeastOneQuiz()));
+    }
+
+    @Override
+    public List<SpecifyingCategoryDTO> getAllSpecifyingCategoriesWithAtLeastOneQuiz() {
+        return SpecifyingCategoryConverter
+                .transform(new ArrayList<>(categoryEJB.getAllSpecifyingCategoriesWithAtLeastOneQuiz()));
+    }
+
+    @Override
+    public List<SubCategoryDTO> getAllSubCategoriesForRootCategory(@ApiParam(ROOT_ID_PARAM) Long id) {
+        return SubCategoryConverter
+                .transform(categoryEJB.getAllSubCategoriesForRootCategory(id));
+    }
+
+    @Override
+    public List<SubCategoryDTO> getAllSubCategoriesForParent(@ApiParam(ROOT_ID_PARAM) Long id) {
+        return SubCategoryConverter
+                .transform(categoryEJB.getAllSubCategoriesForRootCategory(id));
+    }
+
+    @Override
+    public List<SpecifyingCategoryDTO> getAllSpecifyingCategoriesForSubCategory(@ApiParam(ROOT_ID_PARAM) Long id) {
+        return SpecifyingCategoryConverter
+                .transform(categoryEJB.getAllSpecifyingCategoriesForSubCategory(id));
+    }
+
+    @Override
+    public List<SpecifyingCategoryDTO> getAllSpecifyingCategoriesForParent(@ApiParam(ROOT_ID_PARAM) Long id) {
+        return SpecifyingCategoryConverter
+                .transform(categoryEJB.getAllSpecifyingCategoriesForSubCategory(id));
+    }
+
     //endregion
 
     //region Util methods
