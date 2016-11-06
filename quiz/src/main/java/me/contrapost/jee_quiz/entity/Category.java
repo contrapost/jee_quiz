@@ -41,5 +41,5 @@ public abstract class Category {
         this.title = title;
     }
 
-    public abstract List<Quiz> getListOfAllQuizes();
+    public abstract List<Quiz> getListOfAllQuizzes();
 }

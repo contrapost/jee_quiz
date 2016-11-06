@@ -27,7 +27,7 @@ public class QuizEJBTest extends EjbTestBase {
 
         createQuiz(question);
 
-        assertEquals(question, quizEJB.getAllQuizes().get(0).getQuestion());
+        assertEquals(question, quizEJB.getAllQuizzes().get(0).getQuestion());
     }
 
     @Test
@@ -36,7 +36,7 @@ public class QuizEJBTest extends EjbTestBase {
 
         assertTrue(quizEJB.deleteQuiz(quizId));
         assertNull(quizEJB.getQuiz(quizId));
-        assertTrue(quizEJB.getAllQuizes().size() == 0);
+        assertTrue(quizEJB.getAllQuizzes().size() == 0);
     }
 
     @Test
@@ -96,7 +96,7 @@ public class QuizEJBTest extends EjbTestBase {
     }
 
     @Test
-    public void testCreateTwoQuizesWithSameQuestion() {
+    public void testCreateTwoQuizzesWithSameQuestion() {
         String quizName = "Super duper quiz";
 
         createQuiz(quizName);

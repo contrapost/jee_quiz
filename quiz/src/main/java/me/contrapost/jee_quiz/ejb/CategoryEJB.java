@@ -101,11 +101,11 @@ public class CategoryEJB {
         return true;
     }
 
-    public List<Quiz> getAllQuizesForCategory(long categoryId) {
+    public List<Quiz> getAllQuizzesForCategory(long categoryId) {
         Category category = em.find(Category.class, categoryId);
         if (category == null) throw new IllegalArgumentException("There is no category with id: " + categoryId);
 
-        return category.getListOfAllQuizes();
+        return category.getListOfAllQuizzes();
     }
 
     public List<RootCategory> getAllRootCategories() {
@@ -121,15 +121,15 @@ public class CategoryEJB {
     }
 
     public Set<RootCategory> getAllRootCategoriesWithAtLeastOneQuiz() {
-        List<Quiz> quizes = em.createNamedQuery(Quiz.GET_ALL_QUIZES).getResultList();
-        return quizes.stream().map(Quiz::getSpecifyingCategory).collect(Collectors.toSet())
+        List<Quiz> quizzes = em.createNamedQuery(Quiz.GET_ALL_QUIZZES).getResultList();
+        return quizzes.stream().map(Quiz::getSpecifyingCategory).collect(Collectors.toSet())
                 .stream().map(SpecifyingCategory::getSubCategory).collect(Collectors.toSet())
                 .stream().map(SubCategory::getRootCategory).collect(Collectors.toSet());
     }
 
     public Set<SpecifyingCategory> getAllSpecifyingCategoriesWithAtLeastOneQuiz() {
-        List<Quiz> quizes = em.createNamedQuery(Quiz.GET_ALL_QUIZES).getResultList();
-        return quizes.stream().map(Quiz::getSpecifyingCategory).collect(Collectors.toSet());
+        List<Quiz> quizzes = em.createNamedQuery(Quiz.GET_ALL_QUIZZES).getResultList();
+        return quizzes.stream().map(Quiz::getSpecifyingCategory).collect(Collectors.toSet());
     }
 
     public List<SubCategory> getAllSubCategoriesForRootCategory(long categoryId) {

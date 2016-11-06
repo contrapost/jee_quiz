@@ -12,12 +12,12 @@ import java.util.Map;
  * Quiz entity
  */
 @NamedQueries(
-        @NamedQuery(name = Quiz.GET_ALL_QUIZES, query = "select q from Quiz q")
+        @NamedQuery(name = Quiz.GET_ALL_QUIZZES, query = "select q from Quiz q")
 )
 @Entity
 public class Quiz {
 
-    public static final String GET_ALL_QUIZES = "GET_ALL_QUIZES";
+    public static final String GET_ALL_QUIZZES = "GET_ALL_QUIZZES";
 
     @Id
     @GeneratedValue

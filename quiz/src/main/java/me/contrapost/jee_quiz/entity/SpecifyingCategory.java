@@ -1,6 +1,5 @@
 package me.contrapost.jee_quiz.entity;
 
-import org.hibernate.annotations.*;
 import org.hibernate.annotations.NamedQueries;
 import org.hibernate.annotations.NamedQuery;
 
@@ -24,7 +23,7 @@ public class SpecifyingCategory extends Category {
 
     public static final String GET_ALL_SPECIFYING_CATEGORIES = "GET_ALL_SPECIFYING_CATEGORIES";
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
-    private Map<Long, Quiz> quizes;
+    private Map<Long, Quiz> quizzes;
 
     @ManyToOne
     private SubCategory subCategory;
@@ -32,13 +31,13 @@ public class SpecifyingCategory extends Category {
     public SpecifyingCategory() {
     }
 
-    public Map<Long, Quiz> getQuizes() {
-        if(quizes == null) quizes = new HashMap<>();
-        return quizes;
+    public Map<Long, Quiz> getQuizzes() {
+        if(quizzes == null) quizzes = new HashMap<>();
+        return quizzes;
     }
 
-    public void setQuizes(Map<Long, Quiz> quizes) {
-        this.quizes = quizes;
+    public void setQuizzes(Map<Long, Quiz> quizzes) {
+        this.quizzes = quizzes;
     }
 
     public SubCategory getSubCategory() {
@@ -50,7 +49,7 @@ public class SpecifyingCategory extends Category {
     }
 
     @Override
-    public List<Quiz> getListOfAllQuizes() {
-        return new ArrayList<>(getQuizes().values());
+    public List<Quiz> getListOfAllQuizzes() {
+        return new ArrayList<>(getQuizzes().values());
     }
 }

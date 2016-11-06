@@ -13,7 +13,6 @@ import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.validation.ConstraintViolationException;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -344,10 +343,10 @@ public class QuizRestImpl implements QuizRestApi {
     }
     //endregion
 
-    //region implementation of REST API for quizes
+    //region implementation of REST API for quizzes
     @Override
-    public List<QuizDTO> getAllQuizes() {
-        return QuizConverter.transform(quizEJB.getAllQuizes());
+    public List<QuizDTO> getAllQuizzes() {
+        return QuizConverter.transform(quizEJB.getAllQuizzes());
     }
 
     @Override
@@ -367,7 +366,7 @@ public class QuizRestImpl implements QuizRestApi {
             throw new WebApplicationException("Cannot specify id for a newly generated quiz", 400);
         }
 
-        Long specifyingCategoryId = null;
+        Long specifyingCategoryId;
         try {
             specifyingCategoryId = Long.parseLong(dto.specifyingCategoryId);
         } catch (NumberFormatException e) {
@@ -450,6 +449,7 @@ public class QuizRestImpl implements QuizRestApi {
             if (answerMapNode.isNull()) {
                 newAnswerMap = dto.answerMap;
             } else if (answerMapNode.isObject()) {
+                //noinspection unchecked
                 newAnswerMap = jackson.convertValue(answerMapNode, Map.class);
             } else {
                 throw new WebApplicationException("Invalid JSON. Non-string root category id", 400);
@@ -505,8 +505,8 @@ public class QuizRestImpl implements QuizRestApi {
     }
 
     @Override
-    public List<QuizDTO> getAllQuizesForParent(@ApiParam(GENERAL_ID_PARAM) Long id) {
-        return QuizConverter.transform(categoryEJB.getAllQuizesForCategory(id));
+    public List<QuizDTO> getAllQuizzesForParent(@ApiParam(GENERAL_ID_PARAM) Long id) {
+        return QuizConverter.transform(categoryEJB.getAllQuizzesForCategory(id));
     }
 
     //endregion
@@ -514,6 +514,7 @@ public class QuizRestImpl implements QuizRestApi {
     //region Util methods
 
     private WebApplicationException wrapException(Exception e) throws WebApplicationException {
+        @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
         Throwable cause = Throwables.getRootCause(e);
         if (cause instanceof ConstraintViolationException || cause instanceof SQLException) {
             return new WebApplicationException("Invalid constraints on input: " + cause.getMessage(), 400);

@@ -31,7 +31,7 @@ public class QuizEJB {
 
         em.persist(quiz);
 
-        category.getQuizes().put(quiz.getId(), quiz);
+        category.getQuizzes().put(quiz.getId(), quiz);
 
         return quiz.getId();
     }
@@ -41,7 +41,7 @@ public class QuizEJB {
         if (quiz == null) return false;
         SpecifyingCategory specifyingCategory = em.find(SpecifyingCategory.class,
                 quiz.getSpecifyingCategory().getId());
-        specifyingCategory.getQuizes().remove(id);
+        specifyingCategory.getQuizzes().remove(id);
         return true;
     }
 
@@ -66,8 +66,9 @@ public class QuizEJB {
         return em.find(Quiz.class, id);
     }
 
-    public List<Quiz> getAllQuizes() {
-        return em.createNamedQuery(Quiz.GET_ALL_QUIZES).getResultList();
+    public List<Quiz> getAllQuizzes() {
+        //noinspection unchecked
+        return em.createNamedQuery(Quiz.GET_ALL_QUIZZES).getResultList();
     }
 
     public boolean updateQuiz(Long id, String newQuestion, Map<String, Boolean> newAnswerMap) {

@@ -1,9 +1,6 @@
 package me.contrapost.jee_quiz.ejb;
 
-import me.contrapost.jee_quiz.entity.Category;
 import me.contrapost.jee_quiz.entity.Quiz;
-import me.contrapost.jee_quiz.entity.RootCategory;
-import me.contrapost.jee_quiz.entity.SpecifyingCategory;
 import org.jboss.arquillian.junit.Arquillian;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,7 +33,7 @@ public class CategoryEJBTest extends EjbTestBase {
     }
 
     @Test
-    public void testCascadeDeleteOfAllSubCategoriesAndQuizesWhenRootIsDeleted() {
+    public void testCascadeDeleteOfAllSubCategoriesAndQuizzesWhenRootIsDeleted() {
         long rootCategoryId2 = createRootCategory("Root");
         long subCatId = createSubCategory("Sub", rootCategoryId2);
         long specCatId = createSpecifyingCategory("Spec", subCatId);
@@ -89,7 +86,7 @@ public class CategoryEJBTest extends EjbTestBase {
     }
 
     @Test
-    public void testGetAllQuizesForCategory() {
+    public void testGetAllQuizzesForCategory() {
         // Two root categories
         long rootCat1Id = createRootCategory("Root1");
         long rootCat2Id = createRootCategory("Root2");
@@ -129,7 +126,7 @@ public class CategoryEJBTest extends EjbTestBase {
         long specCat14Id = createSpecifyingCategory("Spec14", subCat5Id);
         long specCat15Id = createSpecifyingCategory("Spec15", subCat5Id);
 
-        // Each specifying category has 3 quizes
+        // Each specifying category has 3 quizzes
         // Spec category 1
         long quiz1Id = createQuiz("Quiz1", specCat1Id);
         long quiz2Id = createQuiz("Quiz2", specCat1Id);
@@ -205,24 +202,24 @@ public class CategoryEJBTest extends EjbTestBase {
         long quiz44Id = createQuiz("Quiz44", specCat15Id);
         long quiz45Id = createQuiz("Quiz45", specCat15Id);
 
-        // Root 1 has 2 subcategories, 6 specifying categories and 18 quizes
-        // Root 2 has 3 subcategories, 9 specifying categories and 27 quizes
-        // Each subcategory has 9 quizes
+        // Root 1 has 2 subcategories, 6 specifying categories and 18 quizzes
+        // Root 2 has 3 subcategories, 9 specifying categories and 27 quizzes
+        // Each subcategory has 9 quizzes
 
-        assertEquals(18, categoryEJB.getAllQuizesForCategory(rootCat1Id).size());
-        assertEquals(27, categoryEJB.getAllQuizesForCategory(rootCat2Id).size());
+        assertEquals(18, categoryEJB.getAllQuizzesForCategory(rootCat1Id).size());
+        assertEquals(27, categoryEJB.getAllQuizzesForCategory(rootCat2Id).size());
         assertTrue(categoryEJB
-                        .getAllQuizesForCategory(specCat15Id) // Spec category 15 has quizes 43, 44, 45
+                        .getAllQuizzesForCategory(specCat15Id) // Spec category 15 has quizzes 43, 44, 45
                         .stream()
                         .map(Quiz::getId)
                         .anyMatch(id -> id == quiz45Id));
         assertTrue(categoryEJB
-                        .getAllQuizesForCategory(subCat2Id)  // Subcategory 2 has quizes 10 - 18
+                        .getAllQuizzesForCategory(subCat2Id)  // Subcategory 2 has quizzes 10 - 18
                         .stream()
                         .map(Quiz::getId)
                         .anyMatch(id -> id == quiz14Id));
         assertTrue(categoryEJB
-                        .getAllQuizesForCategory(rootCat1Id) // Root category 1 has quizes 1 - 18
+                        .getAllQuizzesForCategory(rootCat1Id) // Root category 1 has quizzes 1 - 18
                         .stream()
                         .map(Quiz::getId)
                         .anyMatch(id -> id == quiz16Id));

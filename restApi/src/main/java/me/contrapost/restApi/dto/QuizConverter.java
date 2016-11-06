@@ -26,10 +26,10 @@ public class QuizConverter {
         return dto;
     }
 
-    public static List<QuizDTO> transform(List<Quiz> quizes){
-        Objects.requireNonNull(quizes);
+    public static List<QuizDTO> transform(List<Quiz> quizzes){
+        Objects.requireNonNull(quizzes);
 
-        return quizes.stream()
+        return quizzes.stream()
                 .map(QuizConverter::transform)
                 .collect(Collectors.toList());
     }

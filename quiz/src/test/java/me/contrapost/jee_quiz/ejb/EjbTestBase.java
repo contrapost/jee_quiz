@@ -41,7 +41,7 @@ public abstract class EjbTestBase {
     @Before
     @After
     public void emptyDatabase(){
-        deleterEJB.deleteQuizes();
+        deleterEJB.deleteQuizzes();
         deleterEJB.deleteEntities(SpecifyingCategory.class);
 
         deleterEJB.deleteEntities(SubCategory.class);

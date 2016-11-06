@@ -42,16 +42,16 @@ public class RootCategory extends Category{
     }
 
     @Override
-    public List<Quiz> getListOfAllQuizes() {
+    public List<Quiz> getListOfAllQuizzes() {
         List<SpecifyingCategory> specifyingCategories = new ArrayList<>();
         for(SubCategory sc : getSubCategories().values()) {
             specifyingCategories = Stream.concat(sc.getSpecifyingCategories().values().stream(),
                     specifyingCategories.stream()).collect(Collectors.toList());
         }
-        List<Quiz> quizes = new ArrayList<>();
+        List<Quiz> quizzes = new ArrayList<>();
         for (SpecifyingCategory sc : specifyingCategories) {
-            quizes = Stream.concat(quizes.stream(), sc.getQuizes().values().stream()).collect(Collectors.toList());
+            quizzes = Stream.concat(quizzes.stream(), sc.getQuizzes().values().stream()).collect(Collectors.toList());
         }
-        return quizes;
+        return quizzes;
     }
 }

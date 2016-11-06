@@ -37,12 +37,12 @@ public class DeleterEJB {
         query.executeUpdate();
     }
 
-    public void deleteQuizes() {
-        List<Quiz> quizes = em.createNamedQuery(Quiz.GET_ALL_QUIZES).getResultList();
-        for(Quiz quiz : quizes) {
+    public void deleteQuizzes() {
+        List<Quiz> quizzes = em.createNamedQuery(Quiz.GET_ALL_QUIZZES).getResultList();
+        for(Quiz quiz : quizzes) {
             SpecifyingCategory specifyingCategory = em.find(SpecifyingCategory.class,
                     quiz.getSpecifyingCategory().getId());
-            specifyingCategory.getQuizes().remove(quiz.getId());
+            specifyingCategory.getQuizzes().remove(quiz.getId());
         }
     }
 }

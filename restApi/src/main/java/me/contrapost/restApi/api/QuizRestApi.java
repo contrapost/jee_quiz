@@ -15,16 +15,15 @@ import javax.ejb.TransactionAttributeType;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by alexandershipunov on 30/10/2016.
  * Quiz API interface
  */
 @Api(value = "/quiz" , description = "Handling of creating and retrieving root, sub- and specifying " +
-        "categories and quizes")
+        "categories and quizzes")
 @Path("/quiz")
-@Produces(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
 @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
 public interface QuizRestApi {
 
@@ -52,7 +51,7 @@ public interface QuizRestApi {
     @ApiOperation("Create a new root category")
     @POST
     @Path("/categories")
-    @Consumes(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON + "; charset=UTF-8")
     @ApiResponse(code = 200, message = "The id of newly created root category")
     Long createRootCategory(
             @ApiParam("Title of a new root category. Should not specify id.")
@@ -109,7 +108,7 @@ public interface QuizRestApi {
     @ApiOperation("Create a new subcategory")
     @POST
     @Path("/subcategories")
-    @Consumes(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON + "; charset=UTF-8")
     @ApiResponse(code = 200, message = "The id of newly created subcategory")
     Long createSubCategory(
             @ApiParam("Title of a new subcategory. Should not specify id.")
@@ -205,15 +204,15 @@ public interface QuizRestApi {
 
     //endregion
 
-    //region Dealing with quizes
-    @ApiOperation("Get all quizes")
+    //region Dealing with quizzes
+    @ApiOperation("Get all quizzes")
     @GET
-    @Path("/quizes")
-    List<QuizDTO> getAllQuizes();
+    @Path("/quizzes")
+    List<QuizDTO> getAllQuizzes();
 
     @ApiOperation("Get a single quiz specified by id")
     @GET
-    @Path("/quizes/id/{id}")
+    @Path("/quizzes/id/{id}")
     QuizDTO getQuizById(
             @ApiParam(QUIZ_ID_PARAM)
             @PathParam("id")
@@ -221,8 +220,8 @@ public interface QuizRestApi {
 
     @ApiOperation("Create a new quiz")
     @POST
-    @Path("/quizes")
-    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/quizzes")
+    @Consumes(MediaType.APPLICATION_JSON + "; charset=UTF-8")
     @ApiResponse(code = 200, message = "The id of newly created specifying category")
     Long createQuiz(
             @ApiParam("Question, set of answers as a Map<String, boolean> and " +
@@ -231,7 +230,7 @@ public interface QuizRestApi {
 
     @ApiOperation("Update the quiz question")
     @PUT
-    @Path("/quizes/id/{id}/question")
+    @Path("/quizzes/id/{id}/question")
     @Consumes(MediaType.TEXT_PLAIN)
     void updateQuestionQuiz(
             @ApiParam(QUIZ_ID_PARAM)
@@ -243,7 +242,7 @@ public interface QuizRestApi {
     );
 
     @ApiOperation("Modify the quiz using JSON Merge Patch")
-    @Path("/quizes/id/{id}")
+    @Path("/quizzes/id/{id}")
     @PATCH
     @Consumes("application/merge-patch+json")
     void mergePatchQuiz(@ApiParam(QUIZ_ID_PARAM)
@@ -254,7 +253,7 @@ public interface QuizRestApi {
 
     @ApiOperation("Delete a quiz with the given id")
     @DELETE
-    @Path("/quizes/id/{id}")
+    @Path("/quizzes/id/{id}")
     void deleteQuiz(
             @ApiParam(QUIZ_ID_PARAM)
             @PathParam("id")
@@ -300,10 +299,10 @@ public interface QuizRestApi {
                                                       @PathParam("id")
                                                               Long id);
 
-    @ApiOperation("Get all quizes for parent (root/sub/specifying) category specified by id")
+    @ApiOperation("Get all quizzes for parent (root/sub/specifying) category specified by id")
     @GET
-    @Path("/quizes/parent/{id}")
-    List<QuizDTO> getAllQuizesForParent(@ApiParam(GENERAL_ID_PARAM)
+    @Path("/quizzes/parent/{id}")
+    List<QuizDTO> getAllQuizzesForParent(@ApiParam(GENERAL_ID_PARAM)
                                                                     @PathParam("id")
                                                                             Long id);
     //endregion

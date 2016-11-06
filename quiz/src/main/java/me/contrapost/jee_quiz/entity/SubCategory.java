@@ -1,6 +1,5 @@
 package me.contrapost.jee_quiz.entity;
 
-import org.hibernate.annotations.*;
 import org.hibernate.annotations.NamedQueries;
 import org.hibernate.annotations.NamedQuery;
 
@@ -52,11 +51,11 @@ public class SubCategory extends Category{
     }
 
     @Override
-    public List<Quiz> getListOfAllQuizes() {
-        List<Quiz> quizes = new ArrayList<>();
+    public List<Quiz> getListOfAllQuizzes() {
+        List<Quiz> quizzes = new ArrayList<>();
         for(SpecifyingCategory sc : getSpecifyingCategories().values()) {
-            quizes = Stream.concat(quizes.stream(), sc.getQuizes().values().stream()).collect(Collectors.toList());
+            quizzes = Stream.concat(quizzes.stream(), sc.getQuizzes().values().stream()).collect(Collectors.toList());
         }
-        return quizes;
+        return quizzes;
     }
 }
