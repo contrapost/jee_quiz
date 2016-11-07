@@ -23,15 +23,11 @@ import java.util.List;
 @Api(value = "/quiz" , description = "Handling of creating and retrieving root, sub- and specifying " +
         "categories and quizzes")
 @Path("/quiz")
-@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+@Produces(Formats.JSON_V1)
 @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
 public interface QuizRestApi {
 
-    String GENERAL_ID_PARAM = "The numeric id of a parent category (root/sub/specifying)";
-    String ROOT_ID_PARAM = "The numeric id of the root category";
-    String SUB_ID_PARAM = "The numeric id of the subcategory";
-    String SPEC_ID_PARAM = "The numeric id of the specifying category";
-    String QUIZ_ID_PARAM = "The numeric id of the quiz";
+
 
     //region Dealing with root category
 
@@ -44,14 +40,14 @@ public interface QuizRestApi {
     @GET
     @Path("categories/id/{id}")
     RootCategoryDTO getRootCategoryById(
-            @ApiParam(ROOT_ID_PARAM)
+            @ApiParam(Params.ROOT_ID_PARAM)
             @PathParam("id")
                     Long id);
 
     @ApiOperation("Create a new root category")
     @POST
     @Path("/categories")
-    @Consumes(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+    @Consumes(Formats.JSON_V1)
     @ApiResponse(code = 200, message = "The id of newly created root category")
     Long createRootCategory(
             @ApiParam("Title of a new root category. Should not specify id.")
@@ -62,7 +58,7 @@ public interface QuizRestApi {
     @Path("/categories/id/{id}/title")
     @Consumes(MediaType.TEXT_PLAIN)
     void updateRootCategoryTitle(
-            @ApiParam(ROOT_ID_PARAM)
+            @ApiParam(Params.ROOT_ID_PARAM)
             @PathParam("id")
                     Long id,
             //
@@ -73,7 +69,7 @@ public interface QuizRestApi {
     @ApiOperation("Modify the root category using JSON Merge Patch")
     @Path("/categories/id/{id}")
     @PATCH
-    @Consumes("application/merge-patch+json")
+    @Consumes(Formats.JSON_MERGE_V1)
     void mergePatchRootCategory(@ApiParam("The unique id of the root category")
                                 @PathParam("id")
                                         Long id,
@@ -84,7 +80,7 @@ public interface QuizRestApi {
     @DELETE
     @Path("/categories/id/{id}")
     void deleteRootCategory(
-            @ApiParam(ROOT_ID_PARAM)
+            @ApiParam(Params.ROOT_ID_PARAM)
             @PathParam("id")
                     Long id);
 
@@ -101,14 +97,14 @@ public interface QuizRestApi {
     @GET
     @Path("/subcategories/id/{id}")
     SubCategoryDTO getSubCategoryById(
-            @ApiParam(SUB_ID_PARAM)
+            @ApiParam(Params.SUB_ID_PARAM)
             @PathParam("id")
                     Long id);
 
     @ApiOperation("Create a new subcategory")
     @POST
     @Path("/subcategories")
-    @Consumes(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+    @Consumes(Formats.JSON_V1)
     @ApiResponse(code = 200, message = "The id of newly created subcategory")
     Long createSubCategory(
             @ApiParam("Title of a new subcategory. Should not specify id.")
@@ -119,7 +115,7 @@ public interface QuizRestApi {
     @Path("/subcategories/id/{id}/title")
     @Consumes(MediaType.TEXT_PLAIN)
     void updateSubCategoryTitle(
-            @ApiParam(SUB_ID_PARAM)
+            @ApiParam(Params.SUB_ID_PARAM)
             @PathParam("id")
                     Long id,
             //
@@ -130,7 +126,7 @@ public interface QuizRestApi {
     @ApiOperation("Modify the subcategory using JSON Merge Patch")
     @Path("/subcategories/id/{id}")
     @PATCH
-    @Consumes("application/merge-patch+json")
+    @Consumes(Formats.JSON_MERGE_V1)
     void mergePatchSubCategory(@ApiParam("The unique id of the subcategory")
                                @PathParam("id")
                                        Long id,
@@ -141,7 +137,7 @@ public interface QuizRestApi {
     @DELETE
     @Path("/subcategories/id/{id}")
     void deleteSubCategory(
-            @ApiParam(SUB_ID_PARAM)
+            @ApiParam(Params.SUB_ID_PARAM)
             @PathParam("id")
                     Long id);
 
@@ -158,14 +154,14 @@ public interface QuizRestApi {
     @GET
     @Path("/specifying-categories/id/{id}")
     SpecifyingCategoryDTO getSpecifyingCategoryById(
-            @ApiParam(SPEC_ID_PARAM)
+            @ApiParam(Params.SPEC_ID_PARAM)
             @PathParam("id")
                     Long id);
 
     @ApiOperation("Create a new specifying category")
     @POST
     @Path("/specifying-categories")
-    @Consumes(MediaType.APPLICATION_JSON)
+    @Consumes(Formats.JSON_V1)
     @ApiResponse(code = 200, message = "The id of newly created specifying category")
     Long createSpecifyingCategory(
             @ApiParam("Title of a new subcategory. Should not specify id.")
@@ -176,7 +172,7 @@ public interface QuizRestApi {
     @Path("/specifying-categories/id/{id}/title")
     @Consumes(MediaType.TEXT_PLAIN)
     void updateSpecifyingCategoryTitle(
-            @ApiParam(SPEC_ID_PARAM)
+            @ApiParam(Params.SPEC_ID_PARAM)
             @PathParam("id")
                     Long id,
             //
@@ -187,7 +183,7 @@ public interface QuizRestApi {
     @ApiOperation("Modify the specifying category using JSON Merge Patch")
     @Path("/specifying-categories/id/{id}")
     @PATCH
-    @Consumes("application/merge-patch+json")
+    @Consumes(Formats.JSON_MERGE_V1)
     void mergePatchSpecifyingCategory(@ApiParam("The unique id of the specifying category")
                                @PathParam("id")
                                        Long id,
@@ -198,7 +194,7 @@ public interface QuizRestApi {
     @DELETE
     @Path("/specifying-categories/id/{id}")
     void deleteSpecifyingCategory(
-            @ApiParam(SPEC_ID_PARAM)
+            @ApiParam(Params.SPEC_ID_PARAM)
             @PathParam("id")
                     Long id);
 
@@ -214,14 +210,14 @@ public interface QuizRestApi {
     @GET
     @Path("/quizzes/id/{id}")
     QuizDTO getQuizById(
-            @ApiParam(QUIZ_ID_PARAM)
+            @ApiParam(Params.QUIZ_ID_PARAM)
             @PathParam("id")
                     Long id);
 
     @ApiOperation("Create a new quiz")
     @POST
     @Path("/quizzes")
-    @Consumes(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+    @Consumes(Formats.JSON_V1)
     @ApiResponse(code = 200, message = "The id of newly created specifying category")
     Long createQuiz(
             @ApiParam("Question, set of answers as a Map<String, boolean> and " +
@@ -233,7 +229,7 @@ public interface QuizRestApi {
     @Path("/quizzes/id/{id}/question")
     @Consumes(MediaType.TEXT_PLAIN)
     void updateQuestionQuiz(
-            @ApiParam(QUIZ_ID_PARAM)
+            @ApiParam(Params.QUIZ_ID_PARAM)
             @PathParam("id")
                     Long id,
             //
@@ -244,8 +240,8 @@ public interface QuizRestApi {
     @ApiOperation("Modify the quiz using JSON Merge Patch")
     @Path("/quizzes/id/{id}")
     @PATCH
-    @Consumes("application/merge-patch+json")
-    void mergePatchQuiz(@ApiParam(QUIZ_ID_PARAM)
+    @Consumes(Formats.JSON_MERGE_V1)
+    void mergePatchQuiz(@ApiParam(Params.QUIZ_ID_PARAM)
                                       @PathParam("id")
                                               Long id,
                                       @ApiParam("The partial patch")
@@ -255,7 +251,7 @@ public interface QuizRestApi {
     @DELETE
     @Path("/quizzes/id/{id}")
     void deleteQuiz(
-            @ApiParam(QUIZ_ID_PARAM)
+            @ApiParam(Params.QUIZ_ID_PARAM)
             @PathParam("id")
                     Long id);
     //endregion
@@ -274,35 +270,35 @@ public interface QuizRestApi {
     @ApiOperation("Get all subcategories of the category specified by id")
     @GET
     @Path("/categories/id/{id}/subcategories")
-    List<SubCategoryDTO> getAllSubCategoriesForRootCategory(@ApiParam(ROOT_ID_PARAM)
+    List<SubCategoryDTO> getAllSubCategoriesForRootCategory(@ApiParam(Params.ROOT_ID_PARAM)
                                                             @PathParam("id")
                                                                     Long id);
 
     @ApiOperation("Get all subcategories with the given parent specified by id")
     @GET
     @Path("/subcategories/parent/{id}")
-    List<SubCategoryDTO> getAllSubCategoriesForParent(@ApiParam(ROOT_ID_PARAM)
+    List<SubCategoryDTO> getAllSubCategoriesForParent(@ApiParam(Params.ROOT_ID_PARAM)
                                                             @PathParam("id")
                                                                     Long id);
 
     @ApiOperation("Get all specifying categories of the subcategory specified by id")
     @GET
     @Path("/subcategories/id/{id}/specifying-categories")
-    List<SpecifyingCategoryDTO> getAllSpecifyingCategoriesForSubCategory(@ApiParam(SUB_ID_PARAM)
+    List<SpecifyingCategoryDTO> getAllSpecifyingCategoriesForSubCategory(@ApiParam(Params.SUB_ID_PARAM)
                                                             @PathParam("id")
                                                                     Long id);
 
     @ApiOperation("Get all specifying categories with the given subcategory parent specified by id")
     @GET
     @Path("/specifying-categories/parent/{id}")
-    List<SpecifyingCategoryDTO> getAllSpecifyingCategoriesForParent(@ApiParam(SUB_ID_PARAM)
+    List<SpecifyingCategoryDTO> getAllSpecifyingCategoriesForParent(@ApiParam(Params.SUB_ID_PARAM)
                                                       @PathParam("id")
                                                               Long id);
 
     @ApiOperation("Get all quizzes for parent (root/sub/specifying) category specified by id")
     @GET
     @Path("/quizzes/parent/{id}")
-    List<QuizDTO> getAllQuizzesForParent(@ApiParam(GENERAL_ID_PARAM)
+    List<QuizDTO> getAllQuizzesForParent(@ApiParam(Params.GENERAL_ID_PARAM)
                                                                     @PathParam("id")
                                                                             Long id);
     //endregion

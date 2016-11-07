@@ -40,7 +40,7 @@ public class QuizRestImpl implements QuizRestApi {
     }
 
     @Override
-    public RootCategoryDTO getRootCategoryById(@ApiParam("The numeric id of the root category") Long id) {
+    public RootCategoryDTO getRootCategoryById(@ApiParam(Params.ROOT_ID_PARAM) Long id) {
         return RootCategoryConverter.transform(categoryEJB.getRootCategory(id));
     }
 
@@ -71,7 +71,7 @@ public class QuizRestImpl implements QuizRestApi {
     }
 
     @Override
-    public void updateRootCategoryTitle(@ApiParam("The numeric id of the root category") Long id,
+    public void updateRootCategoryTitle(@ApiParam(Params.ROOT_ID_PARAM) Long id,
                                         @ApiParam("The new title which will replace the old one") String title) {
         if(categoryEJB.getRootCategory(id) == null){
             throw new WebApplicationException("Cannot find root category with id: "+id, 404);
@@ -120,7 +120,7 @@ public class QuizRestImpl implements QuizRestApi {
     }
 
     @Override
-    public void deleteRootCategory(@ApiParam("The numeric id of the root category") Long id) {
+    public void deleteRootCategory(@ApiParam(Params.ROOT_ID_PARAM) Long id) {
         categoryEJB.deleteRootCategory(id);
     }
 
@@ -133,7 +133,7 @@ public class QuizRestImpl implements QuizRestApi {
     }
 
     @Override
-    public SubCategoryDTO getSubCategoryById(@ApiParam("The numeric id of the root category") Long id) {
+    public SubCategoryDTO getSubCategoryById(@ApiParam(Params.SUB_ID_PARAM) Long id) {
         return SubCategoryConverter.transform(categoryEJB.getSubCategory(id));
     }
 
@@ -172,7 +172,7 @@ public class QuizRestImpl implements QuizRestApi {
     }
 
     @Override
-    public void updateSubCategoryTitle(@ApiParam("The numeric id of the subcategory") Long id,
+    public void updateSubCategoryTitle(@ApiParam(Params.SUB_ID_PARAM) Long id,
                                        @ApiParam("The new title which will replace the old one") String title) {
         if(categoryEJB.getSubCategory(id) == null){
             throw new WebApplicationException("Cannot find subcategory with id: " + id, 404);
@@ -229,7 +229,7 @@ public class QuizRestImpl implements QuizRestApi {
     }
 
     @Override
-    public void deleteSubCategory(@ApiParam("The numeric id of the subcategory") Long id) {
+    public void deleteSubCategory(@ApiParam(Params.SUB_ID_PARAM) Long id) {
         categoryEJB.deleteSubCategory(id);
     }
 
@@ -242,7 +242,7 @@ public class QuizRestImpl implements QuizRestApi {
     }
 
     @Override
-    public SpecifyingCategoryDTO getSpecifyingCategoryById(@ApiParam("The numeric id of the specifying category") Long id) {
+    public SpecifyingCategoryDTO getSpecifyingCategoryById(@ApiParam(Params.SPEC_ID_PARAM) Long id) {
         return SpecifyingCategoryConverter.transform(categoryEJB.getSpecifyingCategory(id));
     }
 
@@ -281,7 +281,7 @@ public class QuizRestImpl implements QuizRestApi {
     }
 
     @Override
-    public void updateSpecifyingCategoryTitle(@ApiParam(SPEC_ID_PARAM) Long id,
+    public void updateSpecifyingCategoryTitle(@ApiParam(Params.SPEC_ID_PARAM) Long id,
                                               @ApiParam("The new title which will replace the old one") String title) {
         if(categoryEJB.getSpecifyingCategory(id) == null){
             throw new WebApplicationException("Cannot find specifying category with id: " + id, 404);
@@ -338,7 +338,7 @@ public class QuizRestImpl implements QuizRestApi {
     }
 
     @Override
-    public void deleteSpecifyingCategory(@ApiParam("The numeric id of the specifying category") Long id) {
+    public void deleteSpecifyingCategory(@ApiParam(Params.SPEC_ID_PARAM) Long id) {
         categoryEJB.deleteSpecifyingCategory(id);
     }
     //endregion
@@ -350,7 +350,7 @@ public class QuizRestImpl implements QuizRestApi {
     }
 
     @Override
-    public QuizDTO getQuizById(@ApiParam(QUIZ_ID_PARAM) Long id) {
+    public QuizDTO getQuizById(@ApiParam(Params.QUIZ_ID_PARAM) Long id) {
         return QuizConverter.transform(quizEJB.getQuiz(id));
     }
 
@@ -390,7 +390,7 @@ public class QuizRestImpl implements QuizRestApi {
     }
 
     @Override
-    public void updateQuestionQuiz(@ApiParam(QUIZ_ID_PARAM) Long id,
+    public void updateQuestionQuiz(@ApiParam(Params.QUIZ_ID_PARAM) Long id,
                                    @ApiParam("The new question which will replace the old one") String question) {
         if(quizEJB.getQuiz(id) == null){
             throw new WebApplicationException("Cannot find quiz with id: " + id, 404);
@@ -460,7 +460,7 @@ public class QuizRestImpl implements QuizRestApi {
     }
 
     @Override
-    public void deleteQuiz(@ApiParam(QUIZ_ID_PARAM) Long id) {
+    public void deleteQuiz(@ApiParam(Params.QUIZ_ID_PARAM) Long id) {
         quizEJB.deleteQuiz(id);
     }
 
@@ -481,31 +481,31 @@ public class QuizRestImpl implements QuizRestApi {
     }
 
     @Override
-    public List<SubCategoryDTO> getAllSubCategoriesForRootCategory(@ApiParam(ROOT_ID_PARAM) Long id) {
+    public List<SubCategoryDTO> getAllSubCategoriesForRootCategory(@ApiParam(Params.ROOT_ID_PARAM) Long id) {
         return SubCategoryConverter
                 .transform(categoryEJB.getAllSubCategoriesForRootCategory(id));
     }
 
     @Override
-    public List<SubCategoryDTO> getAllSubCategoriesForParent(@ApiParam(ROOT_ID_PARAM) Long id) {
+    public List<SubCategoryDTO> getAllSubCategoriesForParent(@ApiParam(Params.ROOT_ID_PARAM) Long id) {
         return SubCategoryConverter
                 .transform(categoryEJB.getAllSubCategoriesForRootCategory(id));
     }
 
     @Override
-    public List<SpecifyingCategoryDTO> getAllSpecifyingCategoriesForSubCategory(@ApiParam(ROOT_ID_PARAM) Long id) {
+    public List<SpecifyingCategoryDTO> getAllSpecifyingCategoriesForSubCategory(@ApiParam(Params.ROOT_ID_PARAM) Long id) {
         return SpecifyingCategoryConverter
                 .transform(categoryEJB.getAllSpecifyingCategoriesForSubCategory(id));
     }
 
     @Override
-    public List<SpecifyingCategoryDTO> getAllSpecifyingCategoriesForParent(@ApiParam(ROOT_ID_PARAM) Long id) {
+    public List<SpecifyingCategoryDTO> getAllSpecifyingCategoriesForParent(@ApiParam(Params.ROOT_ID_PARAM) Long id) {
         return SpecifyingCategoryConverter
                 .transform(categoryEJB.getAllSpecifyingCategoriesForSubCategory(id));
     }
 
     @Override
-    public List<QuizDTO> getAllQuizzesForParent(@ApiParam(GENERAL_ID_PARAM) Long id) {
+    public List<QuizDTO> getAllQuizzesForParent(@ApiParam(Params.GENERAL_ID_PARAM) Long id) {
         return QuizConverter.transform(categoryEJB.getAllQuizzesForCategory(id));
     }
 
