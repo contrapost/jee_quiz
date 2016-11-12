@@ -1,5 +1,6 @@
 package me.contrapost.restApi.api;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import io.restassured.http.ContentType;
 import me.contrapost.restApi.dto.QuizDTO;
 import me.contrapost.restApi.dto.RootCategoryDTO;
@@ -843,6 +844,194 @@ public class QuizRestIT extends QuizRestTestBase {
                 .get("/quizzes/parent/{id}").then().statusCode(200).body("size()", is(2));
     }
 
+    //endregion
+
+    //region Testing new paths
+    @Test
+    public void testCreateAndGetRootWithNewPath() {
+
+        String title = "Title";
+
+        get("/categories").then().statusCode(200).body("size()", is(0));
+
+        String id = createRootCategory(title);
+
+        get("/categories").then().statusCode(200).body("size()", is(1));
+
+        given().pathParam("id", id)
+                .get("categories/{id}")
+                .then()
+                .statusCode(200)
+                .body("id", is(id))
+                .body("title", is(title));
+    }
+
+    @Test
+    public void testCreateAndGetSubCategoryWithNewPathVersion002() {
+        String title = "SubCategory";
+
+        get("/subcategories").then().statusCode(200).body("size()", is(0));
+
+        String id = createSubCategory(createRootCategory("Root"), title);
+
+        get("/subcategories").then().statusCode(200).body("size()", is(1));
+
+        given().pathParam("id", id)
+                .get("subcategories/{id}")
+                .then()
+                .statusCode(200)
+                .body("id", is(id))
+                .body("title", is(title));
+    }
+
+    @Test
+    public void testCreateAndGetSpecifyingCategoryWithNewPathVersion002() {
+        String title = "Specifying category";
+
+        get("/specifying-categories").then().statusCode(200).body("size()", is(0));
+
+        String id = createSpecifyingCategory(createSubCategory(createRootCategory("Root"), "Sub"), title);
+
+        get("/specifying-categories").then().statusCode(200).body("size()", is(1));
+
+        given().pathParam("id", id)
+                .get("specifying-categories/{id}")
+                .then()
+                .statusCode(200)
+                .body("id", is(id))
+                .body("title", is(title));
+    }
+
+    @Test
+    public void testCreateAndGetQuizWithNewPathVersion002() {
+
+        String quizQuestion = "Quiz question";
+
+        Map<String, Boolean> answerMap = getAnswerMap();
+
+        String specifyingCategoryId = createSpecifyingCategory(createSubCategory(createRootCategory("Root"), "Sub"),
+                "Specifying category");
+
+        get("/quizzes").then().statusCode(200).body("size()", is(0));
+
+        String id = createQuiz(specifyingCategoryId, quizQuestion, answerMap);
+
+        get("/quizzes").then().statusCode(200).body("size()", is(1));
+
+        given().pathParam("id", id)
+                .get("quizzes/{id}")
+                .then()
+                .statusCode(200)
+                .body("id", is(id))
+                .body("specifyingCategoryId", is(specifyingCategoryId))
+                .body("answerMap", is(answerMap))
+                .body("question", is(quizQuestion));
+    }
+
+    @Test
+    public void getAllSpecifyingCategoriesWithAtLeastOneQuizWithNewPathVersion002() {
+        // Each root category has one subcategory
+        String subCategoryId1 = createSubCategory(createRootCategory("Root #1"), "SubCategory #1");
+        String subCategoryId2 = createSubCategory(createRootCategory("Root #2"), "SubCategory #2");
+        String subCategoryId3 = createSubCategory(createRootCategory("Root #3"), "SubCategory #3");
+
+        // Sub #1 (root #1) has spec 1-3, sub #2 (root #2) has spec 4-6 and sub #3 (root #3) has spec 7-9
+        String specCatId1 = createSpecifyingCategory(subCategoryId1, "Specifying category #1 for Subcategory #1");
+        String specCatId2 = createSpecifyingCategory(subCategoryId1, "Specifying category #2 for Subcategory #1");
+        String specCatId3 = createSpecifyingCategory(subCategoryId1, "Specifying category #3 for Subcategory #1");
+        String specCatId4 = createSpecifyingCategory(subCategoryId2, "Specifying category #1 for Subcategory #2");
+        String specCatId5 = createSpecifyingCategory(subCategoryId2, "Specifying category #2 for Subcategory #2");
+        String specCatId6 = createSpecifyingCategory(subCategoryId2, "Specifying category #3 for Subcategory #2");
+        String specCatId7 = createSpecifyingCategory(subCategoryId3, "Specifying category #1 for Subcategory #3");
+        String specCatId8 = createSpecifyingCategory(subCategoryId3, "Specifying category #2 for Subcategory #3");
+        String specCatId9 = createSpecifyingCategory(subCategoryId3, "Specifying category #3 for Subcategory #3");
+
+        // Spec #4 has 3 quizzes, spec #1 and #6 has 2 quizzes, spec #3 and #5 has 1 quiz, spec #2, 7, 8 and 9 has no quizzes
+        createQuiz(specCatId1, "Question #1 from specifying category #1");
+        createQuiz(specCatId1, "Question #2 from specifying category #1");
+        createQuiz(specCatId3, "Question #1 from specifying category #3");
+        createQuiz(specCatId4, "Question #1 from specifying category #4");
+        createQuiz(specCatId4, "Question #2 from specifying category #4");
+        createQuiz(specCatId4, "Question #3 from specifying category #4");
+        createQuiz(specCatId5, "Question #1 from specifying category #5");
+        createQuiz(specCatId6, "Question #1 from specifying category #6");
+        createQuiz(specCatId6, "Question #2 from specifying category #6");
+
+        // Thus, there are 5 specifying categories with at least one quiz
+        get("/specifying-categories?withQuizzes").then().statusCode(200).body("size()", is(5));
+
+        given().get("/specifying-categories?withQuizzes")
+                .then()
+                .statusCode(200)
+                .body("id", hasItems(specCatId1,
+                        specCatId3,
+                        specCatId4,
+                        specCatId5,
+                        specCatId6))
+                .body("title", hasItems("Specifying category #1 for Subcategory #1",
+                        "Specifying category #3 for Subcategory #1",
+                        "Specifying category #1 for Subcategory #2",
+                        "Specifying category #2 for Subcategory #2",
+                        "Specifying category #3 for Subcategory #2"))
+                .body("title", not("Specifying category #2 for Subcategory #1"))
+                .body("title", not("Specifying category #1 for Subcategory #3"))
+                .body("title", not("Specifying category #2 for Subcategory #3"))
+                .body("title", not("Specifying category #3 for Subcategory #3"));
+    }
+
+    @Test
+    public void getAllRootCategoriesWithAtLeastOneQuizWithNewPathVersion002() {
+        String rootId1 = createRootCategory("Root #1");
+        String rootId2 = createRootCategory("Root #2");
+        String rootId3 = createRootCategory("Root #3");
+
+        // Each root category has one subcategory
+        String subCategoryId1 = createSubCategory(rootId1, "SubCategory #1");
+        String subCategoryId2 = createSubCategory(rootId2, "SubCategory #2");
+        String subCategoryId3 = createSubCategory(rootId3, "SubCategory #3");
+
+        // Sub #1 (root #1) has spec 1-3, sub #2 (root #2) has spec 4-6 and sub #3 (root #3) has spec 7-9
+        String specCatId1 = createSpecifyingCategory(subCategoryId1, "Specifying category #1 for Subcategory #1");
+        String specCatId2 = createSpecifyingCategory(subCategoryId1, "Specifying category #2 for Subcategory #1");
+        String specCatId3 = createSpecifyingCategory(subCategoryId1, "Specifying category #3 for Subcategory #1");
+        String specCatId4 = createSpecifyingCategory(subCategoryId2, "Specifying category #1 for Subcategory #2");
+        String specCatId5 = createSpecifyingCategory(subCategoryId2, "Specifying category #2 for Subcategory #2");
+        String specCatId6 = createSpecifyingCategory(subCategoryId2, "Specifying category #3 for Subcategory #2");
+        String specCatId7 = createSpecifyingCategory(subCategoryId3, "Specifying category #1 for Subcategory #3");
+        String specCatId8 = createSpecifyingCategory(subCategoryId3, "Specifying category #2 for Subcategory #3");
+        String specCatId9 = createSpecifyingCategory(subCategoryId3, "Specifying category #3 for Subcategory #3");
+
+        // Spec #4 has 3 quizzes, spec #1 and #6 has 2 quizzes, spec #3 and #5 has 1 quiz, spec #2, 7, 8 and 9 has no quizzes
+        createQuiz(specCatId1, "Question #1 from specifying category #1");
+        createQuiz(specCatId1, "Question #2 from specifying category #1");
+        createQuiz(specCatId3, "Question #1 from specifying category #3");
+        createQuiz(specCatId4, "Question #1 from specifying category #4");
+        createQuiz(specCatId4, "Question #2 from specifying category #4");
+        createQuiz(specCatId4, "Question #3 from specifying category #4");
+        createQuiz(specCatId5, "Question #1 from specifying category #5");
+        createQuiz(specCatId6, "Question #1 from specifying category #6");
+        createQuiz(specCatId6, "Question #2 from specifying category #6");
+
+        // Thus, root #1 has 3 quizzes, root #2 has 6 quizzes, root #3 has no quizzes
+        get("/categories?withQuizzes").then().statusCode(200).body("size()", is(2));
+
+        given().get("/categories?withQuizzes")
+                .then()
+                .statusCode(200)
+                .body("id", hasItems(rootId1, rootId2))
+                .body("title", hasItems("Root #1", "Root #2"))
+                .body("title", not("Root #3"));
+    }
+
+    @Test
+    public void testGetSubCategoriesForRootCategoryWithNewPathVersion002() {
+        testGetSubCategoriesForRootWithSpecifiedPath("/categories/{id}/subcategories");
+    }
+
+    @Test
+    public void testGetAllSpecifyingCategoriesForSubCategoryWithNewPathVersion002() {
+        testGetSpecifyingCategoriesForSubWithSpecifiedPath("/subcategories/{id}/specifying-categories");
+    }
     //endregion
 
     //region Util methods

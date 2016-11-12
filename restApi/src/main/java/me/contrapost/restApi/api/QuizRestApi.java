@@ -1,9 +1,6 @@
 package me.contrapost.restApi.api;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.*;
 import io.swagger.jaxrs.PATCH;
 import me.contrapost.restApi.dto.QuizDTO;
 import me.contrapost.restApi.dto.RootCategoryDTO;
@@ -14,6 +11,7 @@ import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.List;
 
 /**
@@ -34,11 +32,14 @@ public interface QuizRestApi {
     @ApiOperation("Get all root categories")
     @GET
     @Path("/categories")
-    List<RootCategoryDTO> getAllRootCategories();
+    List<RootCategoryDTO> getAllRootCategories(
+            @ApiParam("Specifying to list only categories with quizzes")
+            @QueryParam("withQuizzes")
+            String withQuizzes);
 
     @ApiOperation("Get a single root category specified by id")
     @GET
-    @Path("categories/id/{id}")
+    @Path("categories/{id}")
     RootCategoryDTO getRootCategoryById(
             @ApiParam(Params.ROOT_ID_PARAM)
             @PathParam("id")
@@ -95,7 +96,7 @@ public interface QuizRestApi {
 
     @ApiOperation("Get a single subcategory specified by id")
     @GET
-    @Path("/subcategories/id/{id}")
+    @Path("/subcategories/{id}")
     SubCategoryDTO getSubCategoryById(
             @ApiParam(Params.SUB_ID_PARAM)
             @PathParam("id")
@@ -148,11 +149,13 @@ public interface QuizRestApi {
     @ApiOperation("Get all specifying categories")
     @GET
     @Path("/specifying-categories")
-    List<SpecifyingCategoryDTO> getAllSpecifyingCategories();
+    List<SpecifyingCategoryDTO> getAllSpecifyingCategories(@ApiParam("Specifying to list only categories with quizzes")
+                                                           @QueryParam("withQuizzes")
+                                                                   String withQuizzes);
 
     @ApiOperation("Get a single specifying category specified by id")
     @GET
-    @Path("/specifying-categories/id/{id}")
+    @Path("/specifying-categories/{id}")
     SpecifyingCategoryDTO getSpecifyingCategoryById(
             @ApiParam(Params.SPEC_ID_PARAM)
             @PathParam("id")
@@ -208,7 +211,7 @@ public interface QuizRestApi {
 
     @ApiOperation("Get a single quiz specified by id")
     @GET
-    @Path("/quizzes/id/{id}")
+    @Path("/quizzes/{id}")
     QuizDTO getQuizById(
             @ApiParam(Params.QUIZ_ID_PARAM)
             @PathParam("id")
@@ -257,48 +260,143 @@ public interface QuizRestApi {
     //endregion
 
     //region Custom requests
-    @ApiOperation("Get all root categories with at least one quiz")
-    @GET
-    @Path("/categories/withQuizzes")
-    List<RootCategoryDTO> getAllRootCategoriesWithAtLeastOneQuiz();
-
-    @ApiOperation("Get all specifying categories with at least one quiz")
-    @GET
-    @Path("/categories/withQuizzes/specifying-categories")
-    List<SpecifyingCategoryDTO> getAllSpecifyingCategoriesWithAtLeastOneQuiz();
 
     @ApiOperation("Get all subcategories of the category specified by id")
+    @ApiResponses({
+            @ApiResponse(code = 301, message = "Deprecated URI. Moved permanently.")
+    })
     @GET
-    @Path("/categories/id/{id}/subcategories")
+    @Path("/categories/{id}/subcategories")
+    @Deprecated
     List<SubCategoryDTO> getAllSubCategoriesForRootCategory(@ApiParam(Params.ROOT_ID_PARAM)
-                                                            @PathParam("id")
-                                                                    Long id);
-
-    @ApiOperation("Get all subcategories with the given parent specified by id")
-    @GET
-    @Path("/subcategories/parent/{id}")
-    List<SubCategoryDTO> getAllSubCategoriesForParent(@ApiParam(Params.ROOT_ID_PARAM)
-                                                            @PathParam("id")
-                                                                    Long id);
+                                                                     @PathParam("id")
+                                                                             Long id);
 
     @ApiOperation("Get all specifying categories of the subcategory specified by id")
     @GET
-    @Path("/subcategories/id/{id}/specifying-categories")
+    @Path("/subcategories/{id}/specifying-categories")
     List<SpecifyingCategoryDTO> getAllSpecifyingCategoriesForSubCategory(@ApiParam(Params.SUB_ID_PARAM)
                                                             @PathParam("id")
                                                                     Long id);
-
-    @ApiOperation("Get all specifying categories with the given subcategory parent specified by id")
-    @GET
-    @Path("/specifying-categories/parent/{id}")
-    List<SpecifyingCategoryDTO> getAllSpecifyingCategoriesForParent(@ApiParam(Params.SUB_ID_PARAM)
-                                                      @PathParam("id")
-                                                              Long id);
 
     @ApiOperation("Get all quizzes for parent (root/sub/specifying) category specified by id")
     @GET
     @Path("/quizzes/parent/{id}")
     List<QuizDTO> getAllQuizzesForParent(@ApiParam(Params.GENERAL_ID_PARAM)
+                                                                    @PathParam("id")
+                                                                            Long id);
+    //endregion
+
+    //region Deprecated methods
+    @ApiOperation("Get a single root category specified by id")
+    @ApiResponses({
+            @ApiResponse(code = 301, message = "Deprecated URI. Moved permanently.")
+    })
+    @GET
+    @Path("categories/id/{id}")
+    @Deprecated
+    Response deprecatedGetRootCategoryById(
+            @ApiParam(Params.ROOT_ID_PARAM)
+            @PathParam("id")
+                    Long id);
+
+
+    @ApiOperation("Get a single subcategory specified by id")
+    @ApiResponses({
+            @ApiResponse(code = 301, message = "Deprecated URI. Moved permanently.")
+    })
+    @GET
+    @Path("subcategories/id/{id}")
+    @Deprecated
+    Response deprecatedGetSubCategoryById(
+            @ApiParam(Params.SUB_ID_PARAM)
+            @PathParam("id")
+                    Long id);
+
+    @ApiOperation("Get a single specifying specified by id")
+    @ApiResponses({
+            @ApiResponse(code = 301, message = "Deprecated URI. Moved permanently.")
+    })
+    @GET
+    @Path("specifying-categories/id/{id}")
+    @Deprecated
+    Response deprecatedGetSpecifyingCategoryById(
+            @ApiParam(Params.SPEC_ID_PARAM)
+            @PathParam("id")
+                    Long id);
+
+    @ApiOperation("Get a single quiz by id")
+    @ApiResponses({
+            @ApiResponse(code = 301, message = "Deprecated URI. Moved permanently.")
+    })
+    @GET
+    @Path("quizzes/id/{id}")
+    @Deprecated
+    Response deprecatedGetQuizById(
+            @ApiParam(Params.QUIZ_ID_PARAM)
+            @PathParam("id")
+                    Long id);
+
+    @ApiOperation("Get all root categories with at least one quiz")
+    @ApiResponses({
+            @ApiResponse(code = 301, message = "Deprecated URI. Moved permanently.")
+    })
+    @GET
+    @Path("/categories/withQuizzes")
+    @Deprecated
+    Response deprecatedGetAllRootCategoriesWithAtLeastOneQuiz();
+
+    @ApiOperation("Get all specifying categories with at least one quiz")
+    @ApiResponses({
+            @ApiResponse(code = 301, message = "Deprecated URI. Moved permanently.")
+    })
+    @GET
+    @Path("/categories/withQuizzes/specifying-categories")
+    @Deprecated
+    Response deprecatedGetAllSpecifyingCategoriesWithAtLeastOneQuiz();
+
+
+    @ApiOperation("Get all subcategories of the category specified by id")
+    @ApiResponses({
+            @ApiResponse(code = 301, message = "Deprecated URI. Moved permanently.")
+    })
+    @GET
+    @Path("/categories/id/{id}/subcategories")
+    @Deprecated
+    Response deprecatedGetAllSubCategoriesForRootCategory(@ApiParam(Params.ROOT_ID_PARAM)
+                                                            @PathParam("id")
+                                                                    Long id);
+
+    @ApiOperation("Get all subcategories with the given parent specified by id")
+    @ApiResponses({
+            @ApiResponse(code = 301, message = "Deprecated URI. Moved permanently.")
+    })
+    @GET
+    @Path("/subcategories/parent/{id}")
+    @Deprecated
+    Response deprecatedGetAllSubCategoriesForParent(@ApiParam(Params.ROOT_ID_PARAM)
+                                                      @PathParam("id")
+                                                              Long id);
+
+    @ApiOperation("Get all specifying categories of the subcategory specified by id")
+    @ApiResponses({
+            @ApiResponse(code = 301, message = "Deprecated URI. Moved permanently.")
+    })
+    @GET
+    @Path("/subcategories/id/{id}/specifying-categories")
+    @Deprecated
+    Response deprecatedGetAllSpecifyingCategoriesForSubCategory(@ApiParam(Params.SUB_ID_PARAM)
+                                                                         @PathParam("id")
+                                                                                 Long id);
+
+    @ApiOperation("Get all specifying categories with the given subcategory parent specified by id")
+    @ApiResponses({
+            @ApiResponse(code = 301, message = "Deprecated URI. Moved permanently.")
+    })
+    @GET
+    @Path("/specifying-categories/parent/{id}")
+    @Deprecated
+    Response getAllSpecifyingCategoriesForParent(@ApiParam(Params.SUB_ID_PARAM)
                                                                     @PathParam("id")
                                                                             Long id);
     //endregion

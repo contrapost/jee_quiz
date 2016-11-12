@@ -14,6 +14,8 @@ import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.validation.ConstraintViolationException;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +37,10 @@ public class QuizRestImpl implements QuizRestApi {
 
     //region implementation of REST API for root categories
     @Override
-    public List<RootCategoryDTO> getAllRootCategories() {
+    public List<RootCategoryDTO> getAllRootCategories(String withQuizzes) {
+        if(withQuizzes != null && withQuizzes.isEmpty()) {
+            return RootCategoryConverter.transform(new ArrayList<>(categoryEJB.getAllRootCategoriesWithAtLeastOneQuiz()));
+        }
         return RootCategoryConverter.transform(categoryEJB.getAllRootCategories());
     }
 
@@ -237,7 +242,10 @@ public class QuizRestImpl implements QuizRestApi {
 
     //region implementation of Rest API for specifying categories
     @Override
-    public List<SpecifyingCategoryDTO> getAllSpecifyingCategories() {
+    public List<SpecifyingCategoryDTO> getAllSpecifyingCategories(String withQuizzes) {
+        if(withQuizzes != null && withQuizzes.isEmpty()) {
+            return SpecifyingCategoryConverter.transform(new ArrayList<>(categoryEJB.getAllSpecifyingCategoriesWithAtLeastOneQuiz()));
+        }
         return SpecifyingCategoryConverter.transform(categoryEJB.getAllSpecifyingCategories());
     }
 
@@ -332,9 +340,6 @@ public class QuizRestImpl implements QuizRestApi {
         }
 
         updateTitle(id, newTitle);
-
-//        dto.title = newTitle;
-//        dto.subCategoryId = newSubCategoryId;
     }
 
     @Override
@@ -469,25 +474,9 @@ public class QuizRestImpl implements QuizRestApi {
     //endregion
 
     //region implementation of REST API for custom requests
-    @Override
-    public List<RootCategoryDTO> getAllRootCategoriesWithAtLeastOneQuiz() {
-        return RootCategoryConverter.transform(new ArrayList<>(categoryEJB.getAllRootCategoriesWithAtLeastOneQuiz()));
-    }
-
-    @Override
-    public List<SpecifyingCategoryDTO> getAllSpecifyingCategoriesWithAtLeastOneQuiz() {
-        return SpecifyingCategoryConverter
-                .transform(new ArrayList<>(categoryEJB.getAllSpecifyingCategoriesWithAtLeastOneQuiz()));
-    }
 
     @Override
     public List<SubCategoryDTO> getAllSubCategoriesForRootCategory(@ApiParam(Params.ROOT_ID_PARAM) Long id) {
-        return SubCategoryConverter
-                .transform(categoryEJB.getAllSubCategoriesForRootCategory(id));
-    }
-
-    @Override
-    public List<SubCategoryDTO> getAllSubCategoriesForParent(@ApiParam(Params.ROOT_ID_PARAM) Long id) {
         return SubCategoryConverter
                 .transform(categoryEJB.getAllSubCategoriesForRootCategory(id));
     }
@@ -499,19 +488,98 @@ public class QuizRestImpl implements QuizRestApi {
     }
 
     @Override
-    public List<SpecifyingCategoryDTO> getAllSpecifyingCategoriesForParent(@ApiParam(Params.ROOT_ID_PARAM) Long id) {
-        return SpecifyingCategoryConverter
-                .transform(categoryEJB.getAllSpecifyingCategoriesForSubCategory(id));
-    }
-
-    @Override
     public List<QuizDTO> getAllQuizzesForParent(@ApiParam(Params.GENERAL_ID_PARAM) Long id) {
         return QuizConverter.transform(categoryEJB.getAllQuizzesForCategory(id));
     }
 
     //endregion
 
-    //region Util methods
+    //region deprecated methods
+    @Override
+    public Response deprecatedGetRootCategoryById(@ApiParam(Params.ROOT_ID_PARAM) Long id) {
+        return Response.status(301)
+                .location(UriBuilder.fromUri("quiz/categories/" + id)
+                        .build())
+                .build();
+    }
+
+    @Override
+    public Response deprecatedGetSubCategoryById(@ApiParam(Params.SUB_ID_PARAM) Long id) {
+        return Response.status(301)
+                .location(UriBuilder.fromUri("quiz/subcategories/" + id)
+                        .build())
+                .build();
+    }
+
+    @Override
+    public Response deprecatedGetSpecifyingCategoryById(@ApiParam(Params.SPEC_ID_PARAM) Long id) {
+        return Response.status(301)
+                .location(UriBuilder.fromUri("quiz/specifying-categories/" + id)
+                        .build())
+                .build();
+    }
+
+    @Override
+    public Response deprecatedGetQuizById(@ApiParam(Params.QUIZ_ID_PARAM) Long id) {
+        return Response.status(301)
+                .location(UriBuilder.fromUri("quiz/quizzes/" + id)
+                        .build())
+                .build();
+    }
+
+    @Override
+    public Response deprecatedGetAllRootCategoriesWithAtLeastOneQuiz() {
+        return Response.status(301)
+                .location(UriBuilder.fromUri("quiz/categories").queryParam("withQuizzes", "")
+                        .build())
+                .build();
+    }
+
+
+
+    @Override
+    public Response deprecatedGetAllSpecifyingCategoriesWithAtLeastOneQuiz() {
+        return Response.status(301)
+                .location(UriBuilder.fromUri("quiz/specifying-categories").queryParam("withQuizzes", "")
+                        .build())
+                .build();
+    }
+
+    @Override
+    public Response deprecatedGetAllSubCategoriesForRootCategory(@ApiParam(Params.ROOT_ID_PARAM) Long id) {
+        return Response.status(301)
+                .location(UriBuilder.fromUri("quiz/categories/" + id + "/subcategories")
+                        .build())
+                .build();
+    }
+
+
+    @Override
+    public Response deprecatedGetAllSubCategoriesForParent(@ApiParam(Params.ROOT_ID_PARAM) Long id) {
+        return Response.status(301)
+                .location(UriBuilder.fromUri("quiz/categories/" + id + "/subcategories")
+                        .build())
+                .build();
+    }
+
+    @Override
+    public Response deprecatedGetAllSpecifyingCategoriesForSubCategory(@ApiParam(Params.SUB_ID_PARAM) Long id) {
+        return Response.status(301)
+                .location(UriBuilder.fromUri("quiz/subcategories/" + id + "/specifying-categories")
+                        .build())
+                .build();
+    }
+
+    @Override
+    public Response getAllSpecifyingCategoriesForParent(@ApiParam(Params.ROOT_ID_PARAM) Long id) {
+        return Response.status(301)
+                .location(UriBuilder.fromUri("quiz/subcategories/" + id + "/specifying-categories")
+                        .build())
+                .build();
+    }
+    //endregion
+
+    //region util methods
 
     private WebApplicationException wrapException(Exception e) throws WebApplicationException {
         @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
