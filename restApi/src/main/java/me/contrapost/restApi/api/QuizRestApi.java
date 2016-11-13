@@ -25,8 +25,6 @@ import java.util.List;
 @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
 public interface QuizRestApi {
 
-
-
     //region Dealing with root category
 
     @ApiOperation("Get all root categories")
