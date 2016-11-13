@@ -285,6 +285,46 @@ public interface QuizRestApi {
     List<QuizDTO> getAllQuizzesForParent(@ApiParam(Params.GENERAL_ID_PARAM)
                                                                     @PathParam("id")
                                                                             Long id);
+
+    @ApiOperation("Get a random quiz. Return a random quiz for concrete root, sub- or specifying category" +
+            "depending on filter")
+    @ApiResponses({
+            @ApiResponse(code = 307, message = "Temporary redirect."),
+            @ApiResponse(code = 404, message = "There are no quizzes yet.")
+    })
+    @GET
+    @Path(("/randomQuiz"))
+    Response getRandomQuiz(
+            @ApiParam(Params.ROOT_ID_PARAM)
+            @QueryParam("rootId")
+            String rootId,
+            @ApiParam(Params.SUB_ID_PARAM)
+            @QueryParam("subId")
+                    String subId,
+            @ApiParam(Params.SPEC_ID_PARAM)
+            @QueryParam("specId")
+                    String specId
+    );
+
+    @ApiOperation("Get a random quiz. Return a random quiz for concrete root, sub- or specifying category" +
+            "depending on filter")
+    @GET
+    @Path(("/randomQuizzes"))
+    List<Long> getRandomQuizzes(
+            @ApiParam("Number of quizzes")
+            @QueryParam("limit")
+                    String limit,
+            @ApiParam(Params.ROOT_ID_PARAM)
+            @QueryParam("rootId")
+                    String rootId,
+            @ApiParam(Params.SUB_ID_PARAM)
+            @QueryParam("subId")
+                    String subId,
+            @ApiParam(Params.SPEC_ID_PARAM)
+            @QueryParam("specId")
+                    String specId
+    );
+
     //endregion
 
     //region Deprecated methods

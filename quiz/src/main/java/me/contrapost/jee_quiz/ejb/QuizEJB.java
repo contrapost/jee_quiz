@@ -7,8 +7,10 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 /**
  * Created by Alexander Shipunov on 24.10.16.
@@ -77,5 +79,14 @@ public class QuizEJB {
         quiz.setQuestion(newQuestion);
         quiz.setAnswerMap(newAnswerMap);
         return true;
+    }
+
+    public List<Long> getRandomQuizzes(int numberOfQuizzes) {
+        List<Quiz> quizzes = getAllQuizzes();
+        List<Long> ids = new ArrayList<>();
+        while(ids.size() != numberOfQuizzes && quizzes.size() != 0) {
+            ids.add(quizzes.remove(new Random().nextInt(quizzes.size())).getId());
+        }
+        return ids;
     }
 }

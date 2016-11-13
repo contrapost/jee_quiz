@@ -6,15 +6,14 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
  * Created by Alexander Shipunov on 24.10.16.
  * CategoryEJB
  */
+@SuppressWarnings("unchecked")
 @Stateless
 public class CategoryEJB {
 
@@ -138,5 +137,32 @@ public class CategoryEJB {
 
     public List<SpecifyingCategory> getAllSpecifyingCategoriesForSubCategory(Long id) {
         return new ArrayList<>(getSubCategory(id).getSpecifyingCategories().values());
+    }
+
+    public List<Long> getRandomQuizzesFromRootCategory(Long rootCategoryId, int numberOfQuizzes) {
+        List<Quiz> quizzes = em.find(RootCategory.class, rootCategoryId).getListOfAllQuizzes();
+        List<Long> ids = new ArrayList<>();
+        while(ids.size() != numberOfQuizzes && quizzes.size() != 0) {
+            ids.add(quizzes.remove(new Random().nextInt(quizzes.size())).getId());
+        }
+        return ids;
+    }
+
+    public List<Long> getRandomQuizzesFromSubCategory(Long subcategoryId, int numberOfQuizzes) {
+        List<Quiz> quizzes = em.find(SubCategory.class, subcategoryId).getListOfAllQuizzes();
+        List<Long> ids = new ArrayList<>();
+        while(ids.size() != numberOfQuizzes && quizzes.size() != 0) {
+            ids.add(quizzes.remove(new Random().nextInt(quizzes.size())).getId());
+        }
+        return ids;
+    }
+
+    public List<Long> getRandomQuizzesFromSpecifyingCategory(Long specifyingCategoryId, int numberOfQuizzes) {
+        List<Quiz> quizzes = em.find(SpecifyingCategory.class, specifyingCategoryId).getListOfAllQuizzes();
+        List<Long> ids = new ArrayList<>();
+        while(ids.size() != numberOfQuizzes && quizzes.size() != 0) {
+            ids.add(quizzes.remove(new Random().nextInt(quizzes.size())).getId());
+        }
+        return ids;
     }
 }

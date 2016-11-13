@@ -9,8 +9,7 @@ import me.contrapost.restApi.dto.SubCategoryDTO;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.CoreMatchers.hasItems;
@@ -842,6 +841,92 @@ public class QuizRestIT extends QuizRestTestBase {
 
         given().pathParam("id", specCatId1)
                 .get("/quizzes/parent/{id}").then().statusCode(200).body("size()", is(2));
+    }
+
+    @Test
+    public void testGetRandomQuiz() {
+        String rootId = createRootCategory("Root");
+        String subId = createSubCategory(rootId, "Sub");
+        String specID = createSpecifyingCategory(subId, "Spec");
+        String quizId = createQuiz(specID, "Question");
+
+        get("/randomQuiz").then().statusCode(200).body("id", is(quizId));
+
+        get("/randomQuiz?rootId=" + rootId).then().statusCode(200).body("id", is(quizId));
+
+        get("/randomQuiz?subId=" + subId).then().statusCode(200).body("id", is(quizId));
+
+        get("/randomQuiz?specId=" + specID).then().statusCode(200).body("id", is(quizId));
+    }
+
+    @Test
+    public void testGetRandomQuizzes() {
+        String rootId = createRootCategory("Root");
+        String subId = createSubCategory(rootId, "Sub");
+        String specId = createSpecifyingCategory(subId, "Spec");
+        String quizId1 = createQuiz(specId, "Question 1");
+        String quizId2 = createQuiz(specId, "Question 2");
+        String quizId3 = createQuiz(specId, "Question 3");
+        String quizId4 = createQuiz(specId, "Question 4");
+        String quizId5 = createQuiz(specId, "Question 5");
+
+        get("/randomQuizzes")
+                .then()
+                .statusCode(200)
+                .body("size()", is(5));
+
+        String ids[] = get("/randomQuizzes")
+                .then()
+                .statusCode(200)
+                .extract().as(String[].class);
+
+        List<String> quizIds = Arrays.asList(quizId1, quizId2, quizId3, quizId4, quizId5);
+
+        assertTrue(quizIds.containsAll(Arrays.asList(ids)));
+
+        given().queryParam("limit", 3)
+                .get("/randomQuizzes")
+                .then()
+                .statusCode(200)
+                .body("size()", is(3));
+
+        given().queryParam("rootId", rootId)
+                .get("/randomQuizzes")
+                .then()
+                .statusCode(200)
+                .body("size()", is(5));
+
+        ids = given().queryParam("rootId", rootId)
+                .get("/randomQuizzes")
+                .then()
+                .statusCode(200)
+                .extract().as(String[].class);
+
+        assertTrue(quizIds.containsAll(Arrays.asList(ids)));
+
+        given().queryParam("limit", 3)
+                .and()
+                .queryParam("rootId", rootId)
+                .get("/randomQuizzes")
+                .then()
+                .statusCode(200)
+                .body("size()", is(3));
+
+        given().queryParam("limit", 2)
+                .and()
+                .queryParam("subId", subId)
+                .get("/randomQuizzes")
+                .then()
+                .statusCode(200)
+                .body("size()", is(2));
+
+        given().queryParam("limit", 1)
+                .and()
+                .queryParam("specId", specId)
+                .get("/randomQuizzes")
+                .then()
+                .statusCode(200)
+                .body("size()", is(1));
     }
 
     //endregion
