@@ -46,6 +46,7 @@ public class SubCategory extends Category{
         return specifyingCategories;
     }
 
+    @SuppressWarnings("unused")
     public void setSpecifyingCategories(Map<Long, SpecifyingCategory> specifyingCategories) {
         this.specifyingCategories = specifyingCategories;
     }

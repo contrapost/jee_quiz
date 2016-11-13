@@ -17,6 +17,7 @@ import static org.junit.Assert.*;
  * Created by Alexander Shipunov on 24.10.16.
  * Test of QuizEJB
  */
+@SuppressWarnings("ThrowableResultOfMethodCallIgnored")
 @RunWith(Arquillian.class)
 public class QuizEJBTest extends EjbTestBase {
 

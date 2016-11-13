@@ -21,8 +21,6 @@ public class AnswerMapValidator implements ConstraintValidator<AnswerMap, Map<St
            if (b) correct++;
        }
 
-       if (correct != 1) return false;
-
-      return true;
+       return correct == 1;
    }
 }

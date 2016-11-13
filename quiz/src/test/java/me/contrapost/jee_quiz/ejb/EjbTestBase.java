@@ -17,6 +17,7 @@ import java.util.Map;
 
 public abstract class EjbTestBase {
 
+    @SuppressWarnings("unused")
     @Deployment
     public static JavaArchive createDeployment() {
 

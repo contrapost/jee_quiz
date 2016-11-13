@@ -11,6 +11,7 @@ import static junit.framework.TestCase.*;
  * Created by Alexander Shipunov on 27.10.16.
  * CategoryEJB test suite
  */
+@SuppressWarnings("unused")
 @RunWith(Arquillian.class)
 public class CategoryEJBTest extends EjbTestBase {
 

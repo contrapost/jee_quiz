@@ -8,6 +8,7 @@ import java.lang.annotation.*;
  * Created by alexandershipunov on 28/10/2016.
  * AnswerMap validation
  */
+@SuppressWarnings("unused")
 @Constraint(validatedBy = AnswerMapValidator.class)
 @Target({  //tells on what the @ annotation can be used
         ElementType.FIELD,

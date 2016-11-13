@@ -37,6 +37,7 @@ public class RootCategory extends Category{
         return subCategories;
     }
 
+    @SuppressWarnings("unused")
     public void setSubCategories(Map<Long, SubCategory> subCategories) {
         this.subCategories = subCategories;
     }

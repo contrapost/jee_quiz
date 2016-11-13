@@ -1,15 +1,16 @@
 package me.contrapost.restApi.api;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import io.restassured.http.ContentType;
 import me.contrapost.restApi.dto.QuizDTO;
 import me.contrapost.restApi.dto.RootCategoryDTO;
 import me.contrapost.restApi.dto.SpecifyingCategoryDTO;
 import me.contrapost.restApi.dto.SubCategoryDTO;
-import org.junit.Ignore;
 import org.junit.Test;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.CoreMatchers.hasItems;
@@ -23,6 +24,7 @@ import static org.junit.Assert.assertTrue;
  * Created by alexandershipunov on 30/10/2016.
  * Test suite for QuizRest API
  */
+@SuppressWarnings("unused")
 public class QuizRestIT extends QuizRestTestBase {
 
     @Test
