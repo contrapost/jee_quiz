@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>restApi</artifactId>
+    <artifactId>quizApi</artifactId>
     <packaging>war</packaging>
 
     <dependencies>
@@ -17,11 +17,6 @@
             <groupId>me.contrapost</groupId>
             <artifactId>quiz</artifactId>
         </dependency>
-        <!--<dependency>
-            <groupId>org.pg6100</groupId>
-            <artifactId>utils</artifactId>
-            <type>test-jar</type>
-        </dependency>-->
 
         <dependency>
             <groupId>javax</groupId>

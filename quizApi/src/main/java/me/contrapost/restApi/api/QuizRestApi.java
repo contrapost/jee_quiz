@@ -290,7 +290,7 @@ public interface QuizRestApi {
             @ApiResponse(code = 307, message = "Temporary redirect."),
             @ApiResponse(code = 404, message = "There are no quizzes yet.")
     })
-    @GET
+    @GET // replace parameters with only one wilter
     @Path(("/randomQuiz"))
     Response getRandomQuiz(
             @ApiParam(Params.ROOT_ID_PARAM)
@@ -306,7 +306,7 @@ public interface QuizRestApi {
 
     @ApiOperation("Get a random quiz. Return a random quiz for concrete root, sub- or specifying category" +
             "depending on filter")
-    @GET
+    @GET //TODO POST and replace parameters with just one
     @Path(("/randomQuizzes"))
     List<Long> getRandomQuizzes(
             @ApiParam("Number of quizzes")

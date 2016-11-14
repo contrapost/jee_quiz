@@ -26,7 +26,7 @@
         </dependency>
         <dependency>
             <groupId>me.contrapost</groupId>
-            <artifactId>restApi</artifactId>
+            <artifactId>quizApi</artifactId>
             <version>${project.version}</version>
             <type>war</type>
         </dependency>
