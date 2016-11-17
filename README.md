@@ -1,3 +1,3 @@
 ## jee_quiz
 
-an attempt to make something wonderfull with REST and microservices
+an attempt to make something wonderful with REST and microservices
