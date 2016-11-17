@@ -1,8 +1,8 @@
-package me.contrapost.restApi;
+package me.contrapost.quizApi;
 
 
 import io.swagger.jaxrs.config.BeanConfig;
-import me.contrapost.restApi.api.QuizRestImpl;
+import me.contrapost.quizApi.api.QuizRestImpl;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;

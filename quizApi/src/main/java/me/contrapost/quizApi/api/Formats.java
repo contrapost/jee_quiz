@@ -1,4 +1,4 @@
-package me.contrapost.restApi.api;
+package me.contrapost.quizApi.api;
 
 import javax.ws.rs.core.MediaType;
 

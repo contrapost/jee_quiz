@@ -1,4 +1,4 @@
-package me.contrapost.restApi.api;
+package me.contrapost.quizApi.api;
 
 /**
  * Created by alexandershipunov on 07/11/2016.

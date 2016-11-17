@@ -1,10 +1,10 @@
-package me.contrapost.restApi.api;
+package me.contrapost.quizApi.api;
 
 import io.restassured.http.ContentType;
-import me.contrapost.restApi.dto.QuizDTO;
-import me.contrapost.restApi.dto.RootCategoryDTO;
-import me.contrapost.restApi.dto.SpecifyingCategoryDTO;
-import me.contrapost.restApi.dto.SubCategoryDTO;
+import me.contrapost.quizApi.dto.QuizDTO;
+import me.contrapost.quizApi.dto.RootCategoryDTO;
+import me.contrapost.quizApi.dto.SpecifyingCategoryDTO;
+import me.contrapost.quizApi.dto.SubCategoryDTO;
 import org.junit.Test;
 
 import java.util.Arrays;

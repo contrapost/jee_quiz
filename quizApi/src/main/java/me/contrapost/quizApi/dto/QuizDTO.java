@@ -1,14 +1,13 @@
-package me.contrapost.restApi.dto;
+package me.contrapost.quizApi.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import me.contrapost.jee_quiz.entity.SpecifyingCategory;
 
 import java.util.Map;
 
 /**
  * Created by alexandershipunov on 30/10/2016.
- * QiuzDTO
+ * QuizDTO
  */
 @ApiModel("A quiz")
 public class QuizDTO {

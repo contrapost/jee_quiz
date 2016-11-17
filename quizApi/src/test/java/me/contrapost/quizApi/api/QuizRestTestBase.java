@@ -1,9 +1,9 @@
-package me.contrapost.restApi.api;
+package me.contrapost.quizApi.api;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import me.contrapost.restApi.api.util.JBossUtil;
-import me.contrapost.restApi.dto.RootCategoryDTO;
+import me.contrapost.quizApi.api.util.JBossUtil;
+import me.contrapost.quizApi.dto.RootCategoryDTO;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;

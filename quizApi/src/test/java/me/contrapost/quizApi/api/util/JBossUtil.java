@@ -1,4 +1,4 @@
-package me.contrapost.restApi.api.util;
+package me.contrapost.quizApi.api.util;
 
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;

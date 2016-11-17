@@ -1,7 +1,6 @@
-package me.contrapost.restApi.dto;
+package me.contrapost.quizApi.dto;
 
 import me.contrapost.jee_quiz.entity.SpecifyingCategory;
-import me.contrapost.jee_quiz.entity.SubCategory;
 
 import java.util.List;
 import java.util.Objects;

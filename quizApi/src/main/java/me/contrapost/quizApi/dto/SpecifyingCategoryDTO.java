@@ -1,10 +1,6 @@
-package me.contrapost.restApi.dto;
+package me.contrapost.quizApi.dto;
 
 import io.swagger.annotations.ApiModelProperty;
-import me.contrapost.jee_quiz.entity.Quiz;
-import me.contrapost.jee_quiz.entity.SubCategory;
-
-import java.util.Map;
 
 /**
  * Created by alexandershipunov on 30/10/2016.

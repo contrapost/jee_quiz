@@ -1,4 +1,4 @@
-package me.contrapost.restApi.api;
+package me.contrapost.quizApi.api;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -7,7 +7,7 @@ import com.google.common.base.Throwables;
 import io.swagger.annotations.ApiParam;
 import me.contrapost.jee_quiz.ejb.CategoryEJB;
 import me.contrapost.jee_quiz.ejb.QuizEJB;
-import me.contrapost.restApi.dto.*;
+import me.contrapost.quizApi.dto.*;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;

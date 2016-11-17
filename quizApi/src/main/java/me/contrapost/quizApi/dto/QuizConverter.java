@@ -1,7 +1,8 @@
-package me.contrapost.restApi.dto;
+package me.contrapost.quizApi.dto;
 
 import me.contrapost.jee_quiz.entity.Quiz;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -21,7 +22,7 @@ public class QuizConverter {
         dto.id = String.valueOf(quiz.getId());
         dto.question = quiz.getQuestion();
         dto.specifyingCategoryId = String.valueOf(quiz.getSpecifyingCategory().getId());
-        dto.answerMap = quiz.getAnswerMap();
+        dto.answerMap = new HashMap<>(quiz.getAnswerMap());
 
         return dto;
     }

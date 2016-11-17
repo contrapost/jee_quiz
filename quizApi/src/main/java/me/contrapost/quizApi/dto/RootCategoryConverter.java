@@ -1,4 +1,4 @@
-package me.contrapost.restApi.dto;
+package me.contrapost.quizApi.dto;
 
 import me.contrapost.jee_quiz.entity.RootCategory;
 
