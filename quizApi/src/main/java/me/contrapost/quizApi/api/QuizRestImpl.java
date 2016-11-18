@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiParam;
 import me.contrapost.jee_quiz.ejb.CategoryEJB;
 import me.contrapost.jee_quiz.ejb.QuizEJB;
 import me.contrapost.quizApi.dto.*;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -495,44 +496,66 @@ public class QuizRestImpl implements QuizRestApi {
     }
 
     @Override
-    public Response getRandomQuiz(@ApiParam(Params.ROOT_ID_PARAM) String rootId,
-                                  @ApiParam(Params.SUB_ID_PARAM) String subId,
-                                  @ApiParam(Params.SPEC_ID_PARAM) String specId) {
+    public Response getRandomQuiz(@ApiParam("Filter: x_id where x can be \"r\" for root category, " +
+                                            "\"s\" for subcategory and \"sp\" for specifying category")
+                                              String filter) {
 
         if(quizEJB.getAllQuizzes().isEmpty()) {
             return Response.status(404).build();
         }
 
-        if (!Strings.isNullOrEmpty(rootId)) {
-            Long rootCategoryId = getAsNumber(rootId);
+        String[] parts;
+        Long quizId;
 
-            Long quizId = categoryEJB.getRandomQuizzesFromRootCategory(rootCategoryId, 1).get(0);
+        if (!Strings.isNullOrEmpty(filter)) {
+            parts = filter.split("_");
+            if(parts.length != 2)
+                throw new WebApplicationException("Filter value has incorrect format", 404);
 
-            if(quizId == null) {
-                return Response.status(404).build();
+            if(!StringUtils.isNumeric(parts[1])){
+                throw new WebApplicationException("Filter value has incorrect format", 404);
             }
 
-            return Response.status(307)
-                    .location(URI.create("quiz/quizzes/" + quizId))
-                    .build();
-        }
+            switch (parts[0]){
+                case "r":
+                    Long rootCategoryId = getAsNumber(parts[1]);
 
-        if (!Strings.isNullOrEmpty(subId)) {
-            Long subcategoryId = getAsNumber(subId);
+                    quizId = categoryEJB.getRandomQuizzesFromRootCategory(rootCategoryId, 1).get(0);
 
-            Long quizId = categoryEJB.getRandomQuizzesFromSubCategory(subcategoryId, 1).get(0);
-            return Response.status(307)
-                    .location(URI.create("quiz/quizzes/" + quizId))
-                    .build();
-        }
+                    if(quizId == null) {
+                        return Response.status(404).build();
+                    }
 
-        if (!Strings.isNullOrEmpty(specId)) {
-            Long specifyingCategoryId = getAsNumber(specId);
+                    return Response.status(307)
+                            .location(URI.create("quiz/quizzes/" + quizId))
+                            .build();
+                case "s":
+                    Long subcategoryId = getAsNumber(parts[1]);
 
-            Long quizId = categoryEJB.getRandomQuizzesFromSpecifyingCategory(specifyingCategoryId, 1).get(0);
-            return Response.status(307)
-                    .location(URI.create("quiz/quizzes/" + quizId))
-                    .build();
+                    quizId = categoryEJB.getRandomQuizzesFromSubCategory(subcategoryId, 1).get(0);
+
+                    if(quizId == null) {
+                        return Response.status(404).build();
+                    }
+
+                    return Response.status(307)
+                            .location(URI.create("quiz/quizzes/" + quizId))
+                            .build();
+                case "sp":
+                    Long specifyingCategoryId = getAsNumber(parts[1]);
+
+                    quizId = categoryEJB.getRandomQuizzesFromSpecifyingCategory(specifyingCategoryId, 1).get(0);
+
+                    if(quizId == null) {
+                        return Response.status(404).build();
+                    }
+
+                    return Response.status(307)
+                            .location(URI.create("quiz/quizzes/" + quizId))
+                            .build();
+                default:
+                    throw new WebApplicationException("Filter value has incorrect format", 404);
+            }
         }
 
         return Response.status(307)
@@ -541,10 +564,11 @@ public class QuizRestImpl implements QuizRestApi {
     }
 
     @Override
-    public List<Long> getRandomQuizzes(@ApiParam("Number of quizzes") String limit,
-                                     @ApiParam(Params.ROOT_ID_PARAM) String rootId,
-                                     @ApiParam(Params.SUB_ID_PARAM) String subId,
-                                     @ApiParam(Params.SPEC_ID_PARAM) String specId) {
+    public List<Long> getRandomQuizzes(@ApiParam("Number of quizzes")
+                                                   String limit,
+                                     @ApiParam("Filter: x_id where x can be \"r\" for root category, " +
+                                     "\"s\" for subcategory and \"sp\" for specifying category")
+                                                   String filter) {
 
         if(quizEJB.getAllQuizzes().isEmpty()) {
             throw new WebApplicationException("There are no quizzes yet.", 404);
@@ -561,42 +585,53 @@ public class QuizRestImpl implements QuizRestApi {
             numberOfQuizzes = 5;
         }
 
+        String[] parts;
+
         List<Long> quizIds;
 
-        if (!Strings.isNullOrEmpty(rootId)) {
-            Long rootCategoryId = getAsNumber(rootId);
+        if (!Strings.isNullOrEmpty(filter)) {
+            parts = filter.split("_");
+            if(parts.length != 2)
+                throw new WebApplicationException("Filter value has incorrect format", 404);
 
-            quizIds = categoryEJB.getRandomQuizzesFromRootCategory(rootCategoryId, numberOfQuizzes);
-
-            if(quizIds.size() < numberOfQuizzes) {
-                throw new WebApplicationException("There are not enough quizzes.", 404);
+            if(!StringUtils.isNumeric(parts[1])){
+                throw new WebApplicationException("Filter value has incorrect format", 404);
             }
 
-            return quizIds;
-        }
+            switch (parts[0]){
+                case "r":
+                    Long rootCategoryId = getAsNumber(parts[1]);
 
-        if (!Strings.isNullOrEmpty(subId)) {
-            Long subcategoryId = getAsNumber(subId);
+                    quizIds = categoryEJB.getRandomQuizzesFromRootCategory(rootCategoryId, numberOfQuizzes);
 
-            quizIds = categoryEJB.getRandomQuizzesFromSubCategory(subcategoryId, numberOfQuizzes);
+                    if(quizIds.size() < numberOfQuizzes) {
+                        throw new WebApplicationException("There are not enough quizzes.", 404);
+                    }
 
-            if(quizIds.size() < numberOfQuizzes) {
-                throw new WebApplicationException("There are not enough quizzes.", 404);
+                    return quizIds;
+                case "s":
+                    Long subcategoryId = getAsNumber(parts[1]);
+
+                    quizIds = categoryEJB.getRandomQuizzesFromSubCategory(subcategoryId, numberOfQuizzes);
+
+                    if(quizIds.size() < numberOfQuizzes) {
+                        throw new WebApplicationException("There are not enough quizzes.", 404);
+                    }
+
+                    return quizIds;
+                case "sp":
+                    Long specifyingCategoryId = getAsNumber(parts[1]);
+
+                    quizIds = categoryEJB.getRandomQuizzesFromSpecifyingCategory(specifyingCategoryId, numberOfQuizzes);
+
+                    if(quizIds.size() < numberOfQuizzes) {
+                        throw new WebApplicationException("There are not enough quizzes.", 404);
+                    }
+
+                    return quizIds;
+                default:
+                    throw new WebApplicationException("Filter value has incorrect format", 404);
             }
-
-            return quizIds;
-        }
-
-        if (!Strings.isNullOrEmpty(specId)) {
-            Long specifyingCategoryId = getAsNumber(specId);
-
-            quizIds = categoryEJB.getRandomQuizzesFromSpecifyingCategory(specifyingCategoryId, numberOfQuizzes);
-
-            if(quizIds.size() < numberOfQuizzes) {
-                throw new WebApplicationException("There are not enough quizzes.", 404);
-            }
-
-            return quizIds;
         }
 
         quizIds = quizEJB.getRandomQuizzes(numberOfQuizzes);
@@ -688,7 +723,7 @@ public class QuizRestImpl implements QuizRestApi {
     }
 
     @Override
-    public Response getAllSpecifyingCategoriesForParent(@ApiParam(Params.ROOT_ID_PARAM) Long id) {
+    public Response deprecatedGetAllSpecifyingCategoriesForParent(@ApiParam(Params.ROOT_ID_PARAM) Long id) {
         return Response.status(301)
                 .location(UriBuilder.fromUri("quiz/subcategories/" + id + "/specifying-categories")
                         .build())
@@ -696,6 +731,46 @@ public class QuizRestImpl implements QuizRestApi {
     }
 
 
+    /*@Override
+    public Response deprecatedGetRandomQuizzes(@ApiParam("Number of quizzes") String limit,
+                                       @ApiParam(Params.ROOT_ID_PARAM) String rootId,
+                                       @ApiParam(Params.SUB_ID_PARAM) String subId,
+                                       @ApiParam(Params.SPEC_ID_PARAM) String specId) {
+
+        String query = "";
+        if(!Strings.isNullOrEmpty(limit)) {
+            query = "?limit=" + limit;
+        }
+
+        if (!Strings.isNullOrEmpty(rootId)) {
+            query += "&r_" + rootId;
+            return Response.status(301)
+                    .location(UriBuilder.fromUri("quiz/randomQuizzes/" + query)
+                            .build())
+                    .build();
+        }
+
+        if (!Strings.isNullOrEmpty(subId)) {
+            query += "&s_" + rootId;
+            return Response.status(301)
+                    .location(UriBuilder.fromUri("quiz/randomQuizzes/" + query)
+                            .build())
+                    .build();
+        }
+
+        if (!Strings.isNullOrEmpty(specId)) {
+            query += "&sp_" + rootId;
+            return Response.status(301)
+                    .location(UriBuilder.fromUri("quiz/randomQuizzes/" + query)
+                            .build())
+                    .build();
+        }
+
+        return Response.status(301)
+                .location(UriBuilder.fromUri("quiz/randomQuizzes/" + query)
+                        .build())
+                .build();
+    }*/
     //endregion
 
     //region util methods

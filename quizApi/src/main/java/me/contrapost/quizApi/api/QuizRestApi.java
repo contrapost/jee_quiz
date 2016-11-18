@@ -290,39 +290,28 @@ public interface QuizRestApi {
             @ApiResponse(code = 307, message = "Temporary redirect."),
             @ApiResponse(code = 404, message = "There are no quizzes yet.")
     })
-    @GET // replace parameters with only one wilter
+    @GET // replace parameters with only one filter
     @Path(("/randomQuiz"))
     Response getRandomQuiz(
-            @ApiParam(Params.ROOT_ID_PARAM)
-            @QueryParam("rootId")
-            String rootId,
-            @ApiParam(Params.SUB_ID_PARAM)
-            @QueryParam("subId")
-                    String subId,
-            @ApiParam(Params.SPEC_ID_PARAM)
-            @QueryParam("specId")
-                    String specId
+            @ApiParam("Filter: x_id where x can be \"r\" for root category, " +
+                    "\"s\" for subcategory and \"sp\" for specifying category")
+            @QueryParam("filter")
+                    String filter
     );
 
     @ApiOperation("Get a random quiz. Return a random quiz for concrete root, sub- or specifying category" +
             "depending on filter")
-    @GET //TODO POST and replace parameters with just one
+    @POST
     @Path(("/randomQuizzes"))
     List<Long> getRandomQuizzes(
             @ApiParam("Number of quizzes")
             @QueryParam("limit")
                     String limit,
-            @ApiParam(Params.ROOT_ID_PARAM)
-            @QueryParam("rootId")
-                    String rootId,
-            @ApiParam(Params.SUB_ID_PARAM)
-            @QueryParam("subId")
-                    String subId,
-            @ApiParam(Params.SPEC_ID_PARAM)
-            @QueryParam("specId")
-                    String specId
+            @ApiParam("Filter: x_id where x can be \"r\" for root category, " +
+                    "\"s\" for subcategory and \"sp\" for specifying category")
+            @QueryParam("filter")
+                    String filter
     );
-
     //endregion
 
     //region Deprecated methods
@@ -434,8 +423,51 @@ public interface QuizRestApi {
     @GET
     @Path("/specifying-categories/parent/{id}")
     @Deprecated
-    Response getAllSpecifyingCategoriesForParent(@ApiParam(Params.SUB_ID_PARAM)
+    Response deprecatedGetAllSpecifyingCategoriesForParent(@ApiParam(Params.SUB_ID_PARAM)
                                                                     @PathParam("id")
                                                                             Long id);
+
+    /*@ApiOperation("Get a random quiz. Return a random quiz for concrete root, sub- or specifying category" +
+            "depending on filter")
+    @ApiResponses({
+            @ApiResponse(code = 301, message = "Deprecated URI. Moved permanently."),
+    })
+    @GET
+    @Path(("/randomQuiz"))
+    @Deprecated
+    Response deprecatedGetRandomQuiz(
+            @ApiParam(Params.ROOT_ID_PARAM)
+            @QueryParam("rootId")
+                    String rootId,
+            @ApiParam(Params.SUB_ID_PARAM)
+            @QueryParam("subId")
+                    String subId,
+            @ApiParam(Params.SPEC_ID_PARAM)
+            @QueryParam("specId")
+                    String specId
+    );*/
+
+    /*@ApiOperation("Get a random quiz. Return a random quiz for concrete root, sub- or specifying category" +
+            "depending on filter")
+    @ApiResponses({
+            @ApiResponse(code = 301, message = "Deprecated URI. Moved permanently.")
+    })
+    @GET
+    @Path(("/randomQuizzes"))
+    @Deprecated
+    Response deprecatedGetRandomQuizzes(
+            @ApiParam("Number of quizzes")
+            @QueryParam("limit")
+                    String limit,
+            @ApiParam(Params.ROOT_ID_PARAM)
+            @QueryParam("rootId")
+                    String rootId,
+            @ApiParam(Params.SUB_ID_PARAM)
+            @QueryParam("subId")
+                    String subId,
+            @ApiParam(Params.SPEC_ID_PARAM)
+            @QueryParam("specId")
+                    String specId
+    );*/
     //endregion
 }

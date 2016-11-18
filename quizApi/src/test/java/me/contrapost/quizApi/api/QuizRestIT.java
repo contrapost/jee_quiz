@@ -854,11 +854,11 @@ public class QuizRestIT extends QuizRestTestBase {
 
         get("/randomQuiz").then().statusCode(200).body("id", is(quizId));
 
-        get("/randomQuiz?rootId=" + rootId).then().statusCode(200).body("id", is(quizId));
+        get("/randomQuiz?filter=r_" + rootId).then().statusCode(200).body("id", is(quizId));
 
-        get("/randomQuiz?subId=" + subId).then().statusCode(200).body("id", is(quizId));
+        get("/randomQuiz?filter=s_" + subId).then().statusCode(200).body("id", is(quizId));
 
-        get("/randomQuiz?specId=" + specID).then().statusCode(200).body("id", is(quizId));
+        get("/randomQuiz?filter=sp_" + specID).then().statusCode(200).body("id", is(quizId));
     }
 
     @Test
@@ -872,12 +872,12 @@ public class QuizRestIT extends QuizRestTestBase {
         String quizId4 = createQuiz(specId, "Question 4");
         String quizId5 = createQuiz(specId, "Question 5");
 
-        get("/randomQuizzes")
+        post("/randomQuizzes")
                 .then()
                 .statusCode(200)
                 .body("size()", is(5));
 
-        String ids[] = get("/randomQuizzes")
+        String ids[] = post("/randomQuizzes")
                 .then()
                 .statusCode(200)
                 .extract().as(String[].class);
@@ -887,19 +887,19 @@ public class QuizRestIT extends QuizRestTestBase {
         assertTrue(quizIds.containsAll(Arrays.asList(ids)));
 
         given().queryParam("limit", 3)
-                .get("/randomQuizzes")
+                .post("/randomQuizzes")
                 .then()
                 .statusCode(200)
                 .body("size()", is(3));
 
-        given().queryParam("rootId", rootId)
-                .get("/randomQuizzes")
+        given().queryParam("filter", "r_" + rootId)
+                .post("/randomQuizzes")
                 .then()
                 .statusCode(200)
                 .body("size()", is(5));
 
-        ids = given().queryParam("rootId", rootId)
-                .get("/randomQuizzes")
+        ids = given().queryParam("filter", "r_" + rootId)
+                .post("/randomQuizzes")
                 .then()
                 .statusCode(200)
                 .extract().as(String[].class);
@@ -908,24 +908,24 @@ public class QuizRestIT extends QuizRestTestBase {
 
         given().queryParam("limit", 3)
                 .and()
-                .queryParam("rootId", rootId)
-                .get("/randomQuizzes")
+                .queryParam("filter", "r_" + rootId)
+                .post("/randomQuizzes")
                 .then()
                 .statusCode(200)
                 .body("size()", is(3));
 
         given().queryParam("limit", 2)
                 .and()
-                .queryParam("subId", subId)
-                .get("/randomQuizzes")
+                .queryParam("filter", "s_" + subId)
+                .post("/randomQuizzes")
                 .then()
                 .statusCode(200)
                 .body("size()", is(2));
 
         given().queryParam("limit", 1)
                 .and()
-                .queryParam("specId", specId)
-                .get("/randomQuizzes")
+                .queryParam("filter", "sp_" + specId)
+                .post("/randomQuizzes")
                 .then()
                 .statusCode(200)
                 .body("size()", is(1));
