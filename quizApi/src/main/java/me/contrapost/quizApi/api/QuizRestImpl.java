@@ -41,7 +41,7 @@ public class QuizRestImpl implements QuizRestApi {
     //region implementation of REST API for root categories
     @Override
     public List<RootCategoryDTO> getAllRootCategories(String withQuizzes) {
-        if(withQuizzes != null && withQuizzes.isEmpty()) {
+        if(withQuizzes != null && (withQuizzes.isEmpty() || withQuizzes.equals("true"))) {
             return RootCategoryConverter.transform(new ArrayList<>(categoryEJB.getAllRootCategoriesWithAtLeastOneQuiz()));
         }
         return RootCategoryConverter.transform(categoryEJB.getAllRootCategories());
@@ -246,7 +246,7 @@ public class QuizRestImpl implements QuizRestApi {
     //region implementation of Rest API for specifying categories
     @Override
     public List<SpecifyingCategoryDTO> getAllSpecifyingCategories(String withQuizzes) {
-        if(withQuizzes != null && withQuizzes.isEmpty()) {
+        if(withQuizzes != null && (withQuizzes.isEmpty() || withQuizzes.equals("true"))) {
             return SpecifyingCategoryConverter.transform(new ArrayList<>(categoryEJB.getAllSpecifyingCategoriesWithAtLeastOneQuiz()));
         }
         return SpecifyingCategoryConverter.transform(categoryEJB.getAllSpecifyingCategories());

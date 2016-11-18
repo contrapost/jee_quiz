@@ -1045,9 +1045,15 @@ public class QuizRestIT extends QuizRestTestBase {
         createQuiz(specCatId6, "Question #2 from specifying category #6");
 
         // Thus, there are 5 specifying categories with at least one quiz
+        get("/specifying-categories").then().statusCode(200).body("size()", is(9));
+
+        get("/specifying-categories?withQuizzes=false").then().statusCode(200).body("size()", is(9));
+
         get("/specifying-categories?withQuizzes").then().statusCode(200).body("size()", is(5));
 
-        given().get("/specifying-categories?withQuizzes")
+        get("/specifying-categories?withQuizzes=true").then().statusCode(200).body("size()", is(5));
+
+        given().get("/specifying-categories?withQuizzes=true")
                 .then()
                 .statusCode(200)
                 .body("id", hasItems(specCatId1,
@@ -1100,7 +1106,13 @@ public class QuizRestIT extends QuizRestTestBase {
         createQuiz(specCatId6, "Question #2 from specifying category #6");
 
         // Thus, root #1 has 3 quizzes, root #2 has 6 quizzes, root #3 has no quizzes
+        get("/categories").then().statusCode(200).body("size()", is(3));
+
+        get("/categories?withQuizzes=false").then().statusCode(200).body("size()", is(3));
+
         get("/categories?withQuizzes").then().statusCode(200).body("size()", is(2));
+
+        get("/categories?withQuizzes=true").then().statusCode(200).body("size()", is(2));
 
         given().get("/categories?withQuizzes")
                 .then()
