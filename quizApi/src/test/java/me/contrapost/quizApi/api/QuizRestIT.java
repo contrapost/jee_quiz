@@ -1,16 +1,10 @@
 package me.contrapost.quizApi.api;
 
 import io.restassured.http.ContentType;
-import me.contrapost.quizApi.dto.QuizDTO;
-import me.contrapost.quizApi.dto.RootCategoryDTO;
-import me.contrapost.quizApi.dto.SpecifyingCategoryDTO;
-import me.contrapost.quizApi.dto.SubCategoryDTO;
+import me.contrapost.quizApi.dto.*;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.CoreMatchers.hasItems;
@@ -490,7 +484,7 @@ public class QuizRestIT extends QuizRestTestBase {
 
         Map<String, Boolean> answerMap = getAnswerMap();
 
-        QuizDTO dto = new QuizDTO(null, quizQuestion, specifyingCategoryId, answerMap);
+        QuizWithCorrectAnswerDTO dto = new QuizWithCorrectAnswerDTO(null, quizQuestion, specifyingCategoryId, answerMap);
 
         get("/quizzes").then().statusCode(200).body("size()", is(0));
 
@@ -509,8 +503,43 @@ public class QuizRestIT extends QuizRestTestBase {
                 .statusCode(200)
                 .body("id", is(id))
                 .body("specifyingCategoryId", is(specifyingCategoryId))
-                .body("answerMap", is(answerMap))
+                .body("answerList", is(new ArrayList<>(answerMap.keySet())))
                 .body("question", is(quizQuestion));
+    }
+
+    @Test
+    public void testCheckCorrectAnswer() {
+        String question = "Quiz question";
+
+        Map<String, Boolean> answerMap = new HashMap<>();
+        for (int i = 1; i < 4; i++) {
+            answerMap.put("Wrong answer #" + i, false);
+        }
+        answerMap.put("Correct answer", true);
+
+        String id = createQuiz(createSpecifyingCategory(createSubCategory(createRootCategory(), "Sub"), "Spec"), question, answerMap);
+
+        String isCorrect = given().queryParam("id", id)
+                .and()
+                .queryParam("answer", "Correct answer")
+                .get("answer-check")
+                .then()
+                .statusCode(200)
+                .extract()
+                .asString();
+
+        assertEquals(isCorrect, "true");
+
+        String isWrong = given().queryParam("id", id)
+                .and()
+                .queryParam("answer", "Wrong answer #1")
+                .get("answer-check")
+                .then()
+                .statusCode(200)
+                .extract()
+                .asString();
+
+        assertEquals(isWrong, "false");
     }
 
     @Test
@@ -571,7 +600,7 @@ public class QuizRestIT extends QuizRestTestBase {
     public void testDeleteQuiz() {
 
         String id = given().contentType(ContentType.JSON)
-                .body(new QuizDTO(null,
+                .body(new QuizWithCorrectAnswerDTO(null,
                         "question",
                         createSpecifyingCategory(createSubCategory(createRootCategory("Root"), "Sub"), "Spec"),
                         getAnswerMap()))
@@ -594,7 +623,7 @@ public class QuizRestIT extends QuizRestTestBase {
 
         //first create with a POST
         String id = given().contentType(ContentType.JSON)
-                .body(new QuizDTO(null,
+                .body(new QuizWithCorrectAnswerDTO(null,
                         question,
                         createSpecifyingCategory(createSubCategory(createRootCategory("Root"), "Sub"), "Spec"),
                         getAnswerMap()))
@@ -631,7 +660,7 @@ public class QuizRestIT extends QuizRestTestBase {
         get("/quizzes").then().statusCode(200).body("size()", is(1));
 
         given().contentType(ContentType.JSON)
-                .body(new QuizDTO(null,
+                .body(new QuizWithCorrectAnswerDTO(null,
                         uniqueQuestion,
                         specId,
                         getAnswerMap()))
@@ -663,7 +692,7 @@ public class QuizRestIT extends QuizRestTestBase {
                 .extract()
                 .as(QuizDTO.class);
 
-        assertTrue(originalQuiz.answerMap.keySet().stream().anyMatch(answer -> answer.equals("Correct answer")));
+        assertTrue(originalQuiz.answerList.stream().anyMatch(answer -> answer.equals("Correct answer")));
 
         String newQuestion = "Quiz question v.2";
         String newAnswerMap = "\"answerMap\":{\"answer 1\": true, \"answer 2\": false, \"answer 3\": false, \"answer 4\": false}";
@@ -682,7 +711,7 @@ public class QuizRestIT extends QuizRestTestBase {
                 .as(QuizDTO.class);
 
         assertEquals(newQuestion, readBack.question);
-        assertTrue(readBack.answerMap.keySet().stream().anyMatch(answer -> answer.equals("answer 1")));
+        assertTrue(readBack.answerList.stream().anyMatch(answer -> answer.equals("answer 1")));
         assertEquals(id, readBack.id); // should had stayed the same
     }
 
@@ -1011,7 +1040,7 @@ public class QuizRestIT extends QuizRestTestBase {
                 .statusCode(200)
                 .body("id", is(id))
                 .body("specifyingCategoryId", is(specifyingCategoryId))
-                .body("answerMap", is(answerMap))
+                .body("answerList", is(new ArrayList<>(answerMap.keySet())))
                 .body("question", is(quizQuestion));
     }
 
@@ -1167,7 +1196,7 @@ public class QuizRestIT extends QuizRestTestBase {
 
     private String createQuiz(String specCatId, String question) {
         return given().contentType(ContentType.JSON)
-                .body(new QuizDTO(null, question, specCatId, getAnswerMap()))
+                .body(new QuizWithCorrectAnswerDTO(null, question, specCatId, getAnswerMap()))
                 .post("/quizzes")
                 .then()
                 .statusCode(200)
@@ -1176,7 +1205,7 @@ public class QuizRestIT extends QuizRestTestBase {
 
     private String createQuiz(String specCatId, String question, Map<String, Boolean> answerMap) {
         return given().contentType(ContentType.JSON)
-                .body(new QuizDTO(null, question, specCatId, answerMap))
+                .body(new QuizWithCorrectAnswerDTO(null, question, specCatId, answerMap))
                 .post("/quizzes")
                 .then()
                 .statusCode(200)

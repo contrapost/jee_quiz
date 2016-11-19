@@ -3,14 +3,15 @@ package me.contrapost.quizApi.dto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-import java.util.List;
+import java.util.Map;
 
 /**
- * Created by alexandershipunov on 19/11/2016.
- *
+ * Created by alexandershipunov on 30/10/2016.
+ * QuizWithCorrectAnswerDTO
  */
-@ApiModel("A quiz")
-public class QuizDTO {
+@ApiModel("A quiz with correct answer")
+public class QuizWithCorrectAnswerDTO {
+
     @ApiModelProperty("The id of the quiz")
     public String id;
 
@@ -21,15 +22,15 @@ public class QuizDTO {
     public String specifyingCategoryId;
 
     @ApiModelProperty("The set of answers marked with false and true")
-    public List<String> answerList;
+    public Map<String, Boolean> answerMap;
 
-    public QuizDTO() {
+    public QuizWithCorrectAnswerDTO() {
     }
 
-    public QuizDTO(String id, String question, String categoryId, List<String> answers) {
+    public QuizWithCorrectAnswerDTO(String id, String question, String categoryId, Map<String, Boolean> answers) {
         this.id = id;
         this.question = question;
         specifyingCategoryId = categoryId;
-        answerList = answers;
+        answerMap = answers;
     }
 }

@@ -363,8 +363,13 @@ public class QuizRestImpl implements QuizRestApi {
     }
 
     @Override
+    public boolean checkAnswer(@ApiParam(Params.QUIZ_ID_PARAM) Long id, @ApiParam("Answer to check") String answer) {
+        return quizEJB.getQuiz(id).getAnswerMap().get(answer);
+    }
+
+    @Override
     public Long createQuiz(@ApiParam("Question, set of answers as a Map<String, boolean> and " +
-            "id of specifying category the quiz belongs to. Should not specify id.") QuizDTO dto) {
+            "id of specifying category the quiz belongs to. Should not specify id.") QuizWithCorrectAnswerDTO dto) {
         /*
             Error code 400:
             the user had done something wrong, eg sent invalid input configurations
@@ -414,7 +419,7 @@ public class QuizRestImpl implements QuizRestApi {
     @Override
     public void mergePatchQuiz(@ApiParam("The unique id of the quiz") Long id,
                                @ApiParam("The partial patch") String jsonPatch) {
-        QuizDTO dto = QuizConverter.transform(quizEJB.getQuiz(id));
+        QuizWithCorrectAnswerDTO dto = QuizWithCorrectAnswerConverter.transform(quizEJB.getQuiz(id));
         if (dto == null) {
             throw new WebApplicationException("Cannot find quiz with id " + id, 404);
         }

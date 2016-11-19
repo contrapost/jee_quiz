@@ -26,7 +26,7 @@ public class ApplicationConfig extends Application {
     beanConfig.setHost("localhost:8080");
     beanConfig.setBasePath("/quiz/api");
     //beanConfig.setFilterClass("io.swagger.sample.util.ApiAuthorizationFilterImpl");
-    beanConfig.setResourcePackage("me.contrapost.restApi");
+    beanConfig.setResourcePackage("me.contrapost.quizApi");
 
     //AWFUL NAME: this "set" is the one does actually init Swagger...
     beanConfig.setScan(true);

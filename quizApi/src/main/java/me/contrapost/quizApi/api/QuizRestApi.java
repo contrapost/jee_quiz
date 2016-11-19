@@ -2,10 +2,7 @@ package me.contrapost.quizApi.api;
 
 import io.swagger.annotations.*;
 import io.swagger.jaxrs.PATCH;
-import me.contrapost.quizApi.dto.QuizDTO;
-import me.contrapost.quizApi.dto.RootCategoryDTO;
-import me.contrapost.quizApi.dto.SpecifyingCategoryDTO;
-import me.contrapost.quizApi.dto.SubCategoryDTO;
+import me.contrapost.quizApi.dto.*;
 
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
@@ -215,6 +212,17 @@ public interface QuizRestApi {
             @PathParam("id")
                     Long id);
 
+    @ApiOperation("Check if the answer is correct")
+    @GET
+    @Path("/answer-check")
+    boolean checkAnswer(
+            @ApiParam(Params.QUIZ_ID_PARAM)
+            @QueryParam("id")
+                    Long id,
+            @ApiParam("Answer to check")
+            @QueryParam("answer")
+                    String answer);
+
     @ApiOperation("Create a new quiz")
     @POST
     @Path("/quizzes")
@@ -223,7 +231,7 @@ public interface QuizRestApi {
     Long createQuiz(
             @ApiParam("Question, set of answers as a Map<String, boolean> and " +
                     "id of specifying category the quiz belongs to. Should not specify id.")
-                    QuizDTO dto);
+                    QuizWithCorrectAnswerDTO dto);
 
     @ApiOperation("Update the quiz question")
     @PUT
@@ -426,48 +434,5 @@ public interface QuizRestApi {
     Response deprecatedGetAllSpecifyingCategoriesForParent(@ApiParam(Params.SUB_ID_PARAM)
                                                                     @PathParam("id")
                                                                             Long id);
-
-    /*@ApiOperation("Get a random quiz. Return a random quiz for concrete root, sub- or specifying category" +
-            "depending on filter")
-    @ApiResponses({
-            @ApiResponse(code = 301, message = "Deprecated URI. Moved permanently."),
-    })
-    @GET
-    @Path(("/randomQuiz"))
-    @Deprecated
-    Response deprecatedGetRandomQuiz(
-            @ApiParam(Params.ROOT_ID_PARAM)
-            @QueryParam("rootId")
-                    String rootId,
-            @ApiParam(Params.SUB_ID_PARAM)
-            @QueryParam("subId")
-                    String subId,
-            @ApiParam(Params.SPEC_ID_PARAM)
-            @QueryParam("specId")
-                    String specId
-    );*/
-
-    /*@ApiOperation("Get a random quiz. Return a random quiz for concrete root, sub- or specifying category" +
-            "depending on filter")
-    @ApiResponses({
-            @ApiResponse(code = 301, message = "Deprecated URI. Moved permanently.")
-    })
-    @GET
-    @Path(("/randomQuizzes"))
-    @Deprecated
-    Response deprecatedGetRandomQuizzes(
-            @ApiParam("Number of quizzes")
-            @QueryParam("limit")
-                    String limit,
-            @ApiParam(Params.ROOT_ID_PARAM)
-            @QueryParam("rootId")
-                    String rootId,
-            @ApiParam(Params.SUB_ID_PARAM)
-            @QueryParam("subId")
-                    String subId,
-            @ApiParam(Params.SPEC_ID_PARAM)
-            @QueryParam("specId")
-                    String specId
-    );*/
     //endregion
 }
