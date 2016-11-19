@@ -12,6 +12,7 @@
         <module>quiz</module>
         <module>quizApi</module>
         <module>report</module>
+        <module>gameApi</module>
     </modules>
 
     <properties>
@@ -24,23 +25,13 @@
         <version.jacoco>0.7.7.201606060606</version.jacoco>
         <fs>${file.separator}</fs>
         <swagger-version>1.5.10</swagger-version>
+        <jackson-version>2.7.4</jackson-version>
+        <dropwizard.version>1.0.3</dropwizard.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
 
-            <!-- Internal modules used by other modules -->
-            <!--<dependency>
-                <groupId>org.pg6100</groupId>
-                <artifactId>utils</artifactId>
-                <version>${project.version}</version>
-                <type>test-jar</type>
-            </dependency>
-            <dependency>
-                <groupId>org.pg6100</groupId>
-                <artifactId>xmlAndJson</artifactId>
-                <version>${project.version}</version>
-            </dependency>-->
             <dependency>
                 <groupId>me.contrapost</groupId>
                 <artifactId>quiz</artifactId>
@@ -146,6 +137,46 @@
                 <version>3.0.1</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.fasterxml.jackson.datatype</groupId>
+                <artifactId>jackson-datatype-jsr310</artifactId>
+                <version>${jackson-version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.datatype</groupId>
+                <artifactId>jackson-datatype-jdk8</artifactId>
+                <version>${jackson-version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${jackson-version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson-version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <!-- DropWizard -->
+            <dependency>
+                <groupId>io.dropwizard</groupId>
+                <artifactId>dropwizard-core</artifactId>
+                <version>${dropwizard.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.dropwizard</groupId>
+                <artifactId>dropwizard-testing</artifactId>
+                <version>${dropwizard.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.dropwizard</groupId>
+                <artifactId>dropwizard-assets</artifactId>
+                <version>${dropwizard.version}</version>
+            </dependency>
 
             <!-- Misc -->
             <dependency>
@@ -214,7 +245,7 @@
                 <!--
                   Avoid failing War generation if web.xml is missing, as we ll not
                   use it in some example modules
-              -->
+                -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-war-plugin</artifactId>
