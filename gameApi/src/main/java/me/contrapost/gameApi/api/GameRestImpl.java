@@ -96,7 +96,21 @@ public class GameRestImpl implements GameRestApi {
 
         String result = response.readEntity(String.class);
 
+        updateGameStatus(id, Boolean.parseBoolean(result));
+
         return new AnswerCheckDTO(result);
+    }
+
+    private void updateGameStatus(Long id, boolean isCorrect) {
+        GameEntity ge = em.find(GameEntity.class, id);
+        em.getTransaction().begin();
+        if(isCorrect){
+            ge.setAnswersCounter(ge.getAnswersCounter() + 1);
+            ge.isActive();
+        } else {
+            em.remove(ge);
+        }
+        em.getTransaction().commit();
     }
 
     @Override
