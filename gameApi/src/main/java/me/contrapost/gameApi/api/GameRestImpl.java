@@ -29,6 +29,7 @@ public class GameRestImpl implements GameRestApi {
 
     @Override
     public synchronized List<GameDTO> getAllActiveGames() {
+        //noinspection unchecked
         return GameConverter.transform(em.createNamedQuery(GameEntity.GET_ALL_ACTIVE_GAMES).getResultList());
     }
 

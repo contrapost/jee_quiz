@@ -13,6 +13,7 @@ public class AnswerCheckDTO {
     @ApiModelProperty("The boolean result reflects if the answer was correct")
     public String isCorrect;
 
+    @SuppressWarnings("unused")
     public AnswerCheckDTO() {
     }
 

@@ -52,6 +52,7 @@ public class GameEntity {
         return answersCounter;
     }
 
+    @SuppressWarnings("unused")
     public void setAnswersCounter(int answersCounter) {
         this.answersCounter = answersCounter;
     }
