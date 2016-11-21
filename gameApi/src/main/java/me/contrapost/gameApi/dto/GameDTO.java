@@ -19,16 +19,20 @@ public class GameDTO {
     @ApiModelProperty("Number of questions in the game")
     public int numberOfQuestions;
 
+    @ApiModelProperty("Is the game active")
+    public boolean isActive;
+
     @ApiModelProperty("URI to the current quiz")
     public String currentQuizURI;
 
     public GameDTO() {
     }
 
-    public GameDTO(String id, int answersCounter, int numberOfQuestions, String currentQuizURI) {
+    public GameDTO(String id, int answersCounter, int numberOfQuestions, String currentQuizURI, boolean isActive) {
         this.id = id;
         this.answersCounter = answersCounter;
         this.numberOfQuestions = numberOfQuestions;
         this.currentQuizURI = currentQuizURI;
+        this.isActive = isActive;
     }
 }

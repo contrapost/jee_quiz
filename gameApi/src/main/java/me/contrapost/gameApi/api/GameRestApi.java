@@ -4,9 +4,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
+import me.contrapost.gameApi.dto.AnswerCheckDTO;
 import me.contrapost.gameApi.dto.GameDTO;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.Response;
 import java.util.List;
 
 /**
@@ -26,7 +28,7 @@ public interface GameRestApi {
     @POST
     @Consumes(Formats.JSON_V1)
     @ApiResponse(code = 200, message = "The id of newly created game")
-    Long createGame(
+    Response createGame(
             @ApiParam("Optional parameter specifying number of quizzes in the game. Default value is 5 if absent")
             @QueryParam("limit")
                     String limit);
@@ -42,7 +44,7 @@ public interface GameRestApi {
     @ApiOperation("Answer the current quiz")
     @POST
     @Path("/{id}")
-    GameDTO answerQuiz(
+    AnswerCheckDTO answerQuiz(
             @ApiParam("Unique id of the game")
             @PathParam("id")
                     Long id);
@@ -50,7 +52,7 @@ public interface GameRestApi {
     @ApiOperation("Quit the game")
     @DELETE
     @Path("/{id}")
-    GameDTO quitGame(
+    void quitGame(
             @ApiParam("Unique id of the game")
             @PathParam("id")
                     Long id,

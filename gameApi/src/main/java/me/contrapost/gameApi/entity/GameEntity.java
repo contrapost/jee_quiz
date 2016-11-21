@@ -1,10 +1,9 @@
-package me.contrapost.gameApi.db;
+package me.contrapost.gameApi.entity;
 
 import me.contrapost.jee_quiz.entity.Quiz;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -22,6 +21,8 @@ public class GameEntity {
     private List<Quiz> quizzes;
 
     private int answersCounter;
+
+    private boolean isActive;
 
     public GameEntity() {}
 
@@ -48,5 +49,14 @@ public class GameEntity {
 
     public void setAnswersCounter(int answersCounter) {
         this.answersCounter = answersCounter;
+    }
+
+    public boolean isActive() {
+        setActive(quizzes.size() == answersCounter);
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
     }
 }

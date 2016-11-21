@@ -1,8 +1,10 @@
 package me.contrapost.gameApi.api;
 
 import io.swagger.annotations.ApiParam;
+import me.contrapost.gameApi.dto.AnswerCheckDTO;
 import me.contrapost.gameApi.dto.GameDTO;
 
+import javax.ws.rs.core.Response;
 import java.util.List;
 
 /**
@@ -16,7 +18,7 @@ public class GameRestImpl implements GameRestApi {
     }
 
     @Override
-    public Long createGame(
+    public Response createGame(
             @ApiParam("Optional parameter specifying number of quizzes in the game. " +
                     "Default value is 5 if absent")
                     String limit) {
@@ -29,15 +31,14 @@ public class GameRestImpl implements GameRestApi {
     }
 
     @Override
-    public GameDTO answerQuiz(@ApiParam("Unique id of the game") Long id) {
+    public AnswerCheckDTO answerQuiz(@ApiParam("Unique id of the game") Long id) {
         return null;
     }
 
     @Override
-    public GameDTO quitGame(@ApiParam("Unique id of the game")
+    public void quitGame(@ApiParam("Unique id of the game")
                                         Long id,
                             @ApiParam("Answer")
                                     String answer) {
-        return null;
     }
 }
