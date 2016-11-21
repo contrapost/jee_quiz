@@ -1,5 +1,6 @@
 package me.contrapost.gameApi.dto;
 
+import me.contrapost.gameApi.api.URIs;
 import me.contrapost.gameApi.entity.GameEntity;
 
 import java.util.List;
@@ -17,18 +18,16 @@ public class GameConverter {
     public static GameDTO transform(GameEntity entity){
         Objects.requireNonNull(entity);
 
-        String uri = "URI TO QUIZ"; // TODO
-
         GameDTO dto = new GameDTO();
         dto.id = String.valueOf(entity.getId());
 
         dto.answersCounter = entity.getAnswersCounter();
-        dto.numberOfQuestions = entity.getQuizzes().size();
+        dto.numberOfQuestions = entity.getQuizzesIds().size();
         dto.isActive = entity.isActive();
         if(!entity.isActive()){
             dto.currentQuizURI = "not applicable";
         } else {
-            dto.currentQuizURI = uri + entity.getQuizzes().get(entity.getAnswersCounter()).getId();
+            dto.currentQuizURI = URIs.QUIZ_ROOT_URI + entity.getQuizzesIds().get(entity.getAnswersCounter());
         }
 
         return dto;

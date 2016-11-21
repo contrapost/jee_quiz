@@ -11,12 +11,12 @@ import io.swagger.annotations.ApiModelProperty;
 public class AnswerCheckDTO {
 
     @ApiModelProperty("The boolean result reflects if the answer was correct")
-    public boolean isCorrect;
+    public String isCorrect;
 
     public AnswerCheckDTO() {
     }
 
-    public AnswerCheckDTO(boolean isCorrect) {
+    public AnswerCheckDTO(String isCorrect) {
         this.isCorrect = isCorrect;
     }
 }

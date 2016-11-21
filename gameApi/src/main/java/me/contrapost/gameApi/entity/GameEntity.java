@@ -1,8 +1,8 @@
 package me.contrapost.gameApi.entity;
 
-import me.contrapost.jee_quiz.entity.Quiz;
-
 import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.NamedQueries;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,14 +11,19 @@ import java.util.List;
  *
  */
 @Entity
+@NamedQueries({
+        @NamedQuery(name = GameEntity.GET_ALL_ACTIVE_GAMES, query = "select g from GameEntity g where g.isActive = true"),
+})
 public class GameEntity {
+
+    public static final String GET_ALL_ACTIVE_GAMES = "GET_ALL_ACTIVE_GAMES";
 
     @Id
     @GeneratedValue
     private Long id;
 
-    @OneToMany(fetch = FetchType.EAGER)
-    private List<Quiz> quizzes;
+    @ElementCollection(fetch = FetchType.EAGER)
+    private List<Long> quizzesIds;
 
     private int answersCounter;
 
@@ -34,13 +39,13 @@ public class GameEntity {
         this.id = id;
     }
 
-    public List<Quiz> getQuizzes() {
-        if(quizzes == null) quizzes = new ArrayList<>();
-        return quizzes;
+    public List<Long> getQuizzesIds() {
+        if(quizzesIds == null) quizzesIds = new ArrayList<>();
+        return quizzesIds;
     }
 
-    public void setQuizzes(List<Quiz> quizzes) {
-        this.quizzes = quizzes;
+    public void setQuizzesIds(List<Long> quizzes) {
+        this.quizzesIds = quizzes;
     }
 
     public int getAnswersCounter() {
@@ -52,7 +57,7 @@ public class GameEntity {
     }
 
     public boolean isActive() {
-        setActive(quizzes.size() == answersCounter);
+        setActive(quizzesIds.size() == answersCounter);
         return isActive;
     }
 

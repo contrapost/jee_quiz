@@ -20,7 +20,7 @@ import java.util.List;
 @Produces(Formats.JSON_V1)
 public interface GameRestApi {
 
-    @ApiOperation("Get all root categories")
+    @ApiOperation("Get all active games")
     @GET
     List<GameDTO> getAllActiveGames();
 
@@ -47,7 +47,10 @@ public interface GameRestApi {
     AnswerCheckDTO answerQuiz(
             @ApiParam("Unique id of the game")
             @PathParam("id")
-                    Long id);
+                    Long id,
+            @ApiParam("Answer")
+            @QueryParam("answer")
+                    String answer);
 
     @ApiOperation("Quit the game")
     @DELETE
@@ -55,8 +58,5 @@ public interface GameRestApi {
     void quitGame(
             @ApiParam("Unique id of the game")
             @PathParam("id")
-                    Long id,
-            @ApiParam("Answer")
-            @QueryParam("answer")
-            String answer);
+                    Long id);
 }
