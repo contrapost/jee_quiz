@@ -14,11 +14,6 @@
 
     <dependencies>
 
-        <dependency>
-            <groupId>me.contrapost</groupId>
-            <artifactId>quiz</artifactId>
-        </dependency>
-
         <!--
             Make sure that the "provided" dependencies of "news"
             module are marked as "compile" here
@@ -109,7 +104,10 @@
             <artifactId>jackson-databind</artifactId>
             <scope>compile</scope>
         </dependency>
-
+        <dependency>
+            <groupId>com.github.tomakehurst</groupId>
+            <artifactId>wiremock-standalone</artifactId>
+        </dependency>
     </dependencies>
 
 

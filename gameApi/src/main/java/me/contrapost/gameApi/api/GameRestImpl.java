@@ -23,9 +23,22 @@ import java.util.List;
  */
 public class GameRestImpl implements GameRestApi {
 
+    private final String webAddress;
+
     private EntityManagerFactory factory = Persistence.createEntityManagerFactory("GAME_DB");
 
     private EntityManager em = factory.createEntityManager();
+
+    public GameRestImpl() {
+
+        /*
+             Important that we use a system property (which can be set with
+             -D from command line).
+             Reason? we ll change the server when running tests, as to be
+             able to mock responses deterministically
+         */
+        webAddress = System.getProperty("quizApiAddress", URIs.QUIZ_ROOT_URI);
+    }
 
     @Override
     public synchronized List<GameDTO> getAllActiveGames() {
@@ -43,7 +56,7 @@ public class GameRestImpl implements GameRestApi {
         long specifyingCategoryId = 1; //TODO
 
         URI specCategoryURI = UriBuilder
-                .fromUri(URIs.QUIZ_ROOT_URI + "/randomQuizzes")
+                .fromUri(webAddress + "/randomQuizzes")
                 .queryParam("limit", limit)
                 .queryParam("filter", "sp_" + specifyingCategoryId)
                 .build();
@@ -51,11 +64,10 @@ public class GameRestImpl implements GameRestApi {
         Client client = ClientBuilder.newClient();
         Response response = client.target(specCategoryURI).request("application/json").get();
 
-        String result = response.readEntity(String.class);
+        String[] result = response.readEntity(String[].class);
 
-        String[] resultAsString = result.split("\\D+");
         List<Long> quizzesIds = new ArrayList<>();
-        for (String aResultAsString : resultAsString) {
+        for (String aResultAsString : result) {
             quizzesIds.add(Long.parseLong(aResultAsString));
         }
 
@@ -86,7 +98,7 @@ public class GameRestImpl implements GameRestApi {
                                                           String answer) {
 
         URI uri = UriBuilder
-                .fromUri(URIs.QUIZ_ROOT_URI + "/answer-check")
+                .fromUri(webAddress + "/answer-check")
                 .queryParam("id", id)
                 .queryParam("answer", answer)
                 .build();
