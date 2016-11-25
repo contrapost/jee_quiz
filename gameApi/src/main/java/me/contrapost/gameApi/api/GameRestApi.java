@@ -26,7 +26,6 @@ public interface GameRestApi {
 
     @ApiOperation("Create a new game")
     @POST
-    @Consumes(Formats.JSON_V1)
     @ApiResponse(code = 200, message = "The id of newly created game")
     Response createGame(
             @ApiParam("Optional parameter specifying number of quizzes in the game. Default value is 5 if absent")

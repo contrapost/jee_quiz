@@ -27,6 +27,10 @@ public class GameApplicationTestBase {
 
     private static WireMockServer wireMockServer;
 
+    static {
+        System.setProperty("quizApiAddress", "localhost:8099");
+    }
+
     @BeforeClass
     public static void initRestAssured() {
 
@@ -70,7 +74,7 @@ public class GameApplicationTestBase {
 
         wireMockServer.stubFor( //prepare a stubbed response for the given request
                 WireMock.post(
-                        urlMatching("/randomQuizzes"))
+                        urlMatching(".*quiz/randomQuizzes.*"))
                         .withQueryParam("limit", WireMock.matching("\\D+"))
                         .withQueryParam("filter", WireMock.matching("sp_1"))
                         // define the mocked response of the GET
@@ -85,11 +89,10 @@ public class GameApplicationTestBase {
                 .statusCode(200)
                 .body("size", is(0));
 
-
-        /*given().queryParam("limit", 5)
+        given().queryParam("limit", 5)
                 .post()
                 .then()
-                .statusCode(200);*/
+                .statusCode(200);
     }
 
     @Test
