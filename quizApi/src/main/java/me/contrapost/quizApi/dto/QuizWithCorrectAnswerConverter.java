@@ -1,6 +1,7 @@
 package me.contrapost.quizApi.dto;
 
 import me.contrapost.jee_quiz.entity.Quiz;
+import me.contrapost.quizApi.dto.collection.ListDTO;
 
 import java.util.HashMap;
 import java.util.List;
@@ -25,13 +26,5 @@ public class QuizWithCorrectAnswerConverter {
         dto.answerMap = new HashMap<>(quiz.getAnswerMap());
 
         return dto;
-    }
-
-    public static List<QuizWithCorrectAnswerDTO> transform(List<Quiz> quizzes){
-        Objects.requireNonNull(quizzes);
-
-        return quizzes.stream()
-                .map(QuizWithCorrectAnswerConverter::transform)
-                .collect(Collectors.toList());
     }
 }

@@ -4,12 +4,14 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import me.contrapost.quizApi.api.util.JBossUtil;
 import me.contrapost.quizApi.dto.RootCategoryDTO;
+import me.contrapost.quizApi.dto.collection.ListDTO;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static io.restassured.RestAssured.get;
 import static io.restassured.RestAssured.given;

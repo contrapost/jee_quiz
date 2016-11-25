@@ -486,7 +486,7 @@ public class QuizRestIT extends QuizRestTestBase {
 
         QuizWithCorrectAnswerDTO dto = new QuizWithCorrectAnswerDTO(null, quizQuestion, specifyingCategoryId, answerMap);
 
-        get("/quizzes").then().statusCode(200).body("size()", is(0));
+        get("/quizzes").then().statusCode(200).body("list.size()", is(0));
 
         String id = given().contentType(ContentType.JSON)
                 .body(dto)
@@ -495,7 +495,7 @@ public class QuizRestIT extends QuizRestTestBase {
                 .statusCode(200)
                 .extract().asString();
 
-        get("/quizzes").then().statusCode(200).body("size()", is(1));
+        get("/quizzes").then().statusCode(200).body("list.size()", is(1));
 
         given().pathParam("id", id)
                 .get("quizzes/id/{id}")
@@ -571,12 +571,12 @@ public class QuizRestIT extends QuizRestTestBase {
         String quizId8 = createQuiz(specCatId8, "Question #1 from specifying category #8");
         String quizId9 = createQuiz(specCatId9, "Question #1 from specifying category #9");
 
-        get("/quizzes").then().statusCode(200).body("size()", is(9));
+        get("/quizzes").then().statusCode(200).body("list.size()", is(9));
 
         given().get("/quizzes")
                 .then()
                 .statusCode(200)
-                .body("id", hasItems(quizId1,
+                .body("list.id", hasItems(quizId1,
                         quizId2,
                         quizId3,
                         quizId4,
@@ -585,7 +585,7 @@ public class QuizRestIT extends QuizRestTestBase {
                         quizId7,
                         quizId8,
                         quizId9))
-                .body("question", hasItems("Question #1 from specifying category #1",
+                .body("list.question", hasItems("Question #1 from specifying category #1",
                         "Question #1 from specifying category #2",
                         "Question #1 from specifying category #3",
                         "Question #1 from specifying category #4",
@@ -609,7 +609,7 @@ public class QuizRestIT extends QuizRestTestBase {
                 .statusCode(200)
                 .extract().asString();
 
-        get("/quizzes").then().body("id", contains(id));
+        get("/quizzes").then().body("list.id", contains(id));
 
         delete("/quizzes/id/" + id);
 
@@ -657,7 +657,7 @@ public class QuizRestIT extends QuizRestTestBase {
         String specId = createSpecifyingCategory(subId, "Spec");
         createQuiz(specId, uniqueQuestion);
 
-        get("/quizzes").then().statusCode(200).body("size()", is(1));
+        get("/quizzes").then().statusCode(200).body("list.size()", is(1));
 
         given().contentType(ContentType.JSON)
                 .body(new QuizWithCorrectAnswerDTO(null,
@@ -668,7 +668,7 @@ public class QuizRestIT extends QuizRestTestBase {
                 .then()
                 .statusCode(400);
 
-        get("/quizzes").then().statusCode(200).body("size()", is(1));
+        get("/quizzes").then().statusCode(200).body("list.size()", is(1));
     }
 
     @Test
@@ -865,13 +865,13 @@ public class QuizRestIT extends QuizRestTestBase {
         createQuiz(specCatId6, "Question #2 from specifying category #6");
 
         given().pathParam("id", rootId)
-                .get("/quizzes/parent/{id}").then().statusCode(200).body("size()", is(9));
+                .get("/quizzes/parent/{id}").then().statusCode(200).body("list.size()", is(9));
 
         given().pathParam("id", subCategoryId2)
-                .get("/quizzes/parent/{id}").then().statusCode(200).body("size()", is(6));
+                .get("/quizzes/parent/{id}").then().statusCode(200).body("list.size()", is(6));
 
         given().pathParam("id", specCatId1)
-                .get("/quizzes/parent/{id}").then().statusCode(200).body("size()", is(2));
+                .get("/quizzes/parent/{id}").then().statusCode(200).body("list.size()", is(2));
     }
 
     @Test
@@ -1028,11 +1028,11 @@ public class QuizRestIT extends QuizRestTestBase {
         String specifyingCategoryId = createSpecifyingCategory(createSubCategory(createRootCategory("Root"), "Sub"),
                 "Specifying category");
 
-        get("/quizzes").then().statusCode(200).body("size()", is(0));
+        get("/quizzes").then().statusCode(200).body("list.size()", is(0));
 
         String id = createQuiz(specifyingCategoryId, quizQuestion, answerMap);
 
-        get("/quizzes").then().statusCode(200).body("size()", is(1));
+        get("/quizzes").then().statusCode(200).body("list.size()", is(1));
 
         given().pathParam("id", id)
                 .get("quizzes/{id}")

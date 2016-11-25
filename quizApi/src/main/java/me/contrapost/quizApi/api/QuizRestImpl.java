@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiParam;
 import me.contrapost.jee_quiz.ejb.CategoryEJB;
 import me.contrapost.jee_quiz.ejb.QuizEJB;
 import me.contrapost.quizApi.dto.*;
+import me.contrapost.quizApi.dto.collection.ListDTO;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.ejb.EJB;
@@ -15,6 +16,8 @@ import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.validation.ConstraintViolationException;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -353,8 +356,8 @@ public class QuizRestImpl implements QuizRestApi {
 
     //region implementation of REST API for quizzes
     @Override
-    public List<QuizDTO> getAllQuizzes() {
-        return QuizConverter.transform(quizEJB.getAllQuizzes());
+    public ListDTO<QuizDTO> getAllQuizzes(Integer offset, Integer limit) {
+        return QuizConverter.transform(quizEJB.getAllQuizzes(), offset, limit);
     }
 
     @Override
@@ -496,8 +499,8 @@ public class QuizRestImpl implements QuizRestApi {
     }
 
     @Override
-    public List<QuizDTO> getAllQuizzesForParent(@ApiParam(Params.GENERAL_ID_PARAM) Long id) {
-        return QuizConverter.transform(categoryEJB.getAllQuizzesForCategory(id));
+    public ListDTO<QuizDTO> getAllQuizzesForParent(Integer offset, Integer limit, Long id) {
+        return QuizConverter.transform(categoryEJB.getAllQuizzesForCategory(id), offset, limit);
     }
 
     @Override
@@ -734,48 +737,6 @@ public class QuizRestImpl implements QuizRestApi {
                         .build())
                 .build();
     }
-
-
-    /*@Override
-    public Response deprecatedGetRandomQuizzes(@ApiParam("Number of quizzes") String limit,
-                                       @ApiParam(Params.ROOT_ID_PARAM) String rootId,
-                                       @ApiParam(Params.SUB_ID_PARAM) String subId,
-                                       @ApiParam(Params.SPEC_ID_PARAM) String specId) {
-
-        String query = "";
-        if(!Strings.isNullOrEmpty(limit)) {
-            query = "?limit=" + limit;
-        }
-
-        if (!Strings.isNullOrEmpty(rootId)) {
-            query += "&r_" + rootId;
-            return Response.status(301)
-                    .location(UriBuilder.fromUri("quiz/randomQuizzes/" + query)
-                            .build())
-                    .build();
-        }
-
-        if (!Strings.isNullOrEmpty(subId)) {
-            query += "&s_" + rootId;
-            return Response.status(301)
-                    .location(UriBuilder.fromUri("quiz/randomQuizzes/" + query)
-                            .build())
-                    .build();
-        }
-
-        if (!Strings.isNullOrEmpty(specId)) {
-            query += "&sp_" + rootId;
-            return Response.status(301)
-                    .location(UriBuilder.fromUri("quiz/randomQuizzes/" + query)
-                            .build())
-                    .build();
-        }
-
-        return Response.status(301)
-                .location(UriBuilder.fromUri("quiz/randomQuizzes/" + query)
-                        .build())
-                .build();
-    }*/
     //endregion
 
     //region util methods

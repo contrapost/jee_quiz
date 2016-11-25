@@ -1,6 +1,7 @@
 package me.contrapost.quizApi.dto;
 
 import me.contrapost.jee_quiz.entity.Quiz;
+import me.contrapost.quizApi.dto.collection.ListDTO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,11 +27,25 @@ public class QuizConverter {
         return dto;
     }
 
-    public static List<QuizDTO> transform(List<Quiz> quizzes){
-        Objects.requireNonNull(quizzes);
+    public static ListDTO<QuizDTO> transform(List<Quiz> quizzes, int offset,
+                                                              int limit){
 
-        return quizzes.stream()
-                .map(QuizConverter::transform)
-                .collect(Collectors.toList());
+        List<QuizDTO> dtoList = null;
+        if(quizzes != null){
+            dtoList = quizzes.stream()
+                    .skip(offset) // this is a good example of how streams simplify coding
+                    .limit(limit)
+                    .map(QuizConverter::transform)
+                    .collect(Collectors.toList());
+        }
+
+        ListDTO<QuizDTO> dto = new ListDTO<>();
+        dto.list = dtoList;
+        dto._links = new ListDTO.ListLinks();
+        dto.rangeMin = offset;
+        dto.rangeMax = dto.rangeMin + dtoList.size() - 1;
+        dto.totalSize = quizzes.size();
+
+        return dto;
     }
 }

@@ -3,6 +3,7 @@ package me.contrapost.quizApi.api;
 import io.swagger.annotations.*;
 import io.swagger.jaxrs.PATCH;
 import me.contrapost.quizApi.dto.*;
+import me.contrapost.quizApi.dto.collection.ListDTO;
 
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
@@ -202,7 +203,15 @@ public interface QuizRestApi {
     @ApiOperation("Get all quizzes")
     @GET
     @Path("/quizzes")
-    List<QuizDTO> getAllQuizzes();
+    @Produces(Formats.HAL_V1)
+    ListDTO<QuizDTO> getAllQuizzes(@ApiParam("Offset in the list of news")
+                                   @QueryParam("offset")
+                                   @DefaultValue("0")
+                                           Integer offset,
+                                   @ApiParam("Limit of news in a single retrieved page")
+                                   @QueryParam("limit")
+                                   @DefaultValue("10")
+                                           Integer limit);
 
     @ApiOperation("Get a single quiz specified by id")
     @GET
@@ -288,9 +297,18 @@ public interface QuizRestApi {
     @ApiOperation("Get all quizzes for parent (root/sub/specifying) category specified by id")
     @GET
     @Path("/quizzes/parent/{id}")
-    List<QuizDTO> getAllQuizzesForParent(@ApiParam(Params.GENERAL_ID_PARAM)
-                                                                    @PathParam("id")
-                                                                            Long id);
+    @Produces(Formats.HAL_V1)
+    ListDTO<QuizDTO> getAllQuizzesForParent(@ApiParam("Offset in the list of news")
+                                            @QueryParam("offset")
+                                            @DefaultValue("0")
+                                                    Integer offset,
+                                            @ApiParam("Limit of news in a single retrieved page")
+                                            @QueryParam("limit")
+                                            @DefaultValue("10")
+                                                    Integer limit,
+                                            @ApiParam(Params.GENERAL_ID_PARAM)
+                                            @PathParam("id")
+                                                    Long id);
 
     @ApiOperation("Get a random quiz. Return a random quiz for concrete root, sub- or specifying category" +
             "depending on filter")
