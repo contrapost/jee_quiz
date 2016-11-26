@@ -107,6 +107,13 @@ public class CategoryEJB {
         return category.getListOfAllQuizzes();
     }
 
+    public List<Quiz> getAllQuizzesForCategory(long categoryId, int max) {
+        Category category = em.find(Category.class, categoryId);
+        if (category == null) throw new IllegalArgumentException("There is no category with id: " + categoryId);
+
+        return category.getListOfAllQuizzes().subList(0, max);
+    }
+
     public List<RootCategory> getAllRootCategories() {
         return em.createNamedQuery(RootCategory.GET_ALL_ROOT_CATEGORIES).getResultList();
     }
