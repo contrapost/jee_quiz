@@ -54,6 +54,7 @@ public class QuizEJB {
         return true;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public boolean updateAnswersMap(@NotNull long quizId, @NotNull String previousAnswer, @NotNull String newAnswer) {
         Quiz quiz = em.find(Quiz.class, quizId);
         if (quiz == null || quiz.getAnswerMap().get(previousAnswer) == null) 
@@ -88,5 +89,10 @@ public class QuizEJB {
             ids.add(quizzes.remove(new Random().nextInt(quizzes.size())).getId());
         }
         return ids;
+    }
+
+    public List<Quiz> getQuizList(int limit) {
+        //noinspection unchecked
+        return em.createNamedQuery(Quiz.GET_ALL_QUIZZES).setMaxResults(limit).getResultList();
     }
 }

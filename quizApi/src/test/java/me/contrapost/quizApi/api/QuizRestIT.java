@@ -2,6 +2,7 @@ package me.contrapost.quizApi.api;
 
 import io.restassured.http.ContentType;
 import me.contrapost.quizApi.dto.*;
+import me.contrapost.quizApi.dto.collection.ListDTO;
 import org.junit.Test;
 
 import java.util.*;
@@ -11,8 +12,7 @@ import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Created by alexandershipunov on 30/10/2016.
@@ -508,6 +508,35 @@ public class QuizRestIT extends QuizRestTestBase {
     }
 
     @Test
+    public void testLinks() {
+        for (int i = 0; i < 15; i++) createQuizWithDifferentCategories("" + i, i);
+
+        get("/quizzes").then().statusCode(200).body("list.size()", is(10));
+
+        ListDTO<?> dto = get("/quizzes")
+                .then()
+                .statusCode(200)
+                .extract()
+                .as(ListDTO.class);
+
+        assertEquals(15, dto.totalSize.intValue());
+        assertNotNull(dto._links.next.href);
+
+        ListDTO<?> nextDto = get(dto._links.next.href)
+                .then()
+                .statusCode(200)
+                .extract()
+                .as(ListDTO.class);
+
+        assertEquals(5, nextDto.list.size());
+        assertEquals(15, nextDto.totalSize.intValue());
+        assertNotNull(nextDto._links.previous.href);
+
+        get(nextDto._links.previous.href).then().statusCode(200).body("list.size()", is(10));
+    }
+
+
+    @Test
     public void testCheckCorrectAnswer() {
         String question = "Quiz question";
 
@@ -528,7 +557,7 @@ public class QuizRestIT extends QuizRestTestBase {
                 .extract()
                 .asString();
 
-        assertEquals(isCorrect, "true");
+        assertEquals("true", isCorrect);
 
         String isWrong = given().queryParam("id", id)
                 .and()
@@ -1192,6 +1221,16 @@ public class QuizRestIT extends QuizRestTestBase {
                 .then()
                 .statusCode(200)
                 .extract().asString();
+    }
+
+    private String createQuizWithDifferentCategories(String question, int index) {
+        return createQuiz(
+                createSpecifyingCategory(
+                createSubCategory(
+                createRootCategory("Root" + index),
+                "Sub" + index),
+                "Spec" + index),
+                question);
     }
 
     private String createQuiz(String specCatId, String question) {

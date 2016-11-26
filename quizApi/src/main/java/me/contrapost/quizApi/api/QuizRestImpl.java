@@ -7,8 +7,10 @@ import com.google.common.base.Throwables;
 import io.swagger.annotations.ApiParam;
 import me.contrapost.jee_quiz.ejb.CategoryEJB;
 import me.contrapost.jee_quiz.ejb.QuizEJB;
+import me.contrapost.jee_quiz.entity.Quiz;
 import me.contrapost.quizApi.dto.*;
 import me.contrapost.quizApi.dto.collection.ListDTO;
+import me.contrapost.quizApi.dto.hal.HalLink;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.ejb.EJB;
@@ -16,11 +18,11 @@ import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.validation.ConstraintViolationException;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 import java.net.URI;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -34,6 +36,9 @@ import java.util.Map;
 @Stateless
 @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
 public class QuizRestImpl implements QuizRestApi {
+
+    @Context
+    UriInfo uriInfo;
 
     @EJB
     private CategoryEJB categoryEJB;
@@ -357,7 +362,47 @@ public class QuizRestImpl implements QuizRestApi {
     //region implementation of REST API for quizzes
     @Override
     public ListDTO<QuizDTO> getAllQuizzes(Integer offset, Integer limit) {
-        return QuizConverter.transform(quizEJB.getAllQuizzes(), offset, limit);
+        if(offset < 0){
+            throw new WebApplicationException("Negative offset: "+offset, 400);
+        }
+
+        if(limit < 1){
+            throw new WebApplicationException("Limit should be at least 1: "+limit, 400);
+        }
+
+        int maxFromDb = 50;
+
+        List<Quiz> list = quizEJB.getQuizList(maxFromDb);
+
+        if(offset != 0 && offset >=  list.size()){
+            throw new WebApplicationException("Offset "+ offset + " out of bound "+ list.size(), 400);
+        }
+
+        ListDTO<QuizDTO> listDTO = QuizConverter.transform(list, offset, limit);
+
+        UriBuilder builder = uriInfo.getBaseUriBuilder()
+                .path("/quiz/quizzes")
+                .queryParam("limit", limit);
+
+        listDTO._links.self = new HalLink(builder.clone()
+                .queryParam("offset", offset)
+                .build().toString()
+        );
+
+        if (!list.isEmpty() && offset > 0) {
+            listDTO._links.previous = new HalLink(builder.clone()
+                    .queryParam("offset", Math.max(offset - limit, 0))
+                    .build().toString()
+            );
+        }
+        if (offset + limit < list.size()) {
+            listDTO._links.next = new HalLink(builder.clone()
+                    .queryParam("offset", offset + limit)
+                    .build().toString()
+            );
+        }
+
+        return listDTO;
     }
 
     @Override
