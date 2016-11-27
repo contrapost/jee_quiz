@@ -27,7 +27,7 @@ public class SubCategory extends Category{
     @ManyToOne
     private RootCategory rootCategory;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "subCategory")
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "subCategory")
     private Map<Long, SpecifyingCategory> specifyingCategories;
 
     public SubCategory() {

@@ -22,7 +22,8 @@ import java.util.Map;
 public class SpecifyingCategory extends Category {
 
     public static final String GET_ALL_SPECIFYING_CATEGORIES = "GET_ALL_SPECIFYING_CATEGORIES";
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Map<Long, Quiz> quizzes;
 
     @ManyToOne

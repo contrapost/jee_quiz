@@ -100,6 +100,7 @@ public class CategoryEJB {
         return true;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public List<Quiz> getAllQuizzesForCategory(long categoryId) {
         Category category = em.find(Category.class, categoryId);
         if (category == null) throw new IllegalArgumentException("There is no category with id: " + categoryId);
@@ -111,7 +112,9 @@ public class CategoryEJB {
         Category category = em.find(Category.class, categoryId);
         if (category == null) throw new IllegalArgumentException("There is no category with id: " + categoryId);
 
-        return category.getListOfAllQuizzes().subList(0, max);
+        int sizeOfList = category.getListOfAllQuizzes().size();
+
+        return category.getListOfAllQuizzes().subList(0, max > sizeOfList ? sizeOfList : max);
     }
 
     public List<RootCategory> getAllRootCategories() {

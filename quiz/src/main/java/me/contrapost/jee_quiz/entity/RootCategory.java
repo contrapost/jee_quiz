@@ -26,7 +26,7 @@ public class RootCategory extends Category{
 
     public static final String GET_ALL_ROOT_CATEGORIES = "GET_ALL_ROOT_CATEGORIES";
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "rootCategory")
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "rootCategory")
     private Map<Long, SubCategory> subCategories;
 
     public RootCategory() {
