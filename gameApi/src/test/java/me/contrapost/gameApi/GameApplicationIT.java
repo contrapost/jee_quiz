@@ -2,6 +2,7 @@ package me.contrapost.gameApi;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -15,6 +16,7 @@ import static org.junit.Assert.assertTrue;
  * Created by alexandershipunov on 21/11/2016.
  *
  */
+@Ignore
 public class GameApplicationIT extends GameApplicationTestBase{
 
     private static Process process;
