@@ -70,12 +70,13 @@ public class GameApplicationTestBase {
 
     @Test
     public void testCreateAndGetGame() throws UnsupportedEncodingException {
-        String json = "[1, 2, 3, 4, 5]";
+
+        String json = "{\"ids\":[1, 2, 3, 4, 5]}";
 
         wireMockServer.stubFor( //prepare a stubbed response for the given request
                 WireMock.post(
                         urlMatching(".*quiz/randomQuizzes.*"))
-                        .withQueryParam("limit", WireMock.matching("\\D+"))
+                        .withQueryParam("limit", WireMock.matching("5"))
                         .withQueryParam("filter", WireMock.matching("sp_1"))
                         // define the mocked response of the GET
                         .willReturn(WireMock.aResponse()
