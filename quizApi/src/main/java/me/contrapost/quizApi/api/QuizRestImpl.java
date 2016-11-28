@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiParam;
 import me.contrapost.jee_quiz.ejb.CategoryEJB;
 import me.contrapost.jee_quiz.ejb.QuizEJB;
 import me.contrapost.jee_quiz.entity.Quiz;
+import me.contrapost.jee_quiz.entity.RootCategory;
 import me.contrapost.quizApi.dto.*;
 import me.contrapost.quizApi.dto.collection.ListDTO;
 import me.contrapost.quizApi.dto.hal.HalLink;
@@ -48,16 +49,69 @@ public class QuizRestImpl implements QuizRestApi {
 
     //region implementation of REST API for root categories
     @Override
-    public List<RootCategoryDTO> getAllRootCategories(String withQuizzes) {
-        if(withQuizzes != null && (withQuizzes.isEmpty() || withQuizzes.equals("true"))) {
-            return RootCategoryConverter.transform(new ArrayList<>(categoryEJB.getAllRootCategoriesWithAtLeastOneQuiz()));
+    public ListDTO<RootCategoryDTO> getAllRootCategories(Integer offset, Integer limit, String withQuizzes, Boolean expand) {
+
+        if(offset < 0){
+            throw new WebApplicationException("Negative offset: " + offset, 400);
         }
-        return RootCategoryConverter.transform(categoryEJB.getAllRootCategories());
+
+        if(limit < 1){
+            throw new WebApplicationException("Limit should be at least 1: " + limit, 400);
+        }
+
+        if(expand == null) expand = false;
+
+        int maxFromDb = 50;
+
+        List<RootCategory> rootCategories;
+
+        if(withQuizzes != null && (withQuizzes.isEmpty() || withQuizzes.equals("true"))) {
+            rootCategories = new ArrayList<>(categoryEJB.getAllRootCategoriesWithAtLeastOneQuiz(maxFromDb));
+        } else {
+            rootCategories = categoryEJB.getAllRootCategories(maxFromDb, expand);
+        }
+
+        if(offset != 0 && offset >=  rootCategories.size()){
+            throw new WebApplicationException("Offset "+ offset + " out of bound "+ rootCategories.size(), 400);
+        }
+
+        ListDTO<RootCategoryDTO> dto = RootCategoryConverter.transform(
+                rootCategories, offset, limit, expand);
+
+        UriBuilder builder = uriInfo.getBaseUriBuilder()
+                .path("/quiz/categories")
+                .queryParam("expand", expand)
+                .queryParam("limit", limit);
+
+        if(withQuizzes != null){
+            builder = builder.queryParam("withQuizzes", withQuizzes);
+        }
+
+        dto._links.self = new HalLink(builder.clone()
+                .queryParam("offset", offset)
+                .build().toString()
+        );
+
+        if (!rootCategories.isEmpty() && offset > 0) {
+            dto._links.previous = new HalLink(builder.clone()
+                    .queryParam("offset", Math.max(offset - limit, 0))
+                    .build().toString()
+            );
+        }
+        if (offset + limit < rootCategories.size()) {
+            dto._links.next = new HalLink(builder.clone()
+                    .queryParam("offset", offset + limit)
+                    .build().toString()
+            );
+        }
+
+        return dto;
     }
 
     @Override
-    public RootCategoryDTO getRootCategoryById(@ApiParam(Params.ROOT_ID_PARAM) Long id) {
-        return RootCategoryConverter.transform(categoryEJB.getRootCategory(id));
+    public RootCategoryDTO getRootCategoryById(Boolean expand, Long id) {
+        if(expand == null) expand = false;
+        return RootCategoryConverter.transform(categoryEJB.getRootCategory(id, expand));
     }
 
     @Override

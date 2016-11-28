@@ -63,6 +63,15 @@ public class CategoryEJB {
         return em.find(RootCategory.class, id);
     }
 
+    public RootCategory getRootCategory(@NotNull long id, boolean expand){
+        RootCategory rootCategory = getRootCategory(id);
+        if(expand){
+            rootCategory.getSubCategories().values()
+                    .forEach(subCategory -> subCategory.getSpecifyingCategories().size());
+        }
+        return rootCategory;
+    }
+
     public SubCategory getSubCategory(@NotNull long id){
         return em.find(SubCategory.class, id);
     }
@@ -117,8 +126,20 @@ public class CategoryEJB {
         return category.getListOfAllQuizzes().subList(0, max > sizeOfList ? sizeOfList : max);
     }
 
-    public List<RootCategory> getAllRootCategories() {
-        return em.createNamedQuery(RootCategory.GET_ALL_ROOT_CATEGORIES).getResultList();
+    public List<RootCategory> getAllRootCategories(int limit, boolean expand) {
+        List<RootCategory> list =
+                em.createNamedQuery(RootCategory.GET_ALL_ROOT_CATEGORIES).setMaxResults(limit).getResultList();
+
+        if(expand) {
+            list.forEach(rootCategory -> rootCategory.getSubCategories().size());
+
+            List<SubCategory> subCategories = new ArrayList<>();
+            list.forEach(rootCategory -> subCategories.addAll(rootCategory.getSubCategories().values()));
+
+            subCategories.forEach(subCategory -> subCategory.getSpecifyingCategories().size());
+        }
+
+        return list;
     }
 
     public List<SubCategory> getAllSubCategories() {
@@ -129,8 +150,8 @@ public class CategoryEJB {
         return em.createNamedQuery(SpecifyingCategory.GET_ALL_SPECIFYING_CATEGORIES).getResultList();
     }
 
-    public Set<RootCategory> getAllRootCategoriesWithAtLeastOneQuiz() {
-        List<Quiz> quizzes = em.createNamedQuery(Quiz.GET_ALL_QUIZZES).getResultList();
+    public Set<RootCategory> getAllRootCategoriesWithAtLeastOneQuiz(int limit) {
+        List<Quiz> quizzes = em.createNamedQuery(Quiz.GET_ALL_QUIZZES).setMaxResults(limit).getResultList();
         return quizzes.stream().map(Quiz::getSpecifyingCategory).collect(Collectors.toSet())
                 .stream().map(SpecifyingCategory::getSubCategory).collect(Collectors.toSet())
                 .stream().map(SubCategory::getRootCategory).collect(Collectors.toSet());

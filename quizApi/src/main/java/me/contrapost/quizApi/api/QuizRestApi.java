@@ -28,18 +28,32 @@ public interface QuizRestApi {
     @ApiOperation("Get all root categories")
     @GET
     @Path("/categories")
-    List<RootCategoryDTO> getAllRootCategories(
-            @ApiParam("Specifying to list only categories with quizzes")
-            @QueryParam("withQuizzes")
-            String withQuizzes);
+    ListDTO<RootCategoryDTO> getAllRootCategories(@ApiParam("Offset in the list of news")
+                                               @QueryParam("offset")
+                                               @DefaultValue("0")
+                                                       Integer offset,
+                                               @ApiParam("Limit of news in a single retrieved page")
+                                               @QueryParam("limit")
+                                               @DefaultValue("10")
+                                                       Integer limit,
+                                               @ApiParam("Specifying to list only categories with quizzes")
+                                               @QueryParam("withQuizzes")
+                                               String withQuizzes,
+                                               @ApiParam("Whether to retrieve or not votes and comments for the given news")
+                                               @QueryParam("expand")
+                                               @DefaultValue("false")
+                                               Boolean expand);
 
     @ApiOperation("Get a single root category specified by id")
     @GET
     @Path("categories/{id}")
-    RootCategoryDTO getRootCategoryById(
-            @ApiParam(Params.ROOT_ID_PARAM)
-            @PathParam("id")
-                    Long id);
+    RootCategoryDTO getRootCategoryById(@ApiParam("Whether to retrieve or not votes and comments for the given news")
+                                        @QueryParam("expand")
+                                        @DefaultValue("false")
+                                                Boolean expand,
+                                        @ApiParam(Params.ROOT_ID_PARAM)
+                                        @PathParam("id")
+                                                Long id);
 
     @ApiOperation("Create a new root category")
     @POST

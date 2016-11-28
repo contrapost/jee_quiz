@@ -26,7 +26,7 @@ public class QuizRestIT extends QuizRestTestBase {
 
         get("/categories").then()
                 .statusCode(200)
-                .body("size()", is(0));
+                .body("list.size()", is(0));
     }
 
     //region Testing root category
@@ -36,9 +36,9 @@ public class QuizRestIT extends QuizRestTestBase {
 
         String title = "Title";
 
-        RootCategoryDTO dto = new RootCategoryDTO(null, title);
+        RootCategoryDTO dto = new RootCategoryDTO(null, title, null, null);
 
-        get("/categories").then().statusCode(200).body("size()", is(0));
+        get("/categories").then().statusCode(200).body("list.size()", is(0));
 
         String id = given().contentType(ContentType.JSON)
                 .body(dto)
@@ -47,7 +47,7 @@ public class QuizRestIT extends QuizRestTestBase {
                 .statusCode(200)
                 .extract().asString();
 
-        get("/categories").then().statusCode(200).body("size()", is(1));
+        get("/categories").then().statusCode(200).body("list.size()", is(1));
 
         given().pathParam("id", id)
                 .get("categories/id/{id}")
@@ -63,26 +63,26 @@ public class QuizRestIT extends QuizRestTestBase {
         String rootId2 = createRootCategory("Root #2");
         String rootId3 = createRootCategory("Root #3");
 
-        get("/categories").then().statusCode(200).body("size()", is(3));
+        get("/categories").then().statusCode(200).body("list.size()", is(3));
 
         given().get("/categories")
                 .then()
                 .statusCode(200)
-                .body("id", hasItems(rootId1, rootId2, rootId3))
-                .body("title", hasItems("Root #1", "Root #2", "Root #3"));
+                .body("list.id", hasItems(rootId1, rootId2, rootId3))
+                .body("list.title", hasItems("Root #1", "Root #2", "Root #3"));
     }
 
     @Test
     public void testDeleteRootCategory() {
 
         String id = given().contentType(ContentType.JSON)
-                .body(new RootCategoryDTO(null, "Root"))
+                .body(new RootCategoryDTO(null, "Root", null, null))
                 .post("/categories")
                 .then()
                 .statusCode(200)
                 .extract().asString();
 
-        get("/categories").then().body("id", contains(id));
+        get("/categories").then().body("list.id", contains(id));
 
         delete("/categories/id/" + id);
 
@@ -96,7 +96,7 @@ public class QuizRestIT extends QuizRestTestBase {
 
         //first create with a POST
         String id = given().contentType(ContentType.JSON)
-                .body(new RootCategoryDTO(null, title))
+                .body(new RootCategoryDTO(null, title, null, null))
                 .post("/categories")
                 .then()
                 .statusCode(200)
@@ -152,20 +152,20 @@ public class QuizRestIT extends QuizRestTestBase {
         String title = "Title";
 
         given().contentType(ContentType.JSON)
-                .body(new RootCategoryDTO(null, title))
+                .body(new RootCategoryDTO(null, title, null, null))
                 .post("/categories")
                 .then()
                 .statusCode(200);
 
-        get("/categories").then().statusCode(200).body("size()", is(1));
+        get("/categories").then().statusCode(200).body("list.size()", is(1));
 
         given().contentType(ContentType.JSON)
-                .body(new RootCategoryDTO(null, title))
+                .body(new RootCategoryDTO(null, title, null, null))
                 .post("/categories")
                 .then()
                 .statusCode(400);
 
-        get("/categories").then().statusCode(200).body("size()", is(1));
+        get("/categories").then().statusCode(200).body("list.size()", is(1));
     }
 
     //endregion
@@ -781,14 +781,14 @@ public class QuizRestIT extends QuizRestTestBase {
         createQuiz(specCatId6, "Question #2 from specifying category #6");
 
         // Thus, root #1 has 3 quizzes, root #2 has 6 quizzes, root #3 has no quizzes
-        get("/categories/withQuizzes").then().statusCode(200).body("size()", is(2));
+        get("/categories/withQuizzes").then().statusCode(200).body("list.size()", is(2));
 
         given().get("/categories/withQuizzes")
                 .then()
                 .statusCode(200)
-                .body("id", hasItems(rootId1, rootId2))
-                .body("title", hasItems("Root #1", "Root #2"))
-                .body("title", not("Root #3"));
+                .body("list.id", hasItems(rootId1, rootId2))
+                .body("list.title", hasItems("Root #1", "Root #2"))
+                .body("list.title", not("Root #3"));
     }
 
     @Test
@@ -997,11 +997,11 @@ public class QuizRestIT extends QuizRestTestBase {
 
         String title = "Title";
 
-        get("/categories").then().statusCode(200).body("size()", is(0));
+        get("/categories").then().statusCode(200).body("list.size()", is(0));
 
         String id = createRootCategory(title);
 
-        get("/categories").then().statusCode(200).body("size()", is(1));
+        get("/categories").then().statusCode(200).body("list.size()", is(1));
 
         given().pathParam("id", id)
                 .get("categories/{id}")
@@ -1164,20 +1164,20 @@ public class QuizRestIT extends QuizRestTestBase {
         createQuiz(specCatId6, "Question #2 from specifying category #6");
 
         // Thus, root #1 has 3 quizzes, root #2 has 6 quizzes, root #3 has no quizzes
-        get("/categories").then().statusCode(200).body("size()", is(3));
+        get("/categories").then().statusCode(200).body("list.size()", is(3));
 
-        get("/categories?withQuizzes=false").then().statusCode(200).body("size()", is(3));
+        get("/categories?withQuizzes=false").then().statusCode(200).body("list.size()", is(3));
 
-        get("/categories?withQuizzes").then().statusCode(200).body("size()", is(2));
+        get("/categories?withQuizzes").then().statusCode(200).body("list.size()", is(2));
 
-        get("/categories?withQuizzes=true").then().statusCode(200).body("size()", is(2));
+        get("/categories?withQuizzes=true").then().statusCode(200).body("list.size()", is(2));
 
         given().get("/categories?withQuizzes")
                 .then()
                 .statusCode(200)
-                .body("id", hasItems(rootId1, rootId2))
-                .body("title", hasItems("Root #1", "Root #2"))
-                .body("title", not("Root #3"));
+                .body("list.id", hasItems(rootId1, rootId2))
+                .body("list.title", hasItems("Root #1", "Root #2"))
+                .body("list.title", not("Root #3"));
     }
 
     @Test
@@ -1194,7 +1194,7 @@ public class QuizRestIT extends QuizRestTestBase {
     //region Util methods
     private String createRootCategory(String title) {
         return given().contentType(ContentType.JSON)
-                .body(new RootCategoryDTO(null, title))
+                .body(new RootCategoryDTO(null, title, null, null))
                 .post("/categories")
                 .then()
                 .statusCode(200)

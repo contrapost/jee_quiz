@@ -1,21 +1,15 @@
 package me.contrapost.quizApi.api;
 
 import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
 import me.contrapost.quizApi.api.util.JBossUtil;
-import me.contrapost.quizApi.dto.RootCategoryDTO;
 import me.contrapost.quizApi.dto.collection.ListDTO;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
-import static io.restassured.RestAssured.get;
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.core.Is.is;
 
 /**
  * Created by alexandershipunov on 30/10/2016.
@@ -38,25 +32,44 @@ public class QuizRestTestBase {
     @After
     public void clean() {
 
+        int total = Integer.MAX_VALUE;
+
         /*
-           Recall, as Wildfly is running as a separated process, changed
-           in the database will impact all the tests.
-           Here, we read each resource (GET), and then delete them
-           one by one (DELETE)
+            as the REST API does not return the whole state of the database (even,
+            if I use an infinite "limit") I need to keep doing queries until the totalSize is 0
          */
-        List<RootCategoryDTO> list = Arrays.asList(given().accept(ContentType.JSON).get("/categories")
+
+        while (total > 0) {
+
+            //seems there are some limitations when handling generics
+            ListDTO<?> listDto = given()
+                    .queryParam("limit", Integer.MAX_VALUE)
+                    .get("/categories")
+                    .then()
+                    .statusCode(200)
+                    .extract()
+                    .as(ListDTO.class);
+
+            listDto.list.stream()
+                    //the "NewsDto" get unmarshalled into a map of fields
+                    .map(n -> ((Map) n).get("id"))
+                    .forEach(id ->
+                            given().delete("/categories/id/" + id)
+                                    .then()
+                                    .statusCode(204)
+                    );
+
+            total = listDto.totalSize - listDto.list.size();
+        }
+
+        /*List<RootCategoryDTO> list = Arrays.asList(given().accept(ContentType.JSON).get("/categories")
                 .then()
                 .statusCode(200)
                 .extract().as(RootCategoryDTO[].class));
 
-
-        /*
-            Code 204: "No Content". The server has successfully processed the request,
-            but the return HTTP response will have no body.
-         */
         list.forEach(dto ->
                 given().pathParam("id", dto.id).delete("categories/id/{id}").then().statusCode(204));
 
-        get("/categories").then().statusCode(200).body("size()", is(0));
+        get("/categories").then().statusCode(200).body("size()", is(0));*/
     }
 }
