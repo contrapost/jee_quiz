@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiParam;
 import me.contrapost.gameApi.dto.AnswerCheckDTO;
 import me.contrapost.gameApi.dto.GameConverter;
 import me.contrapost.gameApi.dto.GameDTO;
+import me.contrapost.gameApi.dto.IdsDTO;
 import me.contrapost.gameApi.entity.GameEntity;
 
 import javax.persistence.EntityManager;
@@ -14,7 +15,6 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -31,12 +31,6 @@ public class GameRestImpl implements GameRestApi {
 
     public GameRestImpl() {
 
-        /*
-             Important that we use a system property (which can be set with
-             -D from command line).
-             Reason? we ll change the server when running tests, as to be
-             able to mock responses deterministically
-         */
         webAddress = System.getProperty("quizApiAddress", URIs.QUIZ_ROOT_URI);
     }
 
@@ -56,20 +50,18 @@ public class GameRestImpl implements GameRestApi {
         long specifyingCategoryId = 1; //TODO
 
         URI specCategoryURI = UriBuilder
-                .fromUri(webAddress + "/randomQuizzes")
-                .queryParam("limit", limit)
-                .queryParam("filter", "sp_" + specifyingCategoryId)
+                .fromUri("http://" + webAddress + "/quiz/randomQuizzes?limit=" +
+                        limit  +"&filter=sp_" + specifyingCategoryId)
                 .build();
 
         Client client = ClientBuilder.newClient();
-        Response response = client.target(specCategoryURI).request("application/json").get();
+        Response response = client.target(specCategoryURI).request("application/json").post(null);
 
-        String[] result = response.readEntity(String[].class);
 
-        List<Long> quizzesIds = new ArrayList<>();
-        for (String aResultAsString : result) {
-            quizzesIds.add(Long.parseLong(aResultAsString));
-        }
+        IdsDTO result = response.readEntity(IdsDTO.class);
+
+        List<Long> quizzesIds = result.ids;
+
 
         GameEntity ge = new GameEntity();
         ge.setQuizzesIds(quizzesIds);
@@ -106,9 +98,9 @@ public class GameRestImpl implements GameRestApi {
         Client client = ClientBuilder.newClient();
         Response response = client.target(uri).request("application/json").get();
 
-        String result = response.readEntity(String.class);
+        Boolean result = response.readEntity(Boolean.class);
 
-        updateGameStatus(id, Boolean.parseBoolean(result));
+        updateGameStatus(id, result);
 
         return new AnswerCheckDTO(result);
     }
@@ -118,10 +110,12 @@ public class GameRestImpl implements GameRestApi {
         em.getTransaction().begin();
         if(isCorrect){
             ge.setAnswersCounter(ge.getAnswersCounter() + 1);
-            ge.isActive();
         } else {
             em.remove(ge);
         }
+
+        if(!ge.isActive()) em.remove(ge);
+
         em.getTransaction().commit();
     }
 

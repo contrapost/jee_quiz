@@ -27,6 +27,10 @@ public class GameApplicationTestBase {
 
     private static WireMockServer wireMockServer;
 
+    static {
+        System.setProperty("quizApiAddress", "localhost:8099");
+    }
+
     @BeforeClass
     public static void initRestAssured() {
 
@@ -66,12 +70,13 @@ public class GameApplicationTestBase {
 
     @Test
     public void testCreateAndGetGame() throws UnsupportedEncodingException {
-        String json = "[1, 2, 3, 4, 5]";
+
+        String json = "{\"ids\":[1, 2, 3, 4, 5]}";
 
         wireMockServer.stubFor( //prepare a stubbed response for the given request
                 WireMock.post(
-                        urlMatching("/randomQuizzes"))
-                        .withQueryParam("limit", WireMock.matching("\\D+"))
+                        urlMatching(".*quiz/randomQuizzes.*"))
+                        .withQueryParam("limit", WireMock.matching("5"))
                         .withQueryParam("filter", WireMock.matching("sp_1"))
                         // define the mocked response of the GET
                         .willReturn(WireMock.aResponse()
@@ -85,11 +90,10 @@ public class GameApplicationTestBase {
                 .statusCode(200)
                 .body("size", is(0));
 
-
-        /*given().queryParam("limit", 5)
+        given().queryParam("limit", 5)
                 .post()
                 .then()
-                .statusCode(200);*/
+                .statusCode(200);
     }
 
     @Test
