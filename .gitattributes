@@ -1,1 +1,2 @@
-*/assets/* linguist-vendored
+gameApi/src/main/resources/assets/* linguist-vendored
+quizApi/src/main/webapp/* linguist-vendored
