@@ -18,12 +18,15 @@ public class RootCategoryDTO {
     @ApiModelProperty("The title of the root category")
     public String title;
 
+    @SuppressWarnings("WeakerAccess")
     @ApiModelProperty("Subcategories that belong to the category")
     public List<SubCategoryDTO> subcategories;
 
+    @SuppressWarnings("WeakerAccess")
     @ApiModelProperty("Specifying categories that belong to the category")
     public List<SpecifyingCategoryDTO> specifyingCategories;
 
+    @SuppressWarnings("WeakerAccess")
     public RootCategoryDTO() {
     }
 

@@ -178,7 +178,7 @@ public class QuizRestIT extends QuizRestTestBase {
 
         SubCategoryDTO dto = new SubCategoryDTO(null, title, rootCategoryId);
 
-        get("/subcategories").then().statusCode(200).body("size()", is(0));
+        get("/subcategories").then().statusCode(200).body("list.size()", is(0));
 
         String id = given().contentType(ContentType.JSON)
                 .body(dto)
@@ -187,7 +187,7 @@ public class QuizRestIT extends QuizRestTestBase {
                 .statusCode(200)
                 .extract().asString();
 
-        get("/subcategories").then().statusCode(200).body("size()", is(1));
+        get("/subcategories").then().statusCode(200).body("list.size()", is(1));
 
         given().pathParam("id", id)
                 .get("subcategories/id/{id}")
@@ -205,13 +205,13 @@ public class QuizRestIT extends QuizRestTestBase {
         String subCategoryId2 = createSubCategory(rootId, "SubCategory #2");
         String subCategoryId3 = createSubCategory(rootId, "SubCategory #3");
 
-        get("/subcategories").then().statusCode(200).body("size()", is(3));
+        get("/subcategories").then().statusCode(200).body("list.size()", is(3));
 
         given().get("/subcategories")
                 .then()
                 .statusCode(200)
-                .body("id", hasItems(subCategoryId1, subCategoryId2, subCategoryId3))
-                .body("title", hasItems("SubCategory #1", "SubCategory #2", "SubCategory #3"));
+                .body("list.id", hasItems(subCategoryId1, subCategoryId2, subCategoryId3))
+                .body("list.title", hasItems("SubCategory #1", "SubCategory #2", "SubCategory #3"));
     }
 
     @Test
@@ -224,11 +224,11 @@ public class QuizRestIT extends QuizRestTestBase {
                 .statusCode(200)
                 .extract().asString();
 
-        get("/subcategories").then().body("id", contains(id));
+        get("/subcategories").then().body("list.id", contains(id));
 
         delete("/subcategories/id/" + id);
 
-        get("/subcategories").then().body("id", not(contains(id)));
+        get("/subcategories").then().body("list.id", not(contains(id)));
     }
 
     @Test
@@ -272,7 +272,7 @@ public class QuizRestIT extends QuizRestTestBase {
                 .then()
                 .statusCode(200);
 
-        get("/subcategories").then().statusCode(200).body("size()", is(1));
+        get("/subcategories").then().statusCode(200).body("list.size()", is(1));
 
         given().contentType(ContentType.JSON)
                 .body(new SubCategoryDTO(null, title, rootId))
@@ -280,7 +280,7 @@ public class QuizRestIT extends QuizRestTestBase {
                 .then()
                 .statusCode(400);
 
-        get("/subcategories").then().statusCode(200).body("size()", is(1));
+        get("/subcategories").then().statusCode(200).body("list.size()", is(1));
     }
 
     @Test
@@ -1015,11 +1015,11 @@ public class QuizRestIT extends QuizRestTestBase {
     public void testCreateAndGetSubCategoryWithNewPathVersion002() {
         String title = "SubCategory";
 
-        get("/subcategories").then().statusCode(200).body("size()", is(0));
+        get("/subcategories").then().statusCode(200).body("list.size()", is(0));
 
         String id = createSubCategory(createRootCategory("Root"), title);
 
-        get("/subcategories").then().statusCode(200).body("size()", is(1));
+        get("/subcategories").then().statusCode(200).body("list.size()", is(1));
 
         given().pathParam("id", id)
                 .get("subcategories/{id}")
@@ -1278,11 +1278,11 @@ public class QuizRestIT extends QuizRestTestBase {
                 .get(path)
                 .then()
                 .statusCode(200)
-                .body("id", hasItems(subCategoryId1,
+                .body("list.id", hasItems(subCategoryId1,
                         subCategoryId2,
                         subCategoryId3,
                         subCategoryId4))
-                .body("title", hasItems("SubCategory #1.1",
+                .body("list.title", hasItems("SubCategory #1.1",
                         "SubCategory #1.2",
                         "SubCategory #1.3",
                         "SubCategory #1.4"));
@@ -1291,15 +1291,15 @@ public class QuizRestIT extends QuizRestTestBase {
                 .get(path)
                 .then()
                 .statusCode(200)
-                .body("id", hasItems(subCategoryId5, subCategoryId6))
-                .body("title", hasItems("SubCategory #2.1", "SubCategory #2.2"));
+                .body("list.id", hasItems(subCategoryId5, subCategoryId6))
+                .body("list.title", hasItems("SubCategory #2.1", "SubCategory #2.2"));
 
         given().pathParam("id", rootId3)
                 .get(path)
                 .then()
                 .statusCode(200)
-                .body("id", hasItems(subCategoryId7))
-                .body("title", hasItems("SubCategory #3.1"));
+                .body("list.id", hasItems(subCategoryId7))
+                .body("list.title", hasItems("SubCategory #3.1"));
     }
 
     private void testGetSpecifyingCategoriesForSubWithSpecifiedPath(String path) {

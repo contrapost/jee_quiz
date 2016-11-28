@@ -102,7 +102,14 @@ public interface QuizRestApi {
     @ApiOperation("Get all subcategories")
     @GET
     @Path("/subcategories")
-    List<SubCategoryDTO> getAllSubCategories();
+    ListDTO<SubCategoryDTO> getAllSubCategories(@ApiParam("Offset in the list of news")
+                                                @QueryParam("offset")
+                                                @DefaultValue("0")
+                                                        Integer offset,
+                                                @ApiParam("Limit of news in a single retrieved page")
+                                                @QueryParam("limit")
+                                                @DefaultValue("10")
+                                                        Integer limit);
 
     @ApiOperation("Get a single subcategory specified by id")
     @GET
@@ -297,9 +304,17 @@ public interface QuizRestApi {
     @GET
     @Path("/categories/{id}/subcategories")
     @Deprecated
-    List<SubCategoryDTO> getAllSubCategoriesForRootCategory(@ApiParam(Params.ROOT_ID_PARAM)
+    ListDTO<SubCategoryDTO> getAllSubCategoriesForRootCategory(@ApiParam(Params.ROOT_ID_PARAM)
                                                                      @PathParam("id")
-                                                                             Long id);
+                                                                             Long id,
+                                                               @ApiParam("Offset in the list of news")
+                                                               @QueryParam("offset")
+                                                               @DefaultValue("0")
+                                                                       Integer offset,
+                                                               @ApiParam("Limit of news in a single retrieved page")
+                                                               @QueryParam("limit")
+                                                               @DefaultValue("10")
+                                                                       Integer limit);
 
     @ApiOperation("Get all specifying categories of the subcategory specified by id")
     @GET

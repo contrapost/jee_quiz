@@ -142,6 +142,7 @@ public class CategoryEJB {
         return list;
     }
 
+    @SuppressWarnings("unused")
     public List<SubCategory> getAllSubCategories() {
         return em.createNamedQuery(SubCategory.GET_ALL_SUBCATEGORIES).getResultList();
     }
@@ -162,8 +163,9 @@ public class CategoryEJB {
         return quizzes.stream().map(Quiz::getSpecifyingCategory).collect(Collectors.toSet());
     }
 
-    public List<SubCategory> getAllSubCategoriesForRootCategory(long categoryId) {
-        return new ArrayList<>(getRootCategory(categoryId).getSubCategories().values());
+    public List<SubCategory> getAllSubCategoriesForRootCategory(long categoryId, int max) {
+        return em.createQuery("select s from SubCategory s where s.rootCategory.id = :id")
+                .setParameter("id", categoryId).setMaxResults(max).getResultList();
     }
 
     public List<SpecifyingCategory> getAllSpecifyingCategoriesForSubCategory(Long id) {
@@ -195,5 +197,9 @@ public class CategoryEJB {
             ids.add(quizzes.remove(new Random().nextInt(quizzes.size())).getId());
         }
         return ids;
+    }
+
+    public List<SubCategory> getSubCategoryList(int limit) {
+        return em.createNamedQuery(SubCategory.GET_ALL_SUBCATEGORIES).setMaxResults(limit).getResultList();
     }
 }

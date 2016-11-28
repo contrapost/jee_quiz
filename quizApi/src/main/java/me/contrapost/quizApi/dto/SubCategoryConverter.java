@@ -1,6 +1,7 @@
 package me.contrapost.quizApi.dto;
 
 import me.contrapost.jee_quiz.entity.SubCategory;
+import me.contrapost.quizApi.dto.collection.ListDTO;
 
 import java.util.List;
 import java.util.Objects;
@@ -24,11 +25,25 @@ public class SubCategoryConverter {
         return dto;
     }
 
-    public static List<SubCategoryDTO> transform(List<SubCategory> subCategories){
-        Objects.requireNonNull(subCategories);
+    public static ListDTO<SubCategoryDTO> transform(List<SubCategory> subCategories, int offset,
+                                                 int limit){
+        List<SubCategoryDTO> dtoList = null;
+        if(subCategories != null){
+            dtoList = subCategories.stream()
+                    .skip(offset) // this is a good example of how streams simplify coding
+                    .limit(limit)
+                    .map(SubCategoryConverter::transform)
+                    .collect(Collectors.toList());
+        }
 
-        return subCategories.stream()
-                .map(SubCategoryConverter::transform)
-                .collect(Collectors.toList());
+        ListDTO<SubCategoryDTO> dto = new ListDTO<>();
+        dto.list = dtoList;
+        dto._links = new ListDTO.ListLinks();
+        dto.rangeMin = offset;
+        assert dtoList != null;
+        dto.rangeMax = dto.rangeMin + dtoList.size() - 1;
+        dto.totalSize = subCategories.size();
+
+        return dto;
     }
 }

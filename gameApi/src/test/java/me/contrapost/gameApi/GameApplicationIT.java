@@ -36,12 +36,7 @@ public class GameApplicationIT extends GameApplicationTestBase{
 
         process = new ProcessBuilder().command(command).start();
 
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                stopProcess();
-            }
-        });
+        Runtime.getRuntime().addShutdownHook(new Thread(GameApplicationIT::stopProcess));
 
         assertTrue(process.isAlive());
 
