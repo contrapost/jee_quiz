@@ -50,11 +50,12 @@ public class GameRestImpl implements GameRestApi {
         long specifyingCategoryId = 1; //TODO
 
         URI specCategoryURI = UriBuilder
-                .fromUri("http://" + webAddress + "/quiz/randomQuizzes?limit="+limit+"&filter=sp_" + specifyingCategoryId)
+                .fromUri("http://" + webAddress + "/quiz/randomQuizzes?limit=" +
+                        limit  +"&filter=sp_" + specifyingCategoryId)
                 .build();
 
         Client client = ClientBuilder.newClient();
-        Response response = client.target(specCategoryURI).request("application/json").get();
+        Response response = client.target(specCategoryURI).request("application/json").post(null);
 
 
         IdsDTO result = response.readEntity(IdsDTO.class);
