@@ -5,15 +5,20 @@ import me.contrapost.gameApi.dto.AnswerCheckDTO;
 import me.contrapost.gameApi.dto.GameConverter;
 import me.contrapost.gameApi.dto.GameDTO;
 import me.contrapost.gameApi.dto.IdsDTO;
+import me.contrapost.gameApi.dto.collection.ListDTO;
+import me.contrapost.gameApi.dto.hal.HalLink;
 import me.contrapost.gameApi.entity.GameEntity;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 import java.net.URI;
 import java.util.List;
 
@@ -23,7 +28,10 @@ import java.util.List;
  */
 public class GameRestImpl implements GameRestApi {
 
-    private final String webAddress;
+    @Context
+    UriInfo uriInfo;
+
+    private final String quizApiWebAddress;
 
     private EntityManagerFactory factory = Persistence.createEntityManagerFactory("GAME_DB");
 
@@ -31,13 +39,56 @@ public class GameRestImpl implements GameRestApi {
 
     public GameRestImpl() {
 
-        webAddress = System.getProperty("quizApiAddress", URIs.QUIZ_ROOT_URI);
+        quizApiWebAddress = System.getProperty("quizApiAddress", URIs.QUIZ_ROOT_URI);
     }
 
     @Override
-    public synchronized List<GameDTO> getAllActiveGames() {
-        //noinspection unchecked
-        return GameConverter.transform(em.createNamedQuery(GameEntity.GET_ALL_ACTIVE_GAMES).getResultList());
+    public synchronized ListDTO<GameDTO> getAllActiveGames(Integer offset, Integer limit) {
+
+        if(offset < 0){
+            throw new WebApplicationException("Negative offset: "+offset, 400);
+        }
+
+        if(limit < 1){
+            throw new WebApplicationException("Limit should be at least 1: "+limit, 400);
+        }
+
+        int maxFromDb = 50;
+
+        @SuppressWarnings("unchecked")
+        List<GameEntity> list = em.createNamedQuery(GameEntity.GET_ALL_ACTIVE_GAMES)
+                .setMaxResults(maxFromDb)
+                .getResultList();
+
+        if(offset != 0 && offset >=  list.size()){
+            throw new WebApplicationException("Offset "+ offset + " out of bound "+ list.size(), 400);
+        }
+
+        ListDTO<GameDTO> listDTO = GameConverter.transform(list, offset, limit);
+
+        UriBuilder builder = uriInfo.getBaseUriBuilder()
+                .path("/quiz/subcategories")
+                .queryParam("limit", limit);
+
+        listDTO._links.self = new HalLink(builder.clone()
+                .queryParam("offset", offset)
+                .build().toString()
+        );
+
+        if (!list.isEmpty() && offset > 0) {
+            listDTO._links.previous = new HalLink(builder.clone()
+                    .queryParam("offset", Math.max(offset - limit, 0))
+                    .build().toString()
+            );
+        }
+        if (offset + limit < list.size()) {
+            listDTO._links.next = new HalLink(builder.clone()
+                    .queryParam("offset", offset + limit)
+                    .build().toString()
+            );
+        }
+
+        return listDTO;
     }
 
     @SuppressWarnings("Duplicates")
@@ -50,7 +101,7 @@ public class GameRestImpl implements GameRestApi {
         long specifyingCategoryId = 1; //TODO
 
         URI specCategoryURI = UriBuilder
-                .fromUri("http://" + webAddress + "/quiz/randomQuizzes?limit=" +
+                .fromUri("http://" + quizApiWebAddress + "/quiz/randomQuizzes?limit=" +
                         limit  +"&filter=sp_" + specifyingCategoryId)
                 .build();
 
@@ -90,7 +141,7 @@ public class GameRestImpl implements GameRestApi {
                                                           String answer) {
 
         URI uri = UriBuilder
-                .fromUri(webAddress + "/answer-check")
+                .fromUri(quizApiWebAddress + "/answer-check")
                 .queryParam("id", id)
                 .queryParam("answer", answer)
                 .build();

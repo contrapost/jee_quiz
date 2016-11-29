@@ -6,10 +6,10 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import me.contrapost.gameApi.dto.AnswerCheckDTO;
 import me.contrapost.gameApi.dto.GameDTO;
+import me.contrapost.gameApi.dto.collection.ListDTO;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
-import java.util.List;
 
 /**
  * Created by alexandershipunov on 19/11/2016.
@@ -22,7 +22,14 @@ public interface GameRestApi {
 
     @ApiOperation("Get all active games")
     @GET
-    List<GameDTO> getAllActiveGames();
+    ListDTO<GameDTO> getAllActiveGames(@ApiParam("Offset in the list of news")
+                                       @QueryParam("offset")
+                                       @DefaultValue("0")
+                                               Integer offset,
+                                       @ApiParam("Limit of news in a single retrieved page")
+                                       @QueryParam("limit")
+                                       @DefaultValue("10")
+                                               Integer limit);
 
     @ApiOperation("Create a new game")
     @POST

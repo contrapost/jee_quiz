@@ -1,6 +1,7 @@
 package me.contrapost.gameApi.dto;
 
 import me.contrapost.gameApi.api.URIs;
+import me.contrapost.gameApi.dto.collection.ListDTO;
 import me.contrapost.gameApi.entity.GameEntity;
 
 import java.util.List;
@@ -33,11 +34,25 @@ public class GameConverter {
         return dto;
     }
 
-    public static List<GameDTO> transform(List<GameEntity> entities){
-        Objects.requireNonNull(entities);
+    public static ListDTO<GameDTO> transform(List<GameEntity> games, int offset,
+                                             int limit){
+        List<GameDTO> dtoList = null;
+        if(games != null){
+            dtoList = games.stream()
+                    .skip(offset) // this is a good example of how streams simplify coding
+                    .limit(limit)
+                    .map(GameConverter::transform)
+                    .collect(Collectors.toList());
+        }
 
-        return entities.stream()
-                .map(GameConverter::transform)
-                .collect(Collectors.toList());
+        ListDTO<GameDTO> dto = new ListDTO<>();
+        dto.list = dtoList;
+        dto._links = new ListDTO.ListLinks();
+        dto.rangeMin = offset;
+        assert dtoList != null;
+        dto.rangeMax = dto.rangeMin + dtoList.size() - 1;
+        dto.totalSize = games.size();
+
+        return dto;
     }
 }
