@@ -166,9 +166,17 @@ public interface QuizRestApi {
     @ApiOperation("Get all specifying categories")
     @GET
     @Path("/specifying-categories")
-    List<SpecifyingCategoryDTO> getAllSpecifyingCategories(@ApiParam("Specifying to list only categories with quizzes")
-                                                           @QueryParam("withQuizzes")
-                                                                   String withQuizzes);
+    ListDTO<SpecifyingCategoryDTO> getAllSpecifyingCategories(@ApiParam("Offset in the list of news")
+                                                              @QueryParam("offset")
+                                                              @DefaultValue("0")
+                                                                      Integer offset,
+                                                              @ApiParam("Limit of news in a single retrieved page")
+                                                              @QueryParam("limit")
+                                                              @DefaultValue("10")
+                                                                      Integer limit,
+                                                              @ApiParam("Specifying to list only categories with quizzes")
+                                                              @QueryParam("withQuizzes")
+                                                                      String withQuizzes);
 
     @ApiOperation("Get a single specifying category specified by id")
     @GET
@@ -319,9 +327,17 @@ public interface QuizRestApi {
     @ApiOperation("Get all specifying categories of the subcategory specified by id")
     @GET
     @Path("/subcategories/{id}/specifying-categories")
-    List<SpecifyingCategoryDTO> getAllSpecifyingCategoriesForSubCategory(@ApiParam(Params.SUB_ID_PARAM)
+    ListDTO<SpecifyingCategoryDTO> getAllSpecifyingCategoriesForSubCategory(@ApiParam(Params.SUB_ID_PARAM)
                                                             @PathParam("id")
-                                                                    Long id);
+                                                                    Long id,
+                                                            @ApiParam("Offset in the list of news")
+                                                            @QueryParam("offset")
+                                                            @DefaultValue("0")
+                                                                    Integer offset,
+                                                            @ApiParam("Limit of news in a single retrieved page")
+                                                            @QueryParam("limit")
+                                                            @DefaultValue("10")
+                                                                    Integer limit);
 
     @ApiOperation("Get all quizzes for parent (root/sub/specifying) category specified by id")
     @GET

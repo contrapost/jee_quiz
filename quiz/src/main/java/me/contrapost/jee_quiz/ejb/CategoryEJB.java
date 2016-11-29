@@ -147,29 +147,50 @@ public class CategoryEJB {
         return em.createNamedQuery(SubCategory.GET_ALL_SUBCATEGORIES).getResultList();
     }
 
-    public List<SpecifyingCategory> getAllSpecifyingCategories() {
-        return em.createNamedQuery(SpecifyingCategory.GET_ALL_SPECIFYING_CATEGORIES).getResultList();
+    public List<SpecifyingCategory> getAllSpecifyingCategories(int limit) {
+        return em.createNamedQuery(SpecifyingCategory.GET_ALL_SPECIFYING_CATEGORIES)
+                .setMaxResults(limit)
+                .getResultList();
     }
 
-    public Set<RootCategory> getAllRootCategoriesWithAtLeastOneQuiz(int limit) {
-        List<Quiz> quizzes = em.createNamedQuery(Quiz.GET_ALL_QUIZZES).setMaxResults(limit).getResultList();
-        return quizzes.stream().map(Quiz::getSpecifyingCategory).collect(Collectors.toSet())
+    public List<RootCategory> getAllRootCategoriesWithAtLeastOneQuiz(int limit) {
+
+        List<Quiz> quizzes = em.createNamedQuery(Quiz.GET_ALL_QUIZZES).getResultList();
+        Set<RootCategory> rootCategories = quizzes.stream().map(Quiz::getSpecifyingCategory).collect(Collectors.toSet())
                 .stream().map(SpecifyingCategory::getSubCategory).collect(Collectors.toSet())
                 .stream().map(SubCategory::getRootCategory).collect(Collectors.toSet());
+
+        int size = rootCategories.size();
+
+        return new ArrayList<>(rootCategories).subList(0, limit > size ? size : limit);
     }
 
-    public Set<SpecifyingCategory> getAllSpecifyingCategoriesWithAtLeastOneQuiz() {
-        List<Quiz> quizzes = em.createNamedQuery(Quiz.GET_ALL_QUIZZES).getResultList();
-        return quizzes.stream().map(Quiz::getSpecifyingCategory).collect(Collectors.toSet());
+    public List<SpecifyingCategory> getAllSpecifyingCategoriesWithAtLeastOneQuiz(int limit) {
+        return em.createQuery("select s from SpecifyingCategory s where s.quizzes.size > 0")
+                .setMaxResults(limit)
+                .getResultList();
+
+        /*List<Quiz> quizzes = em.createNamedQuery(Quiz.GET_ALL_QUIZZES).getResultList();
+        List<SpecifyingCategory> specifyingCategories =
+                quizzes.stream().map(Quiz::getSpecifyingCategory).collect(Collectors.toList());
+
+        int size = specifyingCategories.size();
+
+        return new ArrayList<>(specifyingCategories).subList(0, limit > size ? size : limit);*/
     }
 
     public List<SubCategory> getAllSubCategoriesForRootCategory(long categoryId, int max) {
         return em.createQuery("select s from SubCategory s where s.rootCategory.id = :id")
-                .setParameter("id", categoryId).setMaxResults(max).getResultList();
+                .setParameter("id", categoryId)
+                .setMaxResults(max)
+                .getResultList();
     }
 
-    public List<SpecifyingCategory> getAllSpecifyingCategoriesForSubCategory(Long id) {
-        return new ArrayList<>(getSubCategory(id).getSpecifyingCategories().values());
+    public List<SpecifyingCategory> getAllSpecifyingCategoriesForSubCategory(Long id, int limit) {
+        return em.createQuery("select sp from SpecifyingCategory sp where sp.subCategory.id = :id")
+                .setParameter("id", id)
+                .setMaxResults(limit)
+                .getResultList();
     }
 
     public List<Long> getRandomQuizzesFromRootCategory(Long rootCategoryId, int numberOfQuizzes) {

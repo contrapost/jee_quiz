@@ -322,7 +322,7 @@ public class QuizRestIT extends QuizRestTestBase {
 
         SpecifyingCategoryDTO dto = new SpecifyingCategoryDTO(null, title, subCategoryId);
 
-        get("/specifying-categories").then().statusCode(200).body("size()", is(0));
+        get("/specifying-categories").then().statusCode(200).body("list.size()", is(0));
 
         String id = given().contentType(ContentType.JSON)
                 .body(dto)
@@ -331,7 +331,7 @@ public class QuizRestIT extends QuizRestTestBase {
                 .statusCode(200)
                 .extract().asString();
 
-        get("/specifying-categories").then().statusCode(200).body("size()", is(1));
+        get("/specifying-categories").then().statusCode(200).body("list.size()", is(1));
 
         given().pathParam("id", id)
                 .get("specifying-categories/id/{id}")
@@ -359,14 +359,14 @@ public class QuizRestIT extends QuizRestTestBase {
         String specCatId8 = createSpecifyingCategory(subCategoryId3, "Specifying category #2 for Subcategory #3");
         String specCatId9 = createSpecifyingCategory(subCategoryId3, "Specifying category #3 for Subcategory #3");
 
-        get("/specifying-categories").then().statusCode(200).body("size()", is(9));
+        get("/specifying-categories").then().statusCode(200).body("list.size()", is(9));
 
         given().get("/specifying-categories")
                 .then()
                 .statusCode(200)
-                .body("id", hasItems(specCatId1, specCatId2, specCatId3, specCatId4, specCatId5,
+                .body("list.id", hasItems(specCatId1, specCatId2, specCatId3, specCatId4, specCatId5,
                         specCatId6, specCatId7, specCatId8, specCatId9))
-                .body("title", hasItems("Specifying category #1 for Subcategory #1",
+                .body("list.title", hasItems("Specifying category #1 for Subcategory #1",
                         "Specifying category #2 for Subcategory #1",
                         "Specifying category #3 for Subcategory #1",
                         "Specifying category #1 for Subcategory #2",
@@ -388,7 +388,7 @@ public class QuizRestIT extends QuizRestTestBase {
                 .statusCode(200)
                 .extract().asString();
 
-        get("/specifying-categories").then().body("id", contains(id));
+        get("/specifying-categories").then().body("list.id", contains(id));
 
         delete("/specifying-categories/id/" + id);
 
@@ -432,7 +432,7 @@ public class QuizRestIT extends QuizRestTestBase {
         String subId = createSubCategory(rootId, "Subcategory");
         createSpecifyingCategory(subId, title);
 
-        get("/specifying-categories").then().statusCode(200).body("size()", is(1));
+        get("/specifying-categories").then().statusCode(200).body("list.size()", is(1));
 
         given().contentType(ContentType.JSON)
                 .body(new SpecifyingCategoryDTO(null, title,
@@ -441,7 +441,7 @@ public class QuizRestIT extends QuizRestTestBase {
                 .then()
                 .statusCode(400);
 
-        get("/specifying-categories").then().statusCode(200).body("size()", is(1));
+        get("/specifying-categories").then().statusCode(200).body("list.size()", is(1));
     }
 
     @Test
@@ -826,20 +826,20 @@ public class QuizRestIT extends QuizRestTestBase {
         given().get("/categories/withQuizzes/specifying-categories")
                 .then()
                 .statusCode(200)
-                .body("id", hasItems(specCatId1,
+                .body("list.id", hasItems(specCatId1,
                         specCatId3,
                         specCatId4,
                         specCatId5,
                         specCatId6))
-                .body("title", hasItems("Specifying category #1 for Subcategory #1",
+                .body("list.title", hasItems("Specifying category #1 for Subcategory #1",
                         "Specifying category #3 for Subcategory #1",
                         "Specifying category #1 for Subcategory #2",
                         "Specifying category #2 for Subcategory #2",
                         "Specifying category #3 for Subcategory #2"))
-                .body("title", not("Specifying category #2 for Subcategory #1"))
-                .body("title", not("Specifying category #1 for Subcategory #3"))
-                .body("title", not("Specifying category #2 for Subcategory #3"))
-                .body("title", not("Specifying category #3 for Subcategory #3"));
+                .body("list.title", not("Specifying category #2 for Subcategory #1"))
+                .body("list.title", not("Specifying category #1 for Subcategory #3"))
+                .body("list.title", not("Specifying category #2 for Subcategory #3"))
+                .body("list.title", not("Specifying category #3 for Subcategory #3"));
     }
 
     @Test
@@ -1033,11 +1033,11 @@ public class QuizRestIT extends QuizRestTestBase {
     public void testCreateAndGetSpecifyingCategoryWithNewPathVersion002() {
         String title = "Specifying category";
 
-        get("/specifying-categories").then().statusCode(200).body("size()", is(0));
+        get("/specifying-categories").then().statusCode(200).body("list.size()", is(0));
 
         String id = createSpecifyingCategory(createSubCategory(createRootCategory("Root"), "Sub"), title);
 
-        get("/specifying-categories").then().statusCode(200).body("size()", is(1));
+        get("/specifying-categories").then().statusCode(200).body("list.size()", is(1));
 
         given().pathParam("id", id)
                 .get("specifying-categories/{id}")
@@ -1103,31 +1103,31 @@ public class QuizRestIT extends QuizRestTestBase {
         createQuiz(specCatId6, "Question #2 from specifying category #6");
 
         // Thus, there are 5 specifying categories with at least one quiz
-        get("/specifying-categories").then().statusCode(200).body("size()", is(9));
+        get("/specifying-categories").then().statusCode(200).body("list.size()", is(9));
 
-        get("/specifying-categories?withQuizzes=false").then().statusCode(200).body("size()", is(9));
+        get("/specifying-categories?withQuizzes=false").then().statusCode(200).body("list.size()", is(9));
 
-        get("/specifying-categories?withQuizzes").then().statusCode(200).body("size()", is(5));
+        get("/specifying-categories?withQuizzes").then().statusCode(200).body("list.size()", is(5));
 
-        get("/specifying-categories?withQuizzes=true").then().statusCode(200).body("size()", is(5));
+        get("/specifying-categories?withQuizzes=true").then().statusCode(200).body("list.size()", is(5));
 
         given().get("/specifying-categories?withQuizzes=true")
                 .then()
                 .statusCode(200)
-                .body("id", hasItems(specCatId1,
+                .body("list.id", hasItems(specCatId1,
                         specCatId3,
                         specCatId4,
                         specCatId5,
                         specCatId6))
-                .body("title", hasItems("Specifying category #1 for Subcategory #1",
+                .body("list.title", hasItems("Specifying category #1 for Subcategory #1",
                         "Specifying category #3 for Subcategory #1",
                         "Specifying category #1 for Subcategory #2",
                         "Specifying category #2 for Subcategory #2",
                         "Specifying category #3 for Subcategory #2"))
-                .body("title", not("Specifying category #2 for Subcategory #1"))
-                .body("title", not("Specifying category #1 for Subcategory #3"))
-                .body("title", not("Specifying category #2 for Subcategory #3"))
-                .body("title", not("Specifying category #3 for Subcategory #3"));
+                .body("list.title", not("Specifying category #2 for Subcategory #1"))
+                .body("list.title", not("Specifying category #1 for Subcategory #3"))
+                .body("list.title", not("Specifying category #2 for Subcategory #3"))
+                .body("list.title", not("Specifying category #3 for Subcategory #3"));
     }
 
     @Test
@@ -1323,11 +1323,11 @@ public class QuizRestIT extends QuizRestTestBase {
                 .get(path)
                 .then()
                 .statusCode(200)
-                .body("id", hasItems(specCatId1,
+                .body("list.id", hasItems(specCatId1,
                         specCatId2,
                         specCatId3,
                         specCatId4))
-                .body("title", hasItems("Specifying category #1 for Subcategory #1",
+                .body("list.title", hasItems("Specifying category #1 for Subcategory #1",
                         "Specifying category #2 for Subcategory #1",
                         "Specifying category #3 for Subcategory #1",
                         "Specifying category #4 for Subcategory #1"));
@@ -1336,18 +1336,18 @@ public class QuizRestIT extends QuizRestTestBase {
                 .get(path)
                 .then()
                 .statusCode(200)
-                .body("id", hasItems(specCatId5, specCatId6))
-                .body("title", hasItems("Specifying category #1 for Subcategory #2",
+                .body("list.id", hasItems(specCatId5, specCatId6))
+                .body("list.title", hasItems("Specifying category #1 for Subcategory #2",
                         "Specifying category #2 for Subcategory #2"));
 
         given().pathParam("id", subCategoryId3)
                 .get(path)
                 .then()
                 .statusCode(200)
-                .body("id", hasItems(specCatId7,
+                .body("list.id", hasItems(specCatId7,
                         specCatId8,
                         specCatId9))
-                .body("title", hasItems("Specifying category #1 for Subcategory #3",
+                .body("list.title", hasItems("Specifying category #1 for Subcategory #3",
                         "Specifying category #2 for Subcategory #3",
                         "Specifying category #3 for Subcategory #3"));
     }

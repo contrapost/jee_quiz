@@ -9,6 +9,7 @@ import me.contrapost.jee_quiz.ejb.CategoryEJB;
 import me.contrapost.jee_quiz.ejb.QuizEJB;
 import me.contrapost.jee_quiz.entity.Quiz;
 import me.contrapost.jee_quiz.entity.RootCategory;
+import me.contrapost.jee_quiz.entity.SpecifyingCategory;
 import me.contrapost.jee_quiz.entity.SubCategory;
 import me.contrapost.quizApi.dto.*;
 import me.contrapost.quizApi.dto.collection.ListDTO;
@@ -67,7 +68,7 @@ public class QuizRestImpl implements QuizRestApi {
         List<RootCategory> rootCategories;
 
         if(withQuizzes != null && (withQuizzes.isEmpty() || withQuizzes.equals("true"))) {
-            rootCategories = new ArrayList<>(categoryEJB.getAllRootCategoriesWithAtLeastOneQuiz(maxFromDb));
+            rootCategories = categoryEJB.getAllRootCategoriesWithAtLeastOneQuiz(maxFromDb);
         } else {
             rootCategories = categoryEJB.getAllRootCategories(maxFromDb, expand);
         }
@@ -349,11 +350,62 @@ public class QuizRestImpl implements QuizRestApi {
 
     //region implementation of Rest API for specifying categories
     @Override
-    public List<SpecifyingCategoryDTO> getAllSpecifyingCategories(String withQuizzes) {
-        if(withQuizzes != null && (withQuizzes.isEmpty() || withQuizzes.equals("true"))) {
-            return SpecifyingCategoryConverter.transform(new ArrayList<>(categoryEJB.getAllSpecifyingCategoriesWithAtLeastOneQuiz()));
+    public ListDTO<SpecifyingCategoryDTO> getAllSpecifyingCategories(Integer offset,
+                                                                     Integer limit,
+                                                                     String withQuizzes) {
+
+        if(offset < 0){
+            throw new WebApplicationException("Negative offset: " + offset, 400);
         }
-        return SpecifyingCategoryConverter.transform(categoryEJB.getAllSpecifyingCategories());
+
+        if(limit < 1){
+            throw new WebApplicationException("Limit should be at least 1: " + limit, 400);
+        }
+
+        int maxFromDb = 50;
+
+        List<SpecifyingCategory> specifyingCategories;
+
+        if(withQuizzes != null && (withQuizzes.isEmpty() || withQuizzes.equals("true"))) {
+            specifyingCategories = new ArrayList<>(categoryEJB.getAllSpecifyingCategoriesWithAtLeastOneQuiz(maxFromDb));
+        } else {
+            specifyingCategories = categoryEJB.getAllSpecifyingCategories(maxFromDb);
+        }
+
+        if(offset != 0 && offset >=  specifyingCategories.size()){
+            throw new WebApplicationException("Offset "+ offset + " out of bound "+ specifyingCategories.size(), 400);
+        }
+
+        ListDTO<SpecifyingCategoryDTO> dto = SpecifyingCategoryConverter.transform(
+                specifyingCategories, offset, limit);
+
+        UriBuilder builder = uriInfo.getBaseUriBuilder()
+                .path("/quiz/specifying-categories")
+                .queryParam("limit", limit);
+
+        if(withQuizzes != null){
+            builder = builder.queryParam("withQuizzes", withQuizzes);
+        }
+
+        dto._links.self = new HalLink(builder.clone()
+                .queryParam("offset", offset)
+                .build().toString()
+        );
+
+        if (!specifyingCategories.isEmpty() && offset > 0) {
+            dto._links.previous = new HalLink(builder.clone()
+                    .queryParam("offset", Math.max(offset - limit, 0))
+                    .build().toString()
+            );
+        }
+        if (offset + limit < specifyingCategories.size()) {
+            dto._links.next = new HalLink(builder.clone()
+                    .queryParam("offset", offset + limit)
+                    .build().toString()
+            );
+        }
+
+        return dto;
     }
 
     @Override
@@ -649,7 +701,7 @@ public class QuizRestImpl implements QuizRestApi {
         ListDTO<SubCategoryDTO> listDTO = SubCategoryConverter.transform(list, offset, limit);
 
         UriBuilder builder = uriInfo.getBaseUriBuilder()
-                .path("/quiz/subcategories")
+                .path("/quiz/categories/" + id + "/subcategories")
                 .queryParam("limit", limit);
 
         listDTO._links.self = new HalLink(builder.clone()
@@ -674,9 +726,49 @@ public class QuizRestImpl implements QuizRestApi {
     }
 
     @Override
-    public List<SpecifyingCategoryDTO> getAllSpecifyingCategoriesForSubCategory(@ApiParam(Params.ROOT_ID_PARAM) Long id) {
-        return SpecifyingCategoryConverter
-                .transform(categoryEJB.getAllSpecifyingCategoriesForSubCategory(id));
+    public ListDTO<SpecifyingCategoryDTO> getAllSpecifyingCategoriesForSubCategory(Long id, Integer offset, Integer limit) {
+
+        if(offset < 0){
+            throw new WebApplicationException("Negative offset: "+offset, 400);
+        }
+
+        if(limit < 1){
+            throw new WebApplicationException("Limit should be at least 1: "+limit, 400);
+        }
+
+        int maxFromDb = 50;
+
+        List<SpecifyingCategory> list = categoryEJB.getAllSpecifyingCategoriesForSubCategory(id, maxFromDb);
+
+        if(offset != 0 && offset >=  list.size()){
+            throw new WebApplicationException("Offset "+ offset + " out of bound "+ list.size(), 400);
+        }
+
+        ListDTO<SpecifyingCategoryDTO> listDTO = SpecifyingCategoryConverter.transform(list, offset, limit);
+
+        UriBuilder builder = uriInfo.getBaseUriBuilder()
+                .path("/quiz/subcategories/" + id + "/specifying-categories")
+                .queryParam("limit", limit);
+
+        listDTO._links.self = new HalLink(builder.clone()
+                .queryParam("offset", offset)
+                .build().toString()
+        );
+
+        if (!list.isEmpty() && offset > 0) {
+            listDTO._links.previous = new HalLink(builder.clone()
+                    .queryParam("offset", Math.max(offset - limit, 0))
+                    .build().toString()
+            );
+        }
+        if (offset + limit < list.size()) {
+            listDTO._links.next = new HalLink(builder.clone()
+                    .queryParam("offset", offset + limit)
+                    .build().toString()
+            );
+        }
+
+        return listDTO;
     }
 
     @Override
@@ -700,7 +792,7 @@ public class QuizRestImpl implements QuizRestApi {
         ListDTO<QuizDTO> listDTO = QuizConverter.transform(list, offset, limit);
 
         UriBuilder builder = uriInfo.getBaseUriBuilder()
-                .path("/quiz/quizzes")
+                .path("/quiz/quizzes/parent/" + id)
                 .queryParam("limit", limit);
 
         listDTO._links.self = new HalLink(builder.clone()

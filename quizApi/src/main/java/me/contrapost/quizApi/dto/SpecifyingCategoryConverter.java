@@ -1,6 +1,7 @@
 package me.contrapost.quizApi.dto;
 
 import me.contrapost.jee_quiz.entity.SpecifyingCategory;
+import me.contrapost.quizApi.dto.collection.ListDTO;
 
 import java.util.List;
 import java.util.Objects;
@@ -24,11 +25,25 @@ public class SpecifyingCategoryConverter {
         return dto;
     }
 
-    public static List<SpecifyingCategoryDTO> transform(List<SpecifyingCategory> specifyingCategories){
-        Objects.requireNonNull(specifyingCategories);
+    public static ListDTO<SpecifyingCategoryDTO> transform(List<SpecifyingCategory> specifyingCategories, int offset,
+                                                           int limit){
+        List<SpecifyingCategoryDTO> dtoList = null;
+        if(specifyingCategories != null){
+            dtoList = specifyingCategories.stream()
+                    .skip(offset) // this is a good example of how streams simplify coding
+                    .limit(limit)
+                    .map(SpecifyingCategoryConverter::transform)
+                    .collect(Collectors.toList());
+        }
 
-        return specifyingCategories.stream()
-                .map(SpecifyingCategoryConverter::transform)
-                .collect(Collectors.toList());
+        ListDTO<SpecifyingCategoryDTO> dto = new ListDTO<>();
+        dto.list = dtoList;
+        dto._links = new ListDTO.ListLinks();
+        dto.rangeMin = offset;
+        assert dtoList != null;
+        dto.rangeMax = dto.rangeMin + dtoList.size() - 1;
+        dto.totalSize = specifyingCategories.size();
+
+        return dto;
     }
 }
