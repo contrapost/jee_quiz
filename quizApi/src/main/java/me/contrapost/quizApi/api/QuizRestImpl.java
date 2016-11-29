@@ -885,7 +885,7 @@ public class QuizRestImpl implements QuizRestApi {
     }
 
     @Override
-    public List<Long> getRandomQuizzes(@ApiParam("Number of quizzes")
+    public IdsDTO getRandomQuizzes(@ApiParam("Number of quizzes")
                                                    String limit,
                                      @ApiParam("Filter: x_id where x can be \"r\" for root category, " +
                                      "\"s\" for subcategory and \"sp\" for specifying category")
@@ -908,7 +908,9 @@ public class QuizRestImpl implements QuizRestApi {
 
         String[] parts;
 
-        List<Long> quizIds;
+        IdsDTO idsDTOs = new IdsDTO();
+        idsDTOs.ids = new ArrayList<>();
+        ArrayList<Long> quizIds;
 
         if (!Strings.isNullOrEmpty(filter)) {
             parts = filter.split("_");
@@ -923,47 +925,50 @@ public class QuizRestImpl implements QuizRestApi {
                 case "r":
                     Long rootCategoryId = getAsNumber(parts[1]);
 
-                    quizIds = categoryEJB.getRandomQuizzesFromRootCategory(rootCategoryId, numberOfQuizzes);
+                    quizIds = new ArrayList<>(categoryEJB.getRandomQuizzesFromRootCategory(rootCategoryId, numberOfQuizzes));
 
                     if(quizIds.size() < numberOfQuizzes) {
                         throw new WebApplicationException("There are not enough quizzes.", 404);
                     }
 
-                    return quizIds;
+                    idsDTOs.ids.addAll(quizIds);
+                    return idsDTOs;
                 case "s":
                     Long subcategoryId = getAsNumber(parts[1]);
 
-                    quizIds = categoryEJB.getRandomQuizzesFromSubCategory(subcategoryId, numberOfQuizzes);
+                    quizIds = new ArrayList<>(categoryEJB.getRandomQuizzesFromSubCategory(subcategoryId, numberOfQuizzes));
 
                     if(quizIds.size() < numberOfQuizzes) {
                         throw new WebApplicationException("There are not enough quizzes.", 404);
                     }
 
-                    return quizIds;
+                    idsDTOs.ids.addAll(quizIds);
+                    return idsDTOs;
                 case "sp":
                     Long specifyingCategoryId = getAsNumber(parts[1]);
 
-                    quizIds = categoryEJB.getRandomQuizzesFromSpecifyingCategory(specifyingCategoryId, numberOfQuizzes);
+                    quizIds = new ArrayList<>(categoryEJB.getRandomQuizzesFromSpecifyingCategory(specifyingCategoryId, numberOfQuizzes));
 
                     if(quizIds.size() < numberOfQuizzes) {
                         throw new WebApplicationException("There are not enough quizzes.", 404);
                     }
 
-                    return quizIds;
+                    idsDTOs.ids.addAll(quizIds);
+                    return idsDTOs;
                 default:
                     throw new WebApplicationException("Filter value has incorrect format", 404);
             }
         }
 
-        quizIds = quizEJB.getRandomQuizzes(numberOfQuizzes);
+        quizIds = new ArrayList<>(quizEJB.getRandomQuizzes(numberOfQuizzes));
 
         if(quizIds.size() < numberOfQuizzes) {
             throw new WebApplicationException("There are not enough quizzes.", 404);
         }
 
-        return quizIds;
+        idsDTOs.ids.addAll(quizIds);
+        return idsDTOs;
     }
-
 
     //endregion
 

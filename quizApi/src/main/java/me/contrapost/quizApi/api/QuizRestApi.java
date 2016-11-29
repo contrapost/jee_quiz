@@ -10,7 +10,6 @@ import javax.ejb.TransactionAttributeType;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.List;
 
 /**
  * Created by alexandershipunov on 30/10/2016.
@@ -374,7 +373,7 @@ public interface QuizRestApi {
             "depending on filter")
     @POST
     @Path(("/randomQuizzes"))
-    List<Long> getRandomQuizzes(
+    IdsDTO getRandomQuizzes(
             @ApiParam("Number of quizzes")
             @QueryParam("limit")
                     String limit,

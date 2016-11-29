@@ -933,36 +933,40 @@ public class QuizRestIT extends QuizRestTestBase {
         post("/randomQuizzes")
                 .then()
                 .statusCode(200)
-                .body("size()", is(5));
+                .body("ids.size()", is(5));
 
-        String ids[] = post("/randomQuizzes")
+        IdsDTO ids = post("/randomQuizzes")
                 .then()
                 .statusCode(200)
-                .extract().as(String[].class);
+                .extract().as(IdsDTO.class);
 
-        List<String> quizIds = Arrays.asList(quizId1, quizId2, quizId3, quizId4, quizId5);
+        List<Long> quizIds = Arrays.asList(Long.parseLong(quizId1),
+                                            Long.parseLong(quizId2),
+                                            Long.parseLong(quizId3),
+                                            Long.parseLong(quizId4),
+                                            Long.parseLong(quizId5));
 
-        assertTrue(quizIds.containsAll(Arrays.asList(ids)));
+        assertTrue(quizIds.containsAll(ids.ids));
 
         given().queryParam("limit", 3)
                 .post("/randomQuizzes")
                 .then()
                 .statusCode(200)
-                .body("size()", is(3));
+                .body("ids.size()", is(3));
 
         given().queryParam("filter", "r_" + rootId)
                 .post("/randomQuizzes")
                 .then()
                 .statusCode(200)
-                .body("size()", is(5));
+                .body("ids.size()", is(5));
 
         ids = given().queryParam("filter", "r_" + rootId)
                 .post("/randomQuizzes")
                 .then()
                 .statusCode(200)
-                .extract().as(String[].class);
+                .extract().as(IdsDTO.class);
 
-        assertTrue(quizIds.containsAll(Arrays.asList(ids)));
+        assertTrue(quizIds.containsAll(ids.ids));
 
         given().queryParam("limit", 3)
                 .and()
@@ -970,7 +974,7 @@ public class QuizRestIT extends QuizRestTestBase {
                 .post("/randomQuizzes")
                 .then()
                 .statusCode(200)
-                .body("size()", is(3));
+                .body("ids.size()", is(3));
 
         given().queryParam("limit", 2)
                 .and()
@@ -978,7 +982,7 @@ public class QuizRestIT extends QuizRestTestBase {
                 .post("/randomQuizzes")
                 .then()
                 .statusCode(200)
-                .body("size()", is(2));
+                .body("ids.size()", is(2));
 
         given().queryParam("limit", 1)
                 .and()
@@ -986,7 +990,7 @@ public class QuizRestIT extends QuizRestTestBase {
                 .post("/randomQuizzes")
                 .then()
                 .statusCode(200)
-                .body("size()", is(1));
+                .body("ids.size()", is(1));
     }
 
     //endregion
