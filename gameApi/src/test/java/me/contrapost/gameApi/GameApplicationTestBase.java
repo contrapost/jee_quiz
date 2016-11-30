@@ -5,6 +5,7 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.common.ConsoleNotifier;
 import io.restassured.RestAssured;
 import me.contrapost.gameApi.api.Formats;
+import me.contrapost.gameApi.dto.AnswerCheckDTO;
 import me.contrapost.gameApi.dto.collection.ListDTO;
 import org.junit.*;
 
@@ -13,7 +14,8 @@ import java.util.Map;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
-import static io.restassured.RestAssured.given;
+import static io.restassured.RestAssured.*;
+import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.core.Is.is;
 
 /**
@@ -86,18 +88,8 @@ public class GameApplicationTestBase {
     @Test
     public void testCreateAndGetGame() throws UnsupportedEncodingException {
 
-        String json = "{\"ids\":[1, 2, 3, 4, 5]}";
-
-        wireMockServer.stubFor( //prepare a stubbed response for the given request
-                WireMock.post(
-                        urlMatching(".*quiz/randomQuizzes.*"))
-                        .withQueryParam("limit", WireMock.matching("5"))
-                        .withQueryParam("filter", WireMock.matching("sp_1"))
-                        // define the mocked response of the GET
-                        .willReturn(WireMock.aResponse()
-                                .withHeader("Content-Type", "application/json; charset=utf-8")
-                                .withHeader("Content-Length", "" + json.getBytes("utf-8").length)
-                                .withBody(json)));
+        String jsonWithQuizIds = "{\"ids\":[1, 2, 3, 4, 5]}";
+        int limit = 5;
 
         given().contentType(Formats.JSON_V1)
                 .get()
@@ -105,18 +97,96 @@ public class GameApplicationTestBase {
                 .statusCode(200)
                 .body("list.size", is(0));
 
-        given().queryParam("limit", 5)
-                .post()
+        String id = createGame(jsonWithQuizIds, limit);
+
+        given().contentType(Formats.JSON_V1)
+                .get("/" + id)
                 .then()
-                .statusCode(200);
+                .statusCode(200)
+                .body("id", is(id))
+                .body("numberOfQuestions", is(limit));
     }
 
     @Test
-    public void testGetAllActiveGames() {
+    public void testGetAllActiveGames() throws UnsupportedEncodingException {
+        String jsonWithQuizIds = "{\"ids\":[1, 2, 3, 4, 5]}";
+        int limit = 5;
+
+        createGame(jsonWithQuizIds, limit);
+        createGame(jsonWithQuizIds, limit);
+        createGame(jsonWithQuizIds, limit);
+        createGame(jsonWithQuizIds, limit);
+        createGame(jsonWithQuizIds, limit);
+
         given().contentType(Formats.JSON_V1)
                 .get()
                 .then()
                 .statusCode(200)
-                .body("list.size", is(0));
+                .body("list.size", is(5));
+    }
+
+    @Test
+    public void testDeleteAGame() throws UnsupportedEncodingException {
+        String jsonWithQuizIds = "{\"ids\":[1, 2, 3, 4, 5]}";
+        int limit = 5;
+
+        get().then().statusCode(200).body("list.size", is(0));
+
+        String id = createGame(jsonWithQuizIds, limit);
+
+        given().contentType(Formats.JSON_V1)
+                .get("/" + id)
+                .then()
+                .statusCode(200)
+                .body("id", is(id))
+                .body("numberOfQuestions", is(limit));
+
+        delete("/" + id);
+
+        get().then().statusCode(200).body("list.size", is(0));
+    }
+
+    @Test
+    public void testAnswerQuestion() throws UnsupportedEncodingException {
+        String jsonWithQuizIds = "{\"ids\":[1, 2, 3, 4, 5]}";
+        int limit = 5;
+        String jsonAnswer = "{ \"isCorrect\": true}";
+
+        wireMockServer.stubFor(
+                WireMock.get(
+                        urlMatching(".*quiz/answer-check.*"))
+                        .withQueryParam("id", WireMock.matching("\\d+"))
+                        .withQueryParam("answer", WireMock.matching(".+"))
+                        .willReturn(WireMock.aResponse()
+                                .withHeader("Content-Type", "application/json; charset=utf-8")
+                                .withHeader("Content-Length", "" + jsonAnswer.getBytes("utf-8").length)
+                                .withBody(jsonAnswer)));
+
+        String gameId = createGame(jsonWithQuizIds, limit);
+
+       AnswerCheckDTO answer = given().contentType(Formats.JSON_V1).queryParam("answer", "correct_answer")
+                .post("/" + gameId)
+                .then()
+                .statusCode(200).extract().as(AnswerCheckDTO.class);
+
+         assertTrue(answer.isCorrect);
+    }
+
+    private String createGame(String jsonWithQuizIds, int limit) throws UnsupportedEncodingException {
+
+        wireMockServer.stubFor(
+                WireMock.post(
+                        urlMatching(".*randomQuizzes.*"))
+                        .withQueryParam("limit", WireMock.matching("\\d+"))
+                        .withQueryParam("filter", WireMock.matching("sp_" + "\\d+"))
+                        .willReturn(WireMock.aResponse()
+                                .withHeader("Content-Type", "application/json; charset=utf-8")
+                                .withHeader("Content-Length", "" + jsonWithQuizIds.getBytes("utf-8").length)
+                                .withBody(jsonWithQuizIds)));
+
+        return given().queryParam("limit", limit)
+                .post()
+                .then()
+                .statusCode(200).extract().asString();
     }
 }

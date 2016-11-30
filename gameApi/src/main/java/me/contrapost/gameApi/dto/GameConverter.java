@@ -28,7 +28,7 @@ public class GameConverter {
         if(!entity.isActive()){
             dto.currentQuizURI = "not applicable";
         } else {
-            dto.currentQuizURI = URIs.QUIZ_ROOT_URI + entity.getQuizzesIds().get(entity.getAnswersCounter());
+            dto.currentQuizURI = URIs.QUIZ_ROOT_URI + "quizzes/" + entity.getQuizzesIds().get(entity.getAnswersCounter());
         }
 
         return dto;

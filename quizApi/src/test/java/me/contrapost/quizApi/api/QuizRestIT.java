@@ -548,27 +548,27 @@ public class QuizRestIT extends QuizRestTestBase {
 
         String id = createQuiz(createSpecifyingCategory(createSubCategory(createRootCategory(), "Sub"), "Spec"), question, answerMap);
 
-        String isCorrect = given().queryParam("id", id)
+        AnswerCheckDTO answerDTO = given().queryParam("id", id)
                 .and()
                 .queryParam("answer", "Correct answer")
                 .get("answer-check")
                 .then()
                 .statusCode(200)
                 .extract()
-                .asString();
+                .as(AnswerCheckDTO.class);
 
-        assertEquals("true", isCorrect);
+        assertTrue(answerDTO.isCorrect);
 
-        String isWrong = given().queryParam("id", id)
+        AnswerCheckDTO wrongAnswerDTO = given().queryParam("id", id)
                 .and()
                 .queryParam("answer", "Wrong answer #1")
                 .get("answer-check")
                 .then()
                 .statusCode(200)
                 .extract()
-                .asString();
+                .as(AnswerCheckDTO.class);
 
-        assertEquals(isWrong, "false");
+        assertFalse(wrongAnswerDTO.isCorrect);
     }
 
     @Test

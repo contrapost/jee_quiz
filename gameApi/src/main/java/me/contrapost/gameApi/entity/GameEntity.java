@@ -58,7 +58,7 @@ public class GameEntity {
     }
 
     public boolean isActive() {
-        return quizzesIds.size() == answersCounter;
+        return quizzesIds.size() != answersCounter;
     }
 
     public void setActive(boolean active) {

@@ -37,6 +37,7 @@ public interface GameRestApi {
     Response createGame(
             @ApiParam("Optional parameter specifying number of quizzes in the game. Default value is 5 if absent")
             @QueryParam("limit")
+                    @DefaultValue("5")
                     String limit);
 
     @ApiOperation("Get a game specified by id")

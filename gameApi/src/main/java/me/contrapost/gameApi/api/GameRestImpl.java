@@ -113,7 +113,6 @@ public class GameRestImpl implements GameRestApi {
 
         List<Long> quizzesIds = result.ids;
 
-
         GameEntity ge = new GameEntity();
         ge.setQuizzesIds(quizzesIds);
         ge.setActive(true);
@@ -140,20 +139,22 @@ public class GameRestImpl implements GameRestApi {
                                                   @ApiParam("Answer")
                                                           String answer) {
 
+        GameEntity ge = em.find(GameEntity.class, id);
+
+        Long currentQuizId = ge.getQuizzesIds().get(ge.getAnswersCounter());
+
         URI uri = UriBuilder
-                .fromUri(quizApiWebAddress + "/answer-check")
-                .queryParam("id", id)
-                .queryParam("answer", answer)
+                .fromUri("http://" + quizApiWebAddress + "/quiz/answer-check/?id=" + currentQuizId + "&answer=" + answer)
                 .build();
 
         Client client = ClientBuilder.newClient();
         Response response = client.target(uri).request("application/json").get();
 
-        Boolean result = response.readEntity(Boolean.class);
+        AnswerCheckDTO result = response.readEntity(AnswerCheckDTO.class);
 
-        updateGameStatus(id, result);
+        updateGameStatus(id, result.isCorrect);
 
-        return new AnswerCheckDTO(result);
+        return result;
     }
 
     private void updateGameStatus(Long id, boolean isCorrect) {

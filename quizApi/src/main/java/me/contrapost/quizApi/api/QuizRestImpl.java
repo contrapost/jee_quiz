@@ -559,8 +559,10 @@ public class QuizRestImpl implements QuizRestApi {
     }
 
     @Override
-    public boolean checkAnswer(@ApiParam(Params.QUIZ_ID_PARAM) Long id, @ApiParam("Answer to check") String answer) {
-        return quizEJB.getQuiz(id).getAnswerMap().get(answer);
+    public AnswerCheckDTO checkAnswer(@ApiParam(Params.QUIZ_ID_PARAM) Long id, @ApiParam("Answer to check") String answer) {
+        AnswerCheckDTO answerCheckDTO = new AnswerCheckDTO();
+        answerCheckDTO.isCorrect = quizEJB.getQuiz(id).getAnswerMap().get(answer);
+        return answerCheckDTO;
     }
 
     @Override

@@ -5,5 +5,5 @@ package me.contrapost.gameApi.api;
  * contains URIs used in game API
  */
 public interface URIs {
-    String QUIZ_ROOT_URI = "SOME URI TO QUIZ API";
+    String QUIZ_ROOT_URI = "quizApi.com/quiz/api/";
 }

@@ -252,7 +252,7 @@ public interface QuizRestApi {
     @ApiOperation("Check if the answer is correct")
     @GET
     @Path("/answer-check")
-    boolean checkAnswer(
+    AnswerCheckDTO checkAnswer(
             @ApiParam(Params.QUIZ_ID_PARAM)
             @QueryParam("id")
                     Long id,
