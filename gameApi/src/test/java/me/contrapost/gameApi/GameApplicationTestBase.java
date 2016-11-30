@@ -15,6 +15,7 @@ import java.util.Map;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static io.restassured.RestAssured.*;
+import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.core.Is.is;
 
@@ -51,14 +52,8 @@ public class GameApplicationTestBase {
 
         int total = Integer.MAX_VALUE;
 
-        /*
-            as the REST API does not return the whole state of the database (even,
-            if I use an infinite "limit") I need to keep doing queries until the totalSize is 0
-         */
-
         while (total > 0) {
 
-            //seems there are some limitations when handling generics
             ListDTO<?> listDto = given()
                     .queryParam("limit", Integer.MAX_VALUE)
                     .get()
@@ -68,7 +63,6 @@ public class GameApplicationTestBase {
                     .as(ListDTO.class);
 
             listDto.list.stream()
-                    //the "NewsDto" get unmarshalled into a map of fields
                     .map(n -> ((Map) n).get("id"))
                     .forEach(id ->
                             given().delete("/" + id)
@@ -150,26 +144,71 @@ public class GameApplicationTestBase {
     public void testAnswerQuestion() throws UnsupportedEncodingException {
         String jsonWithQuizIds = "{\"ids\":[1, 2, 3, 4, 5]}";
         int limit = 5;
-        String jsonAnswer = "{ \"isCorrect\": true}";
 
-        wireMockServer.stubFor(
-                WireMock.get(
-                        urlMatching(".*quiz/answer-check.*"))
-                        .withQueryParam("id", WireMock.matching("\\d+"))
-                        .withQueryParam("answer", WireMock.matching(".+"))
-                        .willReturn(WireMock.aResponse()
-                                .withHeader("Content-Type", "application/json; charset=utf-8")
-                                .withHeader("Content-Length", "" + jsonAnswer.getBytes("utf-8").length)
-                                .withBody(jsonAnswer)));
+        stubCorrectAnswer();
 
         String gameId = createGame(jsonWithQuizIds, limit);
 
-       AnswerCheckDTO answer = given().contentType(Formats.JSON_V1).queryParam("answer", "correct_answer")
+        get().then().statusCode(200).body("list.size", is(1));
+
+        AnswerCheckDTO answer = given().contentType(Formats.JSON_V1).queryParam("answer", "correct_answer")
                 .post("/" + gameId)
                 .then()
                 .statusCode(200).extract().as(AnswerCheckDTO.class);
 
-         assertTrue(answer.isCorrect);
+        assertTrue(answer.isCorrect);
+
+        get("/" + gameId).then()
+                .statusCode(200)
+                .body("id", is(gameId))
+                .body("numberOfQuestions", is(limit))
+                .body("answersCounter", is(1));
+
+        stubWrongAnswer();
+
+        AnswerCheckDTO answer2 = given().contentType(Formats.JSON_V1).queryParam("answer", "correct_answer")
+                .post("/" + gameId)
+                .then()
+                .statusCode(200).extract().as(AnswerCheckDTO.class);
+
+        assertFalse(answer2.isCorrect);
+
+        get().then().statusCode(200).body("list.size", is(0));
+    }
+
+    @Test
+    public void testWinGame() throws UnsupportedEncodingException {
+        String jsonWithQuizIds = "{\"ids\":[1, 2, 3, 4, 5]}";
+        int limit = 5;
+        String gameId = createGame(jsonWithQuizIds, limit);
+
+        stubCorrectAnswer();
+
+        get("/" + gameId).then()
+                .statusCode(200)
+                .body("id", is(gameId))
+                .body("numberOfQuestions", is(limit))
+                .body("answersCounter", is(0));
+
+        for(int i = 1; i < limit; i++) {
+            given().contentType(Formats.JSON_V1).queryParam("answer", "some_answer")
+                    .post("/" + gameId)
+                    .then()
+                    .statusCode(200).extract().as(AnswerCheckDTO.class);
+        }
+
+        get("/" + gameId).then()
+                .statusCode(200)
+                .body("id", is(gameId))
+                .body("numberOfQuestions", is(limit))
+                .body("answersCounter", is(4));
+
+        given().contentType(Formats.JSON_V1).queryParam("answer", "some_answer")
+                .post("/" + gameId)
+                .then()
+                .statusCode(200).extract().as(AnswerCheckDTO.class);
+
+        get().then().statusCode(200).body("list.size", is(0));
     }
 
     private String createGame(String jsonWithQuizIds, int limit) throws UnsupportedEncodingException {
@@ -188,5 +227,25 @@ public class GameApplicationTestBase {
                 .post()
                 .then()
                 .statusCode(200).extract().asString();
+    }
+
+    private void stubWrongAnswer() throws UnsupportedEncodingException {
+        stubAnswer("{ \"isCorrect\": false}");
+    }
+
+    private void stubCorrectAnswer() throws UnsupportedEncodingException {
+        stubAnswer("{ \"isCorrect\": true}");
+    }
+
+    private void stubAnswer(String answer) throws UnsupportedEncodingException {
+        wireMockServer.stubFor(
+                WireMock.get(
+                        urlMatching(".*quiz/answer-check.*"))
+                        .withQueryParam("id", WireMock.matching("\\d+"))
+                        .withQueryParam("answer", WireMock.matching(".+"))
+                        .willReturn(WireMock.aResponse()
+                                .withHeader("Content-Type", "application/json; charset=utf-8")
+                                .withHeader("Content-Length", "" + answer.getBytes("utf-8").length)
+                                .withBody(answer)));
     }
 }

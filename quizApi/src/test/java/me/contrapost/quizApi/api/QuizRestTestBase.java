@@ -61,15 +61,5 @@ public class QuizRestTestBase {
 
             total = listDto.totalSize - listDto.list.size();
         }
-
-        /*List<RootCategoryDTO> list = Arrays.asList(given().accept(ContentType.JSON).get("/categories")
-                .then()
-                .statusCode(200)
-                .extract().as(RootCategoryDTO[].class));
-
-        list.forEach(dto ->
-                given().pathParam("id", dto.id).delete("categories/id/{id}").then().statusCode(204));
-
-        get("/categories").then().statusCode(200).body("size()", is(0));*/
     }
 }
