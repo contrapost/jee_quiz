@@ -2,7 +2,6 @@ package me.contrapost.gameApi;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -16,7 +15,6 @@ import static org.junit.Assert.assertTrue;
  * Created by alexandershipunov on 21/11/2016.
  *
  */
-@Ignore
 public class GameApplicationIT extends GameApplicationTestBase{
 
     private static Process process;
@@ -32,7 +30,7 @@ public class GameApplicationIT extends GameApplicationTestBase{
             throw new AssertionError("Jar file was not created at: " + jarLocation);
         }
 
-        String[] command = new String[]{"java", "-jar", jarLocation, "server"};
+        String[] command = new String[]{"java", "-DquizApiAddress=localhost:8099", "-jar", jarLocation, "server"};
 
         process = new ProcessBuilder().command(command).start();
 
