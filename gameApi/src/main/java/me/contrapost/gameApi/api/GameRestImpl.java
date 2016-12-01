@@ -1,5 +1,7 @@
 package me.contrapost.gameApi.api;
 
+import com.netflix.hystrix.HystrixCommand;
+import com.netflix.hystrix.HystrixCommandGroupKey;
 import io.swagger.annotations.ApiParam;
 import me.contrapost.gameApi.dto.AnswerCheckDTO;
 import me.contrapost.gameApi.dto.GameConverter;
@@ -100,14 +102,10 @@ public class GameRestImpl implements GameRestApi {
 
         long specifyingCategoryId = 1; //TODO
 
-        URI specCategoryURI = UriBuilder
-                .fromUri("http://" + quizApiWebAddress + "/quiz/randomQuizzes?limit=" +
-                        limit  +"&filter=sp_" + specifyingCategoryId)
-                .build();
+        String address = "http://" + quizApiWebAddress + "/quiz/randomQuizzes?limit=" +
+                limit  +"&filter=sp_" + specifyingCategoryId;
 
-        Client client = ClientBuilder.newClient();
-        Response response = client.target(specCategoryURI).request("application/json").post(null);
-
+        Response response = new CallGameApi(address, Request.CREATE_GAME).execute();
 
         IdsDTO result = response.readEntity(IdsDTO.class);
 
@@ -143,12 +141,9 @@ public class GameRestImpl implements GameRestApi {
 
         Long currentQuizId = ge.getQuizzesIds().get(ge.getAnswersCounter());
 
-        URI uri = UriBuilder
-                .fromUri("http://" + quizApiWebAddress + "/quiz/answer-check/?id=" + currentQuizId + "&answer=" + answer)
-                .build();
+        String address = "http://" + quizApiWebAddress + "/quiz/answer-check/?id=" + currentQuizId + "&answer=" + answer;
 
-        Client client = ClientBuilder.newClient();
-        Response response = client.target(uri).request("application/json").get();
+        Response response = new CallGameApi(address, Request.CHECK_ANSWER).execute();
 
         AnswerCheckDTO result = response.readEntity(AnswerCheckDTO.class);
 
@@ -179,5 +174,48 @@ public class GameRestImpl implements GameRestApi {
         em.getTransaction().begin();
         em.remove(ge);
         em.getTransaction().commit();
+    }
+
+    private class CallGameApi extends HystrixCommand<Response> {
+
+        private final String address;
+        private final Request request;
+
+        @SuppressWarnings("WeakerAccess")
+        protected CallGameApi(String address, Request request) {
+            super(HystrixCommandGroupKey.Factory.asKey("Interactions with QuizApi"));
+            this.address = address;
+            this.request = request;
+        }
+
+        @Override
+        protected Response run() throws Exception {
+
+            URI uri = UriBuilder
+                    .fromUri(address)
+                    .build();
+            Client client = ClientBuilder.newClient();
+
+            Response response = null;
+            switch (request) {
+                case CREATE_GAME:
+                    response = client.target(uri)
+                            .request("application/json")
+                            .post(null);
+                    break;
+                case CHECK_ANSWER:
+                    response = client.target(uri)
+                            .request("application/json")
+                            .get();
+                    break;
+            }
+            return response;
+        }
+
+        @Override
+        protected Response getFallback() {
+            //this is what is returned in case of exceptions or timeouts
+            return null;
+        }
     }
 }

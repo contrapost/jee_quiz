@@ -211,6 +211,19 @@ public class GameApplicationTestBase {
         get().then().statusCode(200).body("list.size", is(0));
     }
 
+    @Test
+    public void testReturnNullIfWaitingTooLong() {
+        stubGameWithDelay(2500);
+
+        try {
+            given().post()
+                    .then()
+                    .statusCode(200);
+        } catch (Exception ex) {
+            assertTrue(ex instanceof NullPointerException);
+        }
+    }
+
     private String createGame(String jsonWithQuizIds, int limit) throws UnsupportedEncodingException {
 
         wireMockServer.stubFor(
@@ -247,5 +260,15 @@ public class GameApplicationTestBase {
                                 .withHeader("Content-Type", "application/json; charset=utf-8")
                                 .withHeader("Content-Length", "" + answer.getBytes("utf-8").length)
                                 .withBody(answer)));
+    }
+
+    @SuppressWarnings("SameParameterValue")
+    private void stubGameWithDelay(int delay) {
+        WireMock.post(
+                urlMatching(".*randomQuizzes.*"))
+                .withQueryParam("limit", WireMock.matching("\\d+"))
+                .withQueryParam("filter", WireMock.matching("sp_" + "\\d+"))
+                .willReturn(WireMock.aResponse()
+                        .withFixedDelay(delay));
     }
 }

@@ -14,10 +14,6 @@
 
     <dependencies>
 
-        <!--
-            Make sure that the "provided" dependencies of "news"
-            module are marked as "compile" here
-          -->
         <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-api</artifactId>
@@ -39,6 +35,14 @@
             <scope>compile</scope>
         </dependency>
 
+        <dependency>
+            <groupId>com.netflix.hystrix</groupId>
+            <artifactId>hystrix-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.reactivex</groupId>
+            <artifactId>rxjava</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>junit</groupId>
