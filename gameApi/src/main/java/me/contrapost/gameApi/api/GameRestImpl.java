@@ -69,7 +69,7 @@ public class GameRestImpl implements GameRestApi {
         ListDTO<GameDTO> listDTO = GameConverter.transform(list, offset, limit);
 
         UriBuilder builder = uriInfo.getBaseUriBuilder()
-                .path("/quiz/subcategories")
+                .path("")
                 .queryParam("limit", limit);
 
         listDTO._links.self = new HalLink(builder.clone()
